@@ -1,0 +1,42 @@
+{
+	"name": "@versatiles/render",
+	"version": "0.0.1",
+	"description": "Renders vector tiles",
+	"bin": {},
+	"prefix": "./",
+	"files": [
+		"dist/**/*.js",
+		"dist/**/*.d.ts"
+	],
+	"scripts": {
+		"build": "npm run build-browser && npm run build-node",
+		"build-browser": "rollup -c=rollup.config.js",
+		"build-node": "rm -rf dist && tsc -p tsconfig.node.json",
+		"check": "npm run lint && npm run test && npm run build",
+		"doc": "npx vrt cmd2md versatiles-render | npx vrt insertmd README.md '## Options'",
+		"lint": "eslint . --color",
+		"test": "cd ..; NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern versatiles-render"
+	},
+	"type": "module",
+	"author": "Michael Kreil <versatiles@michael-kreil.de>",
+	"license": "Unlicense",
+	"engines": {
+		"node": ">= 18"
+	},
+	"dependencies": {
+		"@types/color": "^3.0.6",
+		"@types/mapbox-gl": "^2.7.18",
+		"@versatiles/container": "^1.0.2",
+		"brace-expansion": "^3.0.0",
+		"color": "^4.2.3",
+		"commander": "^11.1.0"
+	},
+	"devDependencies": {
+		"@types/node": "^20.9.0",
+		"@typescript-eslint/eslint-plugin": "^6.10.0",
+		"@typescript-eslint/parser": "^6.10.0",
+		"eslint": "^8.53.0",
+		"tsx": "^4.1.1",
+		"typescript": "^5.2.2"
+	}
+}
