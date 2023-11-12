@@ -240,7 +240,7 @@ export default [
 			'@typescript-eslint/space-before-function-paren': ['error', { 'anonymous': 'always', 'named': 'never', 'asyncArrow': 'always' }],
 
 			'no-use-before-define': 'off',
-			'@typescript-eslint/no-use-before-define': ['error', { 'functions': false }],
+			'@typescript-eslint/no-use-before-define': ['error', { 'functions': false, 'classes': false }],
 
 			'@typescript-eslint/prefer-readonly-parameter-types': 'off',
 

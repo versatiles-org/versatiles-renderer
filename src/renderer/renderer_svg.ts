@@ -1,7 +1,8 @@
-import type { Polygon, Polyline, PixelCoordinate } from '../lib/geometry.js';
+import type { Polygon, Polyline, Point } from '../lib/geometry.js';
 import { Color } from './color.js';
 import { Renderer } from './renderer.js';
 import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle } from './styles.js';
+import type { RendererOptions } from '../types.js';
 
 export class SVGRenderer extends Renderer {
 	readonly #svg: string[];
@@ -10,7 +11,7 @@ export class SVGRenderer extends Renderer {
 
 	#backgroundColor: Color;
 
-	public constructor(opt: { width: number; height: number; scale: number }) {
+	public constructor(opt: RendererOptions) {
 		super(opt);
 		this.#svg = [];
 		this.#scale = opt.scale;
@@ -55,11 +56,11 @@ export class SVGRenderer extends Renderer {
 		].join(' '));
 	}
 
-	public drawText(position: PixelCoordinate, text: string, style: TextStyle): void {
+	public drawText(position: Point, text: string, style: TextStyle): void {
 		// implement me!
 	}
 
-	public drawSymbol(position: PixelCoordinate, symbol: symbol, style: SymbolStyle): void {
+	public drawSymbol(position: Point, symbol: symbol, style: SymbolStyle): void {
 		// implement me!
 	}
 
@@ -75,7 +76,7 @@ export class SVGRenderer extends Renderer {
 		return (v * this.#scale).toFixed(3);
 	}
 
-	#roundPoint(p: PixelCoordinate): string {
+	#roundPoint(p: Point): string {
 		return (p.x * this.#scale).toFixed(3) + ',' + (p.y * this.#scale).toFixed(3);
 	}
 }

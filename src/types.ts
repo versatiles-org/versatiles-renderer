@@ -1,23 +1,22 @@
 import type { VersaTiles } from '@versatiles/container';
-import type { Style } from 'util';
 import type { RendererClass } from './renderer/renderer.js';
+import type { Style } from 'mapbox-gl';
+import type { Point } from './lib/geometry.js';
 
-interface GeoCoordinate {
-	lon: number;
-	lat: number;
-}
-
-interface Viewport {
-	width: number;
-	height: number;
-	center: GeoCoordinate;
+export interface View {
+	center: Point;
 	zoom: number;
-	scale: number;
 }
 
 export interface RenderJob {
 	container: VersaTiles;
 	style: Style;
-	viewport: Viewport;
-	rendererClass: RendererClass;
+	view: View;
+	renderer: RendererClass;
+}
+
+export interface RendererOptions {
+	width: number;
+	height: number;
+	scale: number;
 }

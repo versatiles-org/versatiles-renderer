@@ -1,6 +1,6 @@
 import type { BackgroundLayer, Expression, FillLayer, LineLayer, StyleFunction, SymbolLayer } from 'mapbox-gl';
 import { Color } from './color.js';
-import { PixelCoordinate } from '../lib/geometry.js';
+import { Point } from '../lib/geometry.js';
 
 interface StyleOptions {
 	zoom: number;
@@ -24,7 +24,7 @@ export function makeBackgroundStyle(l: BackgroundLayer, o: StyleOptions): Backgr
 export interface FillStyle {
 	color: Color;
 	opacity: number;
-	translate: PixelCoordinate;
+	translate: Point;
 	visible: boolean;
 }
 
@@ -32,7 +32,7 @@ export function makeFillStyle(l: FillLayer, o: StyleOptions): FillStyle {
 	return {
 		color: new Color(exp(l.paint?.['fill-color'], o) ?? '#000'),
 		opacity: exp(l.paint?.['fill-opacity'], o) ?? 1,
-		translate: new PixelCoordinate(...l.paint?.['fill-translate'] ?? [0, 0]),
+		translate: new Point(...l.paint?.['fill-translate'] ?? [0, 0]),
 		visible: (exp(l.layout?.visibility, o) ?? 'visible') == 'visible',
 	};
 }
@@ -49,7 +49,7 @@ export interface LineStyle {
 	offset: number;
 	opacity: number;
 	roundLimit: number;
-	translate: PixelCoordinate;
+	translate: Point;
 	visible: boolean;
 	width: number;
 }
@@ -66,7 +66,7 @@ export function makeLineStyle(l: LineLayer, o: StyleOptions): LineStyle {
 		offset: exp(l.paint?.['line-offset'], o) ?? 0,
 		opacity: exp(l.paint?.['line-opacity'] ?? 1, o),
 		roundLimit: exp(l.layout?.['line-round-limit'], o) ?? 1.05,
-		translate: new PixelCoordinate(...l.paint?.['line-translate'] ?? [0, 0]),
+		translate: new Point(...l.paint?.['line-translate'] ?? [0, 0]),
 		visible: (exp(l.layout?.visibility, o) ?? 'visible') == 'visible',
 		width: exp(l.paint?.['line-width'], o) ?? 1,
 	};

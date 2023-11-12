@@ -1,16 +1,17 @@
 import { writeFileSync } from 'fs';
-import type { PixelCoordinate, Polygon, Polyline } from '../lib/geometry.js';
+import type { Point, Polygon, Polyline } from '../lib/geometry.js';
 import type { SVGRenderer } from './renderer_svg.js';
 import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle } from './styles.js';
+import type { RendererOptions } from '../types.js';
 
 export abstract class Renderer {
-	protected readonly width: number;
+	public readonly width: number;
 
-	protected readonly height: number;
+	public readonly height: number;
 
-	protected readonly scale: number;
+	public readonly scale: number;
 
-	public constructor(opt: { width: number; height: number; scale: number }) {
+	public constructor(opt: RendererOptions) {
 		this.width = opt.width;
 		this.height = opt.height;
 		this.scale = opt.scale;
@@ -23,8 +24,8 @@ export abstract class Renderer {
 	public abstract drawBackgroundFill(style: BackgroundStyle): void;
 	public abstract drawPolygon(polygon: Polygon, style: FillStyle): void;
 	public abstract drawLineString(polyline: Polyline, style: LineStyle): void;
-	public abstract drawText(position: PixelCoordinate, text: string, style: TextStyle): void;
-	public abstract drawSymbol(position: PixelCoordinate, symbol: symbol, style: SymbolStyle): void;
+	public abstract drawText(position: Point, text: string, style: TextStyle): void;
+	public abstract drawSymbol(position: Point, symbol: symbol, style: SymbolStyle): void;
 
 	public abstract getBuffer(): Buffer;
 }
