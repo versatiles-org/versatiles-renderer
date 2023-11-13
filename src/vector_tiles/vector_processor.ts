@@ -1,23 +1,52 @@
 import { Polygon, Polyline } from '../lib/geometry.js';
 import { Point } from '../lib/geometry.js';
-import type { StyleOptions } from '../renderer/styles.js';
-import { makeBackgroundStyle, makeFillStyle } from '../renderer/styles.js';
 import type { RenderJob } from '../types.js';
 import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
-
+import { createStyleLayer } from '../../node_modules/maplibre-gl/src/style/create_style_layer.js';
+import type { StyleLayer } from '../../node_modules/maplibre-gl/src/style/style_layer.js';
+import { EvaluationParameters } from 'maplibre-gl/src/style/evaluation_parameters.js';
+import type { TransitionParameters } from 'maplibre-gl/src/style/properties.js';
 
 export async function processVectorTiles(job: RenderJob): Promise<void> {
 	const layerFeatures = await getLayerFeatures(job);
 
-
-	console.log(layerFeatures);
-
 	const { renderer } = job;
+
+	/*
 	const styleOptions: StyleOptions = {
 		zoom: job.view.zoom,
 	};
-	for (const layer of job.style.layers) {
+	*/
+
+	const evaluationParameters = new EvaluationParameters(job.view.zoom);
+	const availableImages: string[] = [];
+	const transitionParameters: TransitionParameters = {
+		now: 0,
+		transition: {},
+	};
+
+	job.style.layers.forEach(layerSpecification => {
+		console.log('Z1');
+		const styleLayer = createStyleLayer(layerSpecification);
+		console.log('Z2');
+		styleLayer.recalculate(evaluationParameters, availableImages);
+		process.exit();
+		switch (styleLayer.type) {
+			case 'background':
+				console.log(styleLayer);
+
+				//styleLayer.
+				//const styleB = makeBackgroundStyle(layer, styleOptions);
+				//renderer.drawBackgroundFill(styleB);
+				break;
+			default:
+				throw Error('styleLayer.type: ' + styleLayer.type);
+		}
+	});
+
+
+	/*
 		switch (layer.type) {
 			case 'background':
 				const styleB = makeBackgroundStyle(layer, styleOptions);
@@ -35,6 +64,7 @@ export async function processVectorTiles(job: RenderJob): Promise<void> {
 				throw Error('layer.type: ' + layer.type);
 		}
 	}
+	*/
 	//console.log({ tileCenterCoordinate, tileCols, tileRows });
 	//console.log(tileCoordinates);
 }
