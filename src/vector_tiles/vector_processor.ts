@@ -1,5 +1,7 @@
 import { Polygon, Polyline } from '../lib/geometry.js';
 import { Point } from '../lib/geometry.js';
+import type { StyleOptions } from '../renderer/styles.js';
+import { makeBackgroundStyle, makeFillStyle } from '../renderer/styles.js';
 import type { RenderJob } from '../types.js';
 import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
@@ -7,7 +9,32 @@ import Protobuf from 'pbf';
 
 export async function processVectorTiles(job: RenderJob): Promise<void> {
 	const layerFeatures = await getLayerFeatures(job);
+
+
 	console.log(layerFeatures);
+
+	const { renderer } = job;
+	const styleOptions: StyleOptions = {
+		zoom: job.view.zoom,
+	};
+	for (const layer of job.style.layers) {
+		switch (layer.type) {
+			case 'background':
+				const styleB = makeBackgroundStyle(layer, styleOptions);
+				renderer.drawBackgroundFill(styleB);
+				break;
+			case 'fill':
+				const styleF = makeFillStyle(layer, styleOptions);
+				const source: string = layer['source-layer'] ?? '';
+				const polygons: Polygon[] = layerFeatures.get(source)?.polygons ?? [];
+				for (const polygon of polygons) {
+					renderer.drawPolygon(polygon, styleF);
+				}
+				break;
+			default:
+				throw Error('layer.type: ' + layer.type);
+		}
+	}
 	//console.log({ tileCenterCoordinate, tileCols, tileRows });
 	//console.log(tileCoordinates);
 }

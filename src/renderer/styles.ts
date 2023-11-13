@@ -2,7 +2,7 @@ import type { BackgroundLayer, Expression, FillLayer, LineLayer, StyleFunction, 
 import { Color } from './color.js';
 import { Point } from '../lib/geometry.js';
 
-interface StyleOptions {
+export interface StyleOptions {
 	zoom: number;
 }
 
@@ -32,7 +32,7 @@ export function makeFillStyle(l: FillLayer, o: StyleOptions): FillStyle {
 	return {
 		color: new Color(exp(l.paint?.['fill-color'], o) ?? '#000'),
 		opacity: exp(l.paint?.['fill-opacity'], o) ?? 1,
-		translate: new Point(...l.paint?.['fill-translate'] ?? [0, 0]),
+		translate: new Point(...(l.paint?.['fill-translate'] ?? [0, 0])),
 		visible: (exp(l.layout?.visibility, o) ?? 'visible') == 'visible',
 	};
 }
@@ -106,12 +106,14 @@ export function makeSymbolStyle(l: SymbolLayer, o: StyleOptions): SymbolStyle {
 }
 
 
-function exp<I = number | string | undefined>(value: Expression | I | StyleFunction, o: StyleOptions): I {
+function exp<I = number | string | [number, number] | undefined>(value: Expression | I | StyleFunction, o: StyleOptions): I {
 	if (typeof value === 'object') {
 		console.log(o);
 		if (Array.isArray(value)) {
+			console.log(value);
 			throw Error('implement me');
 		} else {
+			console.log(value);
 			throw Error('implement me');
 		}
 	}
