@@ -1,14 +1,14 @@
 import { VersaTiles } from '@versatiles/container';
 import { SVGRenderer } from './renderer/renderer_svg.js';
-import { processVectorTiles } from './vector_tiles/vector_processor.js';
 import { readFileSync } from 'fs';
 import { Point } from './lib/geometry.js';
 import { resolve } from 'path';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
+import { renderVectorTiles } from './processor/render.js';
 
 const DIRNAME = new URL('../', import.meta.url).pathname;
 
-await processVectorTiles({
+await renderVectorTiles({
 	renderer: new SVGRenderer({ width: 1024, height: 768, scale: 1 }),
 	container: new VersaTiles(resolve(DIRNAME, '../tiles/planet-20230925.versatiles')),
 	style: JSON.parse(readFileSync(resolve(DIRNAME, 'test/colorful.json'), 'utf8')) as StyleSpecification,
