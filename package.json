@@ -9,13 +9,8 @@
 		"dist/**/*.d.ts"
 	],
 	"scripts": {
-		"build": "npm run build-browser && npm run build-node",
-		"build-browser": "rollup -c=rollup.config.js",
-		"build-node": "rm -rf dist && tsc -p tsconfig.node.json",
-		"check": "npm run lint && npm run test && npm run build",
-		"doc": "npx vrt cmd2md versatiles-render | npx vrt insertmd README.md '## Options'",
 		"lint": "eslint . --color",
-		"test": "cd ..; NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern versatiles-render"
+		"start": "tsx src/index.ts"
 	},
 	"type": "module",
 	"author": "Michael Kreil <versatiles@michael-kreil.de>",
