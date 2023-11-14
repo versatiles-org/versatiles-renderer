@@ -77,7 +77,7 @@ export class SVGRenderer extends Renderer {
 
 	public getBuffer(): Buffer {
 		return Buffer.from([
-			`<svg viewBox="0 0 ${this.width} ${this.height}" width="${this.width}" height="${this.height}" xmlns="http://www.w3.org/2000/svg" fill="${this.#backgroundColor.hex}">`,
+			`<svg viewBox="0 0 ${this.width} ${this.height}" width="${this.width}" height="${this.height}" xmlns="http://www.w3.org/2000/svg" style="background-color:${this.#backgroundColor.hex}">`,
 			...this.#svg,
 			'</svg>',
 		].join('\n'));
