@@ -10,7 +10,9 @@ npm run start
 ```
 
 Result:
+
 ![Example: rendered map view](docs/demo.svg)
+
 [Download SVG](docs/demo.svg)
 
 Currently only SVG is supported. Have a look at `src/renderer/` to add a Canvas renderer.
