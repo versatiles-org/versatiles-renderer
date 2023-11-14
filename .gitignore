@@ -1,5 +1,5 @@
 *.png
-*.svg
 *.tmp
+dist
 node_modules
 tmp
