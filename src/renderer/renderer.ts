@@ -1,5 +1,5 @@
 import { writeFileSync } from 'fs';
-import type { Point, Polygon, Polyline } from '../lib/geometry.js';
+import type { Feature, Point2D } from '../lib/geometry.js';
 import type { SVGRenderer } from './renderer_svg.js';
 import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle, RendererOptions } from '../types.js';
 
@@ -21,10 +21,10 @@ export abstract class Renderer {
 	}
 
 	public abstract drawBackgroundFill(style: BackgroundStyle): void;
-	public abstract drawPolygon(polygon: Polygon, style: FillStyle): void;
-	public abstract drawLineString(polyline: Polyline, style: LineStyle): void;
-	public abstract drawText(position: Point, text: string, style: TextStyle): void;
-	public abstract drawSymbol(position: Point, symbol: symbol, style: SymbolStyle): void;
+	public abstract drawPolygons(features: [Feature, FillStyle][], opacity: number): void;
+	public abstract drawLineStrings(features: [Feature, LineStyle][], opacity: number): void;
+	public abstract drawText(position: Point2D, text: string, style: TextStyle): void;
+	public abstract drawSymbol(position: Point2D, symbol: symbol, style: SymbolStyle): void;
 
 	public abstract getBuffer(): Buffer;
 }

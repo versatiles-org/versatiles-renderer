@@ -33,7 +33,6 @@ export interface BackgroundStyle {
 
 export interface FillStyle {
 	color: Color;
-	opacity: number;
 	translate: Point2D;
 }
 
@@ -46,7 +45,6 @@ export interface LineStyle {
 	join: 'bevel' | 'miter' | 'round';
 	miterLimit: number;
 	offset: number;
-	opacity: number;
 	roundLimit: number;
 	translate: Point2D;
 	width: number;

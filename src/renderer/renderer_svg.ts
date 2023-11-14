@@ -23,40 +23,46 @@ export class SVGRenderer extends Renderer {
 		this.#backgroundColor = color;
 	}
 
-	public drawPolygon(feature: Feature, style: FillStyle): void {
-		const path: string = feature.geometry.map(ring =>
-			ring.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p))
-				.join('') + 'z',
-		).join('');
-		this.#svg.push([
-			'<path',
-			`d="${path}"`,
-			(style.opacity === 1) ? '' : `fill-opacity="${style.opacity.toFixed(3)}"`,
-			`fill="${style.color.hex}"`,
-			style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
-			'/>',
-		].join(' '));
-	}
-
-	public drawLineString(feature: Feature, style: LineStyle): void {
-		feature.geometry.forEach(line => {
-			const path: string = line.map((p, i) =>
-				(i === 0 ? 'M' : 'L') + this.#roundPoint(p),
+	public drawPolygons(features: [Feature, FillStyle][], opacity: number): void {
+		this.#svg.push(`<g opacity="${opacity}">`);
+		features.forEach(([feature, style]) => {
+			const path: string = feature.geometry.map(ring =>
+				ring.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p))
+					.join('') + 'z',
 			).join('');
 			this.#svg.push([
 				'<path',
 				`d="${path}"`,
-				'fill="none"',
-				(style.opacity === 1) ? '' : `stroke-opacity="${style.opacity.toFixed(3)}"`,
-				`stroke="${style.color.hex}"`,
-				`stroke-width="${this.#round(style.width)}"`,
+				`fill="${style.color.hex}"`,
 				style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
-				`stroke-linecap="${style.cap}"`,
-				`stroke-linejoin="${style.join}"`,
-				`stroke-miterlimit="${style.miterLimit}"`,
 				'/>',
 			].join(' '));
 		});
+		this.#svg.push('</g>');
+	}
+
+	public drawLineStrings(features: [Feature, LineStyle][], opacity: number): void {
+		this.#svg.push(`<g opacity="${opacity}">`);
+		features.forEach(([feature, style]) => {
+			feature.geometry.forEach(line => {
+				const path: string = line.map((p, i) =>
+					(i === 0 ? 'M' : 'L') + this.#roundPoint(p),
+				).join('');
+				this.#svg.push([
+					'<path',
+					`d="${path}"`,
+					'fill="none"',
+					`stroke="${style.color.hex}"`,
+					`stroke-width="${this.#round(style.width)}"`,
+					style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
+					`stroke-linecap="${style.cap}"`,
+					`stroke-linejoin="${style.join}"`,
+					`stroke-miterlimit="${style.miterLimit}"`,
+					'/>',
+				].join(' '));
+			});
+		});
+		this.#svg.push('</g>');
 	}
 
 	public drawText(feature: Feature, text: string, style: TextStyle): void {

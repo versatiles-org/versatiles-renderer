@@ -49,15 +49,17 @@ async function render(job: RenderJob): Promise<void> {
 					const polygons = layerFeatures.get(layerStyle.sourceLayer)?.polygons;
 					if (!polygons || polygons.length === 0) return;
 					const filter = featureFilter(layerStyle.filter);
+					const polygonFeatures = polygons.filter(feature => filter.filter({ zoom }, feature));
 
-					polygons.forEach(feature => {
-						if (!filter.filter({ zoom }, feature)) return;
-						renderer.drawPolygon(feature, {
+					if (polygonFeatures.length === 0) return;
+
+					renderer.drawPolygons(
+						polygonFeatures.map(feature => [feature, {
 							color: new Color(getPaint<MaplibreColor>('fill-color', feature)),
-							opacity: getPaint<number>('fill-opacity', feature),
 							translate: new Point2D(...getPaint<[number, number]>('fill-translate', feature)),
-						});
-					});
+						}]),
+						getPaint<number>('fill-opacity', polygonFeatures[0]),
+					);
 				}
 				return;
 			case 'line':
@@ -65,13 +67,13 @@ async function render(job: RenderJob): Promise<void> {
 					const lineStrings = layerFeatures.get(layerStyle.sourceLayer)?.linestrings;
 					if (!lineStrings || lineStrings.length === 0) return;
 					const filter = featureFilter(layerStyle.filter);
+					const lineStringFeatures = lineStrings.filter(feature => filter.filter({ zoom }, feature));
 
-					lineStrings.forEach(feature => {
-						if (!filter.filter({ zoom }, feature)) return;
+					if (lineStringFeatures.length === 0) return;
 
-						renderer.drawLineString(feature, {
+					renderer.drawLineStrings(
+						lineStringFeatures.map(feature => [feature, {
 							color: new Color(getPaint<MaplibreColor>('line-color', feature)),
-							opacity: getPaint<number>('line-opacity', feature),
 							translate: new Point2D(...getPaint<[number, number]>('line-translate', feature)),
 							blur: getPaint<number>('line-blur', feature),
 							cap: getLayout<'butt' | 'round' | 'square'>('line-cap', feature),
@@ -82,8 +84,9 @@ async function render(job: RenderJob): Promise<void> {
 							offset: getPaint<number>('line-offset', feature),
 							roundLimit: getLayout<number>('line-round-limit', feature),
 							width: getPaint<number>('line-width', feature),
-						});
-					});
+						}]),
+						getPaint<number>('line-opacity', lineStringFeatures[0]),
+					);
 				}
 				return;
 			case 'symbol':
