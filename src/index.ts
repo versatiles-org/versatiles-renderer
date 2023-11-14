@@ -10,7 +10,7 @@ const DIRNAME = new URL('../', import.meta.url).pathname;
 
 await renderVectorTiles(
 	{
-		renderer: new SVGRenderer({ width: 1024, height: 768, scale: 1 }),
+		renderer: new SVGRenderer({ width: 512, height: 384, scale: 1 }),
 		container: new VersaTiles(resolve(DIRNAME, '../tiles/planet-20230925.versatiles')),
 		style: JSON.parse(readFileSync(resolve(DIRNAME, 'test/colorful.json'), 'utf8')) as StyleSpecification,
 		view: {
