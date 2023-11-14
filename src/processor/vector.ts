@@ -12,7 +12,6 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const tileCenterCoordinate = center.getProject2Pixel().scale(2 ** zoomLevel);
 
 	const tileSize = 2 ** (zoom - zoomLevel + 8);
-	console.log(tileSize);
 
 	const tileCols = width / tileSize;
 	const tileRows = height / tileSize;
