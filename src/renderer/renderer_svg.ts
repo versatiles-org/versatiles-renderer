@@ -1,8 +1,7 @@
 import type { Polygon, Polyline, Point } from '../lib/geometry.js';
-import { Color } from './color.js';
+import { Color } from '../lib/color.js';
 import { Renderer } from './renderer.js';
-import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle } from './styles.js';
-import type { RendererOptions } from '../types.js';
+import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle, RendererOptions } from '../types.js';
 
 export class SVGRenderer extends Renderer {
 	readonly #svg: string[];
@@ -19,12 +18,11 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public drawBackgroundFill(style: BackgroundStyle): void {
-		if (!style.visible) return;
+		console.log(style);
 		this.#backgroundColor = style.color;
 	}
 
 	public drawPolygon(polygon: Polygon, style: FillStyle): void {
-		if (!style.visible) return;
 		const path: string = polygon.rings.map(ring =>
 			ring.map((p, i) =>
 				(i === 0 ? 'M' : 'L') + this.#roundPoint(p),
@@ -41,7 +39,6 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public drawLineString(polyline: Polyline, style: LineStyle): void {
-		if (!style.visible) return;
 		const path: string = polyline.ring.map((p, i) =>
 			(i === 0 ? 'M' : 'L') + this.#roundPoint(p),
 		).join('');

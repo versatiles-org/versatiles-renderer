@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/max-params */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
@@ -5,7 +7,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -30,8 +31,6 @@ import type { TransitionParameters, PropertyValue, Transitioning, Properties } f
 import type { EvaluationParameters } from './evaluation_parameters.js';
 import type { CrossfadeParameters } from './evaluation_parameters.js';
 
-import type { StyleSetterOptions } from './style.ts.tmp';
-
 const TRANSITION_SUFFIX = '-transition';
 
 /**
@@ -42,39 +41,39 @@ export abstract class StyleLayer extends Evented {
 
 	metadata: unknown;
 
-	type: CustomLayerInterface['type'] | LayerSpecification['type'];
+	type: LayerSpecification['type'];
 
-	source: string;
+	source!: string;
 
-	sourceLayer: string;
+	sourceLayer!: string;
 
 	minzoom: number;
 
 	maxzoom: number;
 
-	filter: FilterSpecification | void;
+	filter!: FilterSpecification | void;
 
-	visibility: 'none' | 'visible' | void;
+	visibility!: 'none' | 'visible' | void;
 
-	_crossfadeParameters: CrossfadeParameters;
+	_crossfadeParameters!: CrossfadeParameters;
 
-	_unevaluatedLayout: Layout<any>;
+	_unevaluatedLayout!: Layout<any>;
 
 	readonly layout: unknown;
 
-	_transitionablePaint: Transitionable<any>;
+	_transitionablePaint!: Transitionable<any>;
 
-	_transitioningPaint: Transitioning<any>;
+	_transitioningPaint!: Transitioning<any>;
 
 	readonly paint: unknown;
 
 	_featureFilter: FeatureFilter;
 
-	readonly onAdd: ((map: Map) => void);
+	readonly onAdd!: ((map: Map) => void);
 
-	readonly onRemove: ((map: Map) => void);
+	readonly onRemove!: ((map: Map) => void);
 
-	constructor(layer: CustomLayerInterface | LayerSpecification, properties: Readonly<{
+	constructor(layer: LayerSpecification, properties: Readonly<{
 		layout?: Properties<any>;
 		paint?: Properties<any>;
 	}>) {
@@ -83,10 +82,6 @@ export abstract class StyleLayer extends Evented {
 		this.id = layer.id;
 		this.type = layer.type;
 		this._featureFilter = { filter: () => true, needGeometry: false };
-
-		if (layer.type === 'custom') return;
-
-		layer = (layer as LayerSpecification);
 
 		this.metadata = layer.metadata;
 		this.minzoom = layer.minzoom;
@@ -130,7 +125,7 @@ export abstract class StyleLayer extends Evented {
 		return this._unevaluatedLayout.getValue(name);
 	}
 
-	setLayoutProperty(name: string, value: any, options: StyleSetterOptions = {}) {
+	setLayoutProperty(name: string, value: any, options = {}) {
 		if (value !== null && value !== undefined) {
 			const key = `layers.${this.id}.layout.${name}`;
 			if (this._validate(validateLayoutProperty, key, name, value, options)) {
@@ -154,7 +149,7 @@ export abstract class StyleLayer extends Evented {
 		}
 	}
 
-	setPaintProperty(name: string, value: unknown, options: StyleSetterOptions = {}) {
+	setPaintProperty(name: string, value: unknown, options = {}) {
 		if (value !== null && value !== undefined) {
 			const key = `layers.${this.id}.paint.${name}`;
 			if (this._validate(validatePaintProperty, key, name, value, options)) {
@@ -188,7 +183,6 @@ export abstract class StyleLayer extends Evented {
 		// No-op; can be overridden by derived classes.
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	_handleOverridablePaintPropertyUpdate<T, R>(name: string, oldValue: PropertyValue<T, R>, newValue: PropertyValue<T, R>): boolean {
 		// No-op; can be overridden by derived classes.
 		return false;
@@ -239,26 +233,15 @@ export abstract class StyleLayer extends Evented {
 			output.layout.visibility = this.visibility;
 		}
 
-		return filterObject(output, (value, key) => {
+		return filterObject(output, (value: {} | undefined, key: string) => {
 			return value !== undefined &&
 				!(key === 'layout' && !Object.keys(value).length) &&
 				!(key === 'paint' && !Object.keys(value).length);
 		});
 	}
 
-	_validate(validate: Function, key: string, name: string, value: unknown, options: StyleSetterOptions = {}) {
-		if (options && options.validate === false) {
-			return false;
-		}
-		return emitValidationErrors(this, validate.call(validateStyle, {
-			key,
-			layerType: this.type,
-			objectKey: name,
-			value,
-			styleSpec,
-			// Workaround for https://github.com/mapbox/mapbox-gl-js/issues/2407
-			style: { glyphs: true, sprite: true },
-		}));
+	_validate(validate: Function, key: string, name: string, value: unknown, options = {}) {
+		return false;
 	}
 
 	is3D() {

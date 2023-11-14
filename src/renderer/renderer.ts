@@ -1,8 +1,7 @@
 import { writeFileSync } from 'fs';
 import type { Point, Polygon, Polyline } from '../lib/geometry.js';
 import type { SVGRenderer } from './renderer_svg.js';
-import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle } from './styles.js';
-import type { RendererOptions } from '../types.js';
+import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle, RendererOptions } from '../types.js';
 
 export abstract class Renderer {
 	public readonly width: number;
