@@ -46,6 +46,7 @@ export class SVGRenderer extends Renderer {
 			this.#svg.push([
 				'<path',
 				`d="${path}"`,
+				'fill="none"',
 				(style.opacity === 1) ? '' : `stroke-opacity="${style.opacity.toFixed(3)}"`,
 				`stroke="${style.color.hex}"`,
 				`stroke-width="${this.#round(style.width)}"`,

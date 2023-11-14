@@ -34,7 +34,6 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 			width / 2 + (x - tileCenterCoordinate.x) * tileSize,
 			height / 2 + (y - tileCenterCoordinate.y) * tileSize,
 		);
-		console.log(offset);
 
 		const buffer = await job.container.getTileUncompressed(zoomLevel, x, y);
 		if (!buffer) return;

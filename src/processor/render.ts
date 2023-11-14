@@ -1,4 +1,4 @@
-import type { Feature, Color as MaplibreColor } from '@maplibre/maplibre-gl-style-spec';
+import { featureFilter, type Feature, type Color as MaplibreColor } from '@maplibre/maplibre-gl-style-spec';
 import { Color } from '../lib/color.js';
 import { getLayerFeatures } from './vector.js';
 import { getLayerStyles } from './styles.js';
@@ -48,8 +48,10 @@ async function render(job: RenderJob): Promise<void> {
 				{
 					const polygons = layerFeatures.get(layerStyle.sourceLayer)?.polygons;
 					if (!polygons || polygons.length === 0) return;
+					const filter = featureFilter(layerStyle.filter);
 
 					polygons.forEach(feature => {
+						if (!filter.filter({ zoom }, feature)) return;
 						renderer.drawPolygon(feature, {
 							color: new Color(getPaint<MaplibreColor>('fill-color', feature)),
 							opacity: getPaint<number>('fill-opacity', feature),
@@ -60,10 +62,13 @@ async function render(job: RenderJob): Promise<void> {
 				return;
 			case 'line':
 				{
-					const polygons = layerFeatures.get(layerStyle.sourceLayer)?.linestrings;
-					if (!polygons || polygons.length === 0) return;
+					const lineStrings = layerFeatures.get(layerStyle.sourceLayer)?.linestrings;
+					if (!lineStrings || lineStrings.length === 0) return;
+					const filter = featureFilter(layerStyle.filter);
 
-					polygons.forEach(feature => {
+					lineStrings.forEach(feature => {
+						if (!filter.filter({ zoom }, feature)) return;
+
 						renderer.drawLineString(feature, {
 							color: new Color(getPaint<MaplibreColor>('line-color', feature)),
 							opacity: getPaint<number>('line-opacity', feature),
