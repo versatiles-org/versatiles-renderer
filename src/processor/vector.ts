@@ -77,11 +77,13 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 						break;
 				}
 
-				list.push(new Feature({
+				const feature = new Feature({
 					type,
 					geometry,
 					properties: featureSrc.properties,
-				}));
+				});
+
+				if (feature.doesOverlap([0, 0, width, height])) list.push(feature);
 			}
 		}
 	}));

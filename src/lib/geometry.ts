@@ -16,6 +16,7 @@ interface Patterns {
 }
 
 type Geometry = Point2D[][];
+type Bbox = [number, number, number, number];
 
 export class Point2D implements MapLibrePoint2D {
 	public x: number;
@@ -75,5 +76,30 @@ export class Feature implements MapLibreFeature {
 		this.properties = opt.properties;
 		this.patterns = opt.patterns;
 		this.geometry = opt.geometry;
+	}
+
+	public getBbox(): Bbox {
+		let xMin = 1e10;
+		let yMin = 1e10;
+		let xMax = -1e10;
+		let yMax = -1e10;
+		this.geometry.forEach(ring => {
+			ring.forEach(point => {
+				if (xMin > point.x) xMin = point.x;
+				if (yMin > point.y) yMin = point.y;
+				if (xMax < point.x) xMax = point.x;
+				if (yMax < point.y) yMax = point.y;
+			});
+		});
+		return [xMin, yMin, xMax, yMax];
+	}
+
+	public doesOverlap(bbox: Bbox): boolean {
+		const featureBbox = this.getBbox();
+		if (featureBbox[0] > bbox[2]) return false;
+		if (featureBbox[1] > bbox[3]) return false;
+		if (featureBbox[2] < bbox[0]) return false;
+		if (featureBbox[3] < bbox[1]) return false;
+		return true;
 	}
 }
