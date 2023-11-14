@@ -1,15 +1,18 @@
+/* eslint-disable @typescript-eslint/explicit-member-accessibility */
 import { StyleLayer } from '../style_layer.js';
 
-import properties, { BackgroundPaintPropsPossiblyEvaluated } from './background_style_layer_properties.g';
-import { Transitionable, Transitioning, PossiblyEvaluated } from '../properties';
+import properties from './background_style_layer_properties.g.js';
+import type { Transitionable, Transitioning, PossiblyEvaluated } from '../properties.js';
 
-import type { BackgroundPaintProps } from './background_style_layer_properties.g';
+import type { BackgroundPaintProps, BackgroundPaintPropsPossiblyEvaluated } from './background_style_layer_properties.g.js';
 import type { LayerSpecification } from '@maplibre/maplibre-gl-style-spec';
 
 export class BackgroundStyleLayer extends StyleLayer {
-	_transitionablePaint: Transitionable<BackgroundPaintProps>;
-	_transitioningPaint: Transitioning<BackgroundPaintProps>;
-	paint: PossiblyEvaluated<BackgroundPaintProps, BackgroundPaintPropsPossiblyEvaluated>;
+	declare _transitionablePaint: Transitionable<BackgroundPaintProps>;
+
+	declare _transitioningPaint: Transitioning<BackgroundPaintProps>;
+
+	declare paint: PossiblyEvaluated<BackgroundPaintProps, BackgroundPaintPropsPossiblyEvaluated>;
 
 	constructor(layer: LayerSpecification) {
 		super(layer, properties);

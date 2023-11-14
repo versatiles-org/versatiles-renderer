@@ -1,30 +1,36 @@
-import {filterObject} from '../util/util';
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/max-params */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-invalid-void-type */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/member-ordering */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/explicit-member-accessibility */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { filterObject } from '../util/util.js';
 
-import {latest as styleSpec, supportsPropertyExpression} from '@maplibre/maplibre-gl-style-spec';
+import { latest as styleSpec, supportsPropertyExpression } from '@maplibre/maplibre-gl-style-spec';
 import {
-    validateStyle,
-    validateLayoutProperty,
-    validatePaintProperty,
-    emitValidationErrors
-} from './validate_style';
-import {Evented} from '../util/evented';
-import {Layout, Transitionable, Transitioning, Properties, PossiblyEvaluated, PossiblyEvaluatedPropertyValue} from './properties';
+	validateStyle,
+	validateLayoutProperty,
+	validatePaintProperty,
+	emitValidationErrors,
+} from './validate_style.js';
+import { Evented } from '../util/evented.js';
+import { Layout, Transitionable, PossiblyEvaluated, PossiblyEvaluatedPropertyValue } from './properties.js';
 
-import type {Bucket} from '../data/bucket';
-import type Point from '@mapbox/point-geometry';
-import type {FeatureFilter, FeatureState,
-    LayerSpecification,
-    FilterSpecification} from '@maplibre/maplibre-gl-style-spec';
-import type {TransitionParameters, PropertyValue} from './properties';
-import {EvaluationParameters} from './evaluation_parameters';
-import type {CrossfadeParameters} from './evaluation_parameters';
+import type { FeatureFilter, LayerSpecification, FilterSpecification } from '@maplibre/maplibre-gl-style-spec';
+import type { TransitionParameters, PropertyValue, Transitioning, Properties } from './properties.js';
+import type { EvaluationParameters } from './evaluation_parameters.js';
+import type { CrossfadeParameters } from './evaluation_parameters.js';
 
-import type {Transform} from '../geo/transform';
-import type {CustomLayerInterface} from './style_layer/custom_style_layer';
-import type {Map} from '../ui/map';
-import type {StyleSetterOptions} from './style';
-import {mat4} from 'gl-matrix';
-import type {VectorTileFeature} from '@mapbox/vector-tile';
+import type { StyleSetterOptions } from './style.ts.tmp';
 
 const TRANSITION_SUFFIX = '-transition';
 
@@ -32,256 +38,257 @@ const TRANSITION_SUFFIX = '-transition';
  * A base class for style layers
  */
 export abstract class StyleLayer extends Evented {
-    id: string;
-    metadata: unknown;
-    type: LayerSpecification['type'] | CustomLayerInterface['type'];
-    source: string;
-    sourceLayer: string;
-    minzoom: number;
-    maxzoom: number;
-    filter: FilterSpecification | void;
-    visibility: 'visible' | 'none' | void;
-    _crossfadeParameters: CrossfadeParameters;
+	id: string;
 
-    _unevaluatedLayout: Layout<any>;
-    readonly layout: unknown;
+	metadata: unknown;
 
-    _transitionablePaint: Transitionable<any>;
-    _transitioningPaint: Transitioning<any>;
-    readonly paint: unknown;
+	type: CustomLayerInterface['type'] | LayerSpecification['type'];
 
-    _featureFilter: FeatureFilter;
+	source: string;
 
-    readonly onAdd: ((map: Map) => void);
-    readonly onRemove: ((map: Map) => void);
+	sourceLayer: string;
 
-    queryRadius?(bucket: Bucket): number;
-    queryIntersectsFeature?(
-        queryGeometry: Array<Point>,
-        feature: VectorTileFeature,
-        featureState: FeatureState,
-        geometry: Array<Array<Point>>,
-        zoom: number,
-        transform: Transform,
-        pixelsToTileUnits: number,
-        pixelPosMatrix: mat4
-    ): boolean | number;
+	minzoom: number;
 
-    constructor(layer: LayerSpecification | CustomLayerInterface, properties: Readonly<{
-        layout?: Properties<any>;
-        paint?: Properties<any>;
-    }>) {
-        super();
+	maxzoom: number;
 
-        this.id = layer.id;
-        this.type = layer.type;
-        this._featureFilter = {filter: () => true, needGeometry: false};
+	filter: FilterSpecification | void;
 
-        if (layer.type === 'custom') return;
+	visibility: 'none' | 'visible' | void;
 
-        layer = (layer as any as LayerSpecification);
+	_crossfadeParameters: CrossfadeParameters;
 
-        this.metadata = layer.metadata;
-        this.minzoom = layer.minzoom;
-        this.maxzoom = layer.maxzoom;
+	_unevaluatedLayout: Layout<any>;
 
-        if (layer.type !== 'background') {
-            this.source = layer.source;
-            this.sourceLayer = layer['source-layer'];
-            this.filter = layer.filter;
-        }
+	readonly layout: unknown;
 
-        if (properties.layout) {
-            this._unevaluatedLayout = new Layout(properties.layout);
-        }
+	_transitionablePaint: Transitionable<any>;
 
-        if (properties.paint) {
-            this._transitionablePaint = new Transitionable(properties.paint);
+	_transitioningPaint: Transitioning<any>;
 
-            for (const property in layer.paint) {
-                this.setPaintProperty(property, layer.paint[property], {validate: false});
-            }
-            for (const property in layer.layout) {
-                this.setLayoutProperty(property, layer.layout[property], {validate: false});
-            }
+	readonly paint: unknown;
 
-            this._transitioningPaint = this._transitionablePaint.untransitioned();
-            //$FlowFixMe
-            this.paint = new PossiblyEvaluated(properties.paint);
-        }
-    }
+	_featureFilter: FeatureFilter;
 
-    getCrossfadeParameters() {
-        return this._crossfadeParameters;
-    }
+	readonly onAdd: ((map: Map) => void);
 
-    getLayoutProperty(name: string) {
-        if (name === 'visibility') {
-            return this.visibility;
-        }
+	readonly onRemove: ((map: Map) => void);
 
-        return this._unevaluatedLayout.getValue(name);
-    }
+	constructor(layer: CustomLayerInterface | LayerSpecification, properties: Readonly<{
+		layout?: Properties<any>;
+		paint?: Properties<any>;
+	}>) {
+		super();
 
-    setLayoutProperty(name: string, value: any, options: StyleSetterOptions = {}) {
-        if (value !== null && value !== undefined) {
-            const key = `layers.${this.id}.layout.${name}`;
-            if (this._validate(validateLayoutProperty, key, name, value, options)) {
-                return;
-            }
-        }
+		this.id = layer.id;
+		this.type = layer.type;
+		this._featureFilter = { filter: () => true, needGeometry: false };
 
-        if (name === 'visibility') {
-            this.visibility = value;
-            return;
-        }
+		if (layer.type === 'custom') return;
 
-        this._unevaluatedLayout.setValue(name, value);
-    }
+		layer = (layer as LayerSpecification);
 
-    getPaintProperty(name: string) {
-        if (name.endsWith(TRANSITION_SUFFIX)) {
-            return this._transitionablePaint.getTransition(name.slice(0, -TRANSITION_SUFFIX.length));
-        } else {
-            return this._transitionablePaint.getValue(name);
-        }
-    }
+		this.metadata = layer.metadata;
+		this.minzoom = layer.minzoom;
+		this.maxzoom = layer.maxzoom;
 
-    setPaintProperty(name: string, value: unknown, options: StyleSetterOptions = {}) {
-        if (value !== null && value !== undefined) {
-            const key = `layers.${this.id}.paint.${name}`;
-            if (this._validate(validatePaintProperty, key, name, value, options)) {
-                return false;
-            }
-        }
+		if (layer.type !== 'background') {
+			this.source = layer.source;
+			this.sourceLayer = layer['source-layer'];
+			this.filter = layer.filter;
+		}
 
-        if (name.endsWith(TRANSITION_SUFFIX)) {
-            this._transitionablePaint.setTransition(name.slice(0, -TRANSITION_SUFFIX.length), (value as any) || undefined);
-            return false;
-        } else {
-            const transitionable = this._transitionablePaint._values[name];
-            const isCrossFadedProperty = transitionable.property.specification['property-type'] === 'cross-faded-data-driven';
-            const wasDataDriven = transitionable.value.isDataDriven();
-            const oldValue = transitionable.value;
+		if (properties.layout) {
+			this._unevaluatedLayout = new Layout(properties.layout);
+		}
 
-            this._transitionablePaint.setValue(name, value);
-            this._handleSpecialPaintPropertyUpdate(name);
+		if (properties.paint) {
+			this._transitionablePaint = new Transitionable(properties.paint);
 
-            const newValue = this._transitionablePaint._values[name].value;
-            const isDataDriven = newValue.isDataDriven();
+			for (const property in layer.paint) {
+				this.setPaintProperty(property, layer.paint[property], { validate: false });
+			}
+			for (const property in layer.layout) {
+				this.setLayoutProperty(property, layer.layout[property], { validate: false });
+			}
 
-            // if a cross-faded value is changed, we need to make sure the new icons get added to each tile's iconAtlas
-            // so a call to _updateLayer is necessary, and we return true from this function so it gets called in
-            // Style#setPaintProperty
-            return isDataDriven || wasDataDriven || isCrossFadedProperty || this._handleOverridablePaintPropertyUpdate(name, oldValue, newValue);
-        }
-    }
+			this._transitioningPaint = this._transitionablePaint.untransitioned();
+			//$FlowFixMe
+			this.paint = new PossiblyEvaluated(properties.paint);
+		}
+	}
 
-    _handleSpecialPaintPropertyUpdate(_: string) {
-        // No-op; can be overridden by derived classes.
-    }
+	getCrossfadeParameters() {
+		return this._crossfadeParameters;
+	}
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _handleOverridablePaintPropertyUpdate<T, R>(name: string, oldValue: PropertyValue<T, R>, newValue: PropertyValue<T, R>): boolean {
-        // No-op; can be overridden by derived classes.
-        return false;
-    }
+	getLayoutProperty(name: string) {
+		if (name === 'visibility') {
+			return this.visibility;
+		}
 
-    isHidden(zoom: number) {
-        if (this.minzoom && zoom < this.minzoom) return true;
-        if (this.maxzoom && zoom >= this.maxzoom) return true;
-        return this.visibility === 'none';
-    }
+		return this._unevaluatedLayout.getValue(name);
+	}
 
-    updateTransitions(parameters: TransitionParameters) {
-        this._transitioningPaint = this._transitionablePaint.transitioned(parameters, this._transitioningPaint);
-    }
+	setLayoutProperty(name: string, value: any, options: StyleSetterOptions = {}) {
+		if (value !== null && value !== undefined) {
+			const key = `layers.${this.id}.layout.${name}`;
+			if (this._validate(validateLayoutProperty, key, name, value, options)) {
+				return;
+			}
+		}
 
-    hasTransition() {
-        return this._transitioningPaint.hasTransition();
-    }
+		if (name === 'visibility') {
+			this.visibility = value;
+			return;
+		}
 
-    recalculate(parameters: EvaluationParameters, availableImages: Array<string>) {
-        if (parameters.getCrossfadeParameters) {
-            this._crossfadeParameters = parameters.getCrossfadeParameters();
-        }
+		this._unevaluatedLayout.setValue(name, value);
+	}
 
-        if (this._unevaluatedLayout) {
-            (this as any).layout = this._unevaluatedLayout.possiblyEvaluate(parameters, undefined, availableImages);
-        }
+	getPaintProperty(name: string) {
+		if (name.endsWith(TRANSITION_SUFFIX)) {
+			return this._transitionablePaint.getTransition(name.slice(0, -TRANSITION_SUFFIX.length));
+		} else {
+			return this._transitionablePaint.getValue(name);
+		}
+	}
 
-        (this as any).paint = this._transitioningPaint.possiblyEvaluate(parameters, undefined, availableImages);
-    }
+	setPaintProperty(name: string, value: unknown, options: StyleSetterOptions = {}) {
+		if (value !== null && value !== undefined) {
+			const key = `layers.${this.id}.paint.${name}`;
+			if (this._validate(validatePaintProperty, key, name, value, options)) {
+				return false;
+			}
+		}
 
-    serialize(): LayerSpecification {
-        const output: LayerSpecification = {
-            'id': this.id,
-            'type': this.type as LayerSpecification['type'],
-            'source': this.source,
-            'source-layer': this.sourceLayer,
-            'metadata': this.metadata,
-            'minzoom': this.minzoom,
-            'maxzoom': this.maxzoom,
-            'filter': this.filter as FilterSpecification,
-            'layout': this._unevaluatedLayout && this._unevaluatedLayout.serialize(),
-            'paint': this._transitionablePaint && this._transitionablePaint.serialize()
-        };
+		if (name.endsWith(TRANSITION_SUFFIX)) {
+			this._transitionablePaint.setTransition(name.slice(0, -TRANSITION_SUFFIX.length), (value as any) || undefined);
+			return false;
+		} else {
+			const transitionable = this._transitionablePaint._values[name];
+			const isCrossFadedProperty = transitionable.property.specification['property-type'] === 'cross-faded-data-driven';
+			const wasDataDriven = transitionable.value.isDataDriven();
+			const oldValue = transitionable.value;
 
-        if (this.visibility) {
-            output.layout = output.layout || {};
-            output.layout.visibility = this.visibility;
-        }
+			this._transitionablePaint.setValue(name, value);
+			this._handleSpecialPaintPropertyUpdate(name);
 
-        return filterObject(output, (value, key) => {
-            return value !== undefined &&
-                !(key === 'layout' && !Object.keys(value).length) &&
-                !(key === 'paint' && !Object.keys(value).length);
-        });
-    }
+			const newValue = this._transitionablePaint._values[name].value;
+			const isDataDriven = newValue.isDataDriven();
 
-    _validate(validate: Function, key: string, name: string, value: unknown, options: StyleSetterOptions = {}) {
-        if (options && options.validate === false) {
-            return false;
-        }
-        return emitValidationErrors(this, validate.call(validateStyle, {
-            key,
-            layerType: this.type,
-            objectKey: name,
-            value,
-            styleSpec,
-            // Workaround for https://github.com/mapbox/mapbox-gl-js/issues/2407
-            style: {glyphs: true, sprite: true}
-        }));
-    }
+			// if a cross-faded value is changed, we need to make sure the new icons get added to each tile's iconAtlas
+			// so a call to _updateLayer is necessary, and we return true from this function so it gets called in
+			// Style#setPaintProperty
+			return isDataDriven || wasDataDriven || isCrossFadedProperty || this._handleOverridablePaintPropertyUpdate(name, oldValue, newValue);
+		}
+	}
 
-    is3D() {
-        return false;
-    }
+	_handleSpecialPaintPropertyUpdate(_: string) {
+		// No-op; can be overridden by derived classes.
+	}
 
-    isTileClipped() {
-        return false;
-    }
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	_handleOverridablePaintPropertyUpdate<T, R>(name: string, oldValue: PropertyValue<T, R>, newValue: PropertyValue<T, R>): boolean {
+		// No-op; can be overridden by derived classes.
+		return false;
+	}
 
-    hasOffscreenPass() {
-        return false;
-    }
+	isHidden(zoom: number) {
+		if (this.minzoom && zoom < this.minzoom) return true;
+		if (this.maxzoom && zoom >= this.maxzoom) return true;
+		return this.visibility === 'none';
+	}
 
-    resize() {
-        // noop
-    }
+	updateTransitions(parameters: TransitionParameters) {
+		this._transitioningPaint = this._transitionablePaint.transitioned(parameters, this._transitioningPaint);
+	}
 
-    isStateDependent() {
-        for (const property in (this as any).paint._values) {
-            const value = (this as any).paint.get(property);
-            if (!(value instanceof PossiblyEvaluatedPropertyValue) || !supportsPropertyExpression(value.property.specification)) {
-                continue;
-            }
+	hasTransition() {
+		return this._transitioningPaint.hasTransition();
+	}
 
-            if ((value.value.kind === 'source' || value.value.kind === 'composite') &&
-                value.value.isStateDependent) {
-                return true;
-            }
-        }
-        return false;
-    }
+	recalculate(parameters: EvaluationParameters, availableImages: string[]) {
+		if (parameters.getCrossfadeParameters) {
+			this._crossfadeParameters = parameters.getCrossfadeParameters();
+		}
+
+		if (this._unevaluatedLayout) {
+			(this as any).layout = this._unevaluatedLayout.possiblyEvaluate(parameters, undefined, availableImages);
+		}
+
+		(this as any).paint = this._transitioningPaint.possiblyEvaluate(parameters, undefined, availableImages);
+	}
+
+	serialize(): LayerSpecification {
+		const output: LayerSpecification = {
+			'id': this.id,
+			'type': this.type as LayerSpecification['type'],
+			'source': this.source,
+			'source-layer': this.sourceLayer,
+			'metadata': this.metadata,
+			'minzoom': this.minzoom,
+			'maxzoom': this.maxzoom,
+			'filter': this.filter as FilterSpecification,
+			'layout': this._unevaluatedLayout?.serialize(),
+			'paint': this._transitionablePaint?.serialize(),
+		};
+
+		if (this.visibility) {
+			output.layout = output.layout || {};
+			output.layout.visibility = this.visibility;
+		}
+
+		return filterObject(output, (value, key) => {
+			return value !== undefined &&
+				!(key === 'layout' && !Object.keys(value).length) &&
+				!(key === 'paint' && !Object.keys(value).length);
+		});
+	}
+
+	_validate(validate: Function, key: string, name: string, value: unknown, options: StyleSetterOptions = {}) {
+		if (options && options.validate === false) {
+			return false;
+		}
+		return emitValidationErrors(this, validate.call(validateStyle, {
+			key,
+			layerType: this.type,
+			objectKey: name,
+			value,
+			styleSpec,
+			// Workaround for https://github.com/mapbox/mapbox-gl-js/issues/2407
+			style: { glyphs: true, sprite: true },
+		}));
+	}
+
+	is3D() {
+		return false;
+	}
+
+	isTileClipped() {
+		return false;
+	}
+
+	hasOffscreenPass() {
+		return false;
+	}
+
+	resize() {
+		// noop
+	}
+
+	isStateDependent() {
+		for (const property in (this as any).paint._values) {
+			const value = (this as any).paint.get(property);
+			if (!(value instanceof PossiblyEvaluatedPropertyValue) || !supportsPropertyExpression(value.property.specification)) {
+				continue;
+			}
+
+			if ((value.value.kind === 'source' || value.value.kind === 'composite') &&
+				value.value.isStateDependent) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

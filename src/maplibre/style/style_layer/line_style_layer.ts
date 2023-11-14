@@ -1,131 +1,105 @@
-import Point from '@mapbox/point-geometry';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/max-params */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/explicit-member-accessibility */
 
-import {StyleLayer} from '../style_layer';
-import {LineBucket} from '../../data/bucket/line_bucket';
-import {polygonIntersectsBufferedMultiLine} from '../../util/intersection_tests';
-import {getMaximumPaintValue, translateDistance, translate, offsetLine} from '../query_utils';
-import properties, {LineLayoutPropsPossiblyEvaluated, LinePaintPropsPossiblyEvaluated} from './line_style_layer_properties.g';
-import {extend} from '../../util/util';
-import {EvaluationParameters} from '../evaluation_parameters';
-import {Transitionable, Transitioning, Layout, PossiblyEvaluated, DataDrivenProperty} from '../properties';
+import { StyleLayer } from '../style_layer';
+import properties from './line_style_layer_properties.g';
+import { extend } from '../../util/util';
+import { EvaluationParameters } from '../evaluation_parameters';
+import type { Transitionable, Transitioning, Layout, PossiblyEvaluated } from '../properties';
+import { DataDrivenProperty } from '../properties';
 
-import {isZoomExpression, Step} from '@maplibre/maplibre-gl-style-spec';
-import type {FeatureState, LayerSpecification} from '@maplibre/maplibre-gl-style-spec';
-import type {Bucket, BucketParameters} from '../../data/bucket';
-import type {LineLayoutProps, LinePaintProps} from './line_style_layer_properties.g';
-import type {Transform} from '../../geo/transform';
-import type {VectorTileFeature} from '@mapbox/vector-tile';
+import { isZoomExpression, Step } from '@maplibre/maplibre-gl-style-spec';
+import type { LayerSpecification } from '@maplibre/maplibre-gl-style-spec';
+import type { LineLayoutProps, LinePaintProps, LineLayoutPropsPossiblyEvaluated, LinePaintPropsPossiblyEvaluated } from './line_style_layer_properties.g';
 
 export class LineFloorwidthProperty extends DataDrivenProperty<number> {
-    useIntegerZoom: true;
+	useIntegerZoom: true;
 
-    possiblyEvaluate(value, parameters) {
-        parameters = new EvaluationParameters(Math.floor(parameters.zoom), {
-            now: parameters.now,
-            fadeDuration: parameters.fadeDuration,
-            zoomHistory: parameters.zoomHistory,
-            transition: parameters.transition
-        });
-        return super.possiblyEvaluate(value, parameters);
-    }
+	possiblyEvaluate(value, parameters) {
+		parameters = new EvaluationParameters(Math.floor(parameters.zoom), {
+			now: parameters.now,
+			fadeDuration: parameters.fadeDuration,
+			zoomHistory: parameters.zoomHistory,
+			transition: parameters.transition,
+		});
+		return super.possiblyEvaluate(value, parameters);
+	}
 
-    evaluate(value, globals, feature, featureState) {
-        globals = extend({}, globals, {zoom: Math.floor(globals.zoom)});
-        return super.evaluate(value, globals, feature, featureState);
-    }
+	evaluate(value, globals, feature, featureState) {
+		globals = extend({}, globals, { zoom: Math.floor(globals.zoom) });
+		return super.evaluate(value, globals, feature, featureState);
+	}
 }
 
 let lineFloorwidthProperty: LineFloorwidthProperty;
 
 export class LineStyleLayer extends StyleLayer {
-    _unevaluatedLayout: Layout<LineLayoutProps>;
-    layout: PossiblyEvaluated<LineLayoutProps, LineLayoutPropsPossiblyEvaluated>;
+	_unevaluatedLayout: Layout<LineLayoutProps>;
 
-    gradientVersion: number;
-    stepInterpolant: boolean;
+	layout: PossiblyEvaluated<LineLayoutProps, LineLayoutPropsPossiblyEvaluated>;
 
-    _transitionablePaint: Transitionable<LinePaintProps>;
-    _transitioningPaint: Transitioning<LinePaintProps>;
-    paint: PossiblyEvaluated<LinePaintProps, LinePaintPropsPossiblyEvaluated>;
+	gradientVersion: number;
 
-    constructor(layer: LayerSpecification) {
-        super(layer, properties);
-        this.gradientVersion = 0;
-        if (!lineFloorwidthProperty) {
-            lineFloorwidthProperty =
-                new LineFloorwidthProperty(properties.paint.properties['line-width'].specification);
-            lineFloorwidthProperty.useIntegerZoom = true;
-        }
-    }
+	stepInterpolant: boolean;
 
-    _handleSpecialPaintPropertyUpdate(name: string) {
-        if (name === 'line-gradient') {
-            const expression = this.gradientExpression();
-            if (isZoomExpression(expression)) {
-                this.stepInterpolant = expression._styleExpression.expression instanceof Step;
-            } else {
-                this.stepInterpolant = false;
-            }
-            this.gradientVersion = (this.gradientVersion + 1) % Number.MAX_SAFE_INTEGER;
-        }
-    }
+	_transitionablePaint: Transitionable<LinePaintProps>;
 
-    gradientExpression() {
-        return this._transitionablePaint._values['line-gradient'].value.expression;
-    }
+	_transitioningPaint: Transitioning<LinePaintProps>;
 
-    recalculate(parameters: EvaluationParameters, availableImages: Array<string>) {
-        super.recalculate(parameters, availableImages);
-        (this.paint._values as any)['line-floorwidth'] =
-            lineFloorwidthProperty.possiblyEvaluate(this._transitioningPaint._values['line-width'].value, parameters);
-    }
+	paint: PossiblyEvaluated<LinePaintProps, LinePaintPropsPossiblyEvaluated>;
 
-    createBucket(parameters: BucketParameters<any>) {
-        return new LineBucket(parameters);
-    }
+	constructor(layer: LayerSpecification) {
+		super(layer, properties);
+		this.gradientVersion = 0;
+		if (!lineFloorwidthProperty) {
+			lineFloorwidthProperty =
+				new LineFloorwidthProperty(properties.paint.properties['line-width'].specification);
+			lineFloorwidthProperty.useIntegerZoom = true;
+		}
+	}
 
-    queryRadius(bucket: Bucket): number {
-        const lineBucket: LineBucket = (bucket as any);
-        const width = getLineWidth(
-            getMaximumPaintValue('line-width', this, lineBucket),
-            getMaximumPaintValue('line-gap-width', this, lineBucket));
-        const offset = getMaximumPaintValue('line-offset', this, lineBucket);
-        return width / 2 + Math.abs(offset) + translateDistance(this.paint.get('line-translate'));
-    }
+	_handleSpecialPaintPropertyUpdate(name: string) {
+		if (name === 'line-gradient') {
+			const expression = this.gradientExpression();
+			if (isZoomExpression(expression)) {
+				this.stepInterpolant = expression._styleExpression.expression instanceof Step;
+			} else {
+				this.stepInterpolant = false;
+			}
+			this.gradientVersion = (this.gradientVersion + 1) % Number.MAX_SAFE_INTEGER;
+		}
+	}
 
-    queryIntersectsFeature(
-        queryGeometry: Array<Point>,
-        feature: VectorTileFeature,
-        featureState: FeatureState,
-        geometry: Array<Array<Point>>,
-        zoom: number,
-        transform: Transform,
-        pixelsToTileUnits: number
-    ): boolean {
-        const translatedPolygon = translate(queryGeometry,
-            this.paint.get('line-translate'),
-            this.paint.get('line-translate-anchor'),
-            transform.angle, pixelsToTileUnits);
-        const halfWidth = pixelsToTileUnits / 2 * getLineWidth(
-            this.paint.get('line-width').evaluate(feature, featureState),
-            this.paint.get('line-gap-width').evaluate(feature, featureState));
-        const lineOffset = this.paint.get('line-offset').evaluate(feature, featureState);
-        if (lineOffset) {
-            geometry = offsetLine(geometry, lineOffset * pixelsToTileUnits);
-        }
+	gradientExpression() {
+		return this._transitionablePaint._values['line-gradient'].value.expression;
+	}
 
-        return polygonIntersectsBufferedMultiLine(translatedPolygon, geometry, halfWidth);
-    }
+	recalculate(parameters: EvaluationParameters, availableImages: string[]) {
+		super.recalculate(parameters, availableImages);
+		(this.paint._values as any)['line-floorwidth'] =
+			lineFloorwidthProperty.possiblyEvaluate(this._transitioningPaint._values['line-width'].value, parameters);
+	}
 
-    isTileClipped() {
-        return true;
-    }
+	isTileClipped() {
+		return true;
+	}
 }
 
 function getLineWidth(lineWidth, lineGapWidth) {
-    if (lineGapWidth > 0) {
-        return lineGapWidth + 2 * lineWidth;
-    } else {
-        return lineWidth;
-    }
+	if (lineGapWidth > 0) {
+		return lineGapWidth + 2 * lineWidth;
+	} else {
+		return lineWidth;
+	}
 }

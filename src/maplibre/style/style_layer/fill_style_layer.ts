@@ -1,65 +1,43 @@
-import {StyleLayer} from '../style_layer';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/explicit-member-accessibility */
+import { StyleLayer } from '../style_layer';
 
-import {FillBucket} from '../../data/bucket/fill_bucket';
-import {polygonIntersectsMultiPolygon} from '../../util/intersection_tests';
-import {translateDistance, translate} from '../query_utils';
-import properties, {FillLayoutPropsPossiblyEvaluated, FillPaintPropsPossiblyEvaluated} from './fill_style_layer_properties.g';
-import {Transitionable, Transitioning, Layout, PossiblyEvaluated} from '../properties';
+import properties from './fill_style_layer_properties.g';
+import type { Transitionable, Transitioning, Layout, PossiblyEvaluated } from '../properties';
 
-import type {FeatureState, LayerSpecification} from '@maplibre/maplibre-gl-style-spec';
-import type {BucketParameters} from '../../data/bucket';
-import type Point from '@mapbox/point-geometry';
-import type {FillLayoutProps, FillPaintProps} from './fill_style_layer_properties.g';
-import type {EvaluationParameters} from '../evaluation_parameters';
-import type {Transform} from '../../geo/transform';
-import type {VectorTileFeature} from '@mapbox/vector-tile';
+import type { LayerSpecification } from '@maplibre/maplibre-gl-style-spec';
+import type { FillLayoutProps, FillPaintProps, FillLayoutPropsPossiblyEvaluated, FillPaintPropsPossiblyEvaluated } from './fill_style_layer_properties.g';
+import type { EvaluationParameters } from '../evaluation_parameters';
 
 export class FillStyleLayer extends StyleLayer {
-    _unevaluatedLayout: Layout<FillLayoutProps>;
-    layout: PossiblyEvaluated<FillLayoutProps, FillLayoutPropsPossiblyEvaluated>;
+	_unevaluatedLayout: Layout<FillLayoutProps>;
 
-    _transitionablePaint: Transitionable<FillPaintProps>;
-    _transitioningPaint: Transitioning<FillPaintProps>;
-    paint: PossiblyEvaluated<FillPaintProps, FillPaintPropsPossiblyEvaluated>;
+	layout: PossiblyEvaluated<FillLayoutProps, FillLayoutPropsPossiblyEvaluated>;
 
-    constructor(layer: LayerSpecification) {
-        super(layer, properties);
-    }
+	_transitionablePaint: Transitionable<FillPaintProps>;
 
-    recalculate(parameters: EvaluationParameters, availableImages: Array<string>) {
-        super.recalculate(parameters, availableImages);
+	_transitioningPaint: Transitioning<FillPaintProps>;
 
-        const outlineColor = this.paint._values['fill-outline-color'];
-        if (outlineColor.value.kind === 'constant' && outlineColor.value.value === undefined) {
-            this.paint._values['fill-outline-color'] = this.paint._values['fill-color'];
-        }
-    }
+	paint: PossiblyEvaluated<FillPaintProps, FillPaintPropsPossiblyEvaluated>;
 
-    createBucket(parameters: BucketParameters<any>) {
-        return new FillBucket(parameters);
-    }
+	constructor(layer: LayerSpecification) {
+		super(layer, properties);
+	}
 
-    queryRadius(): number {
-        return translateDistance(this.paint.get('fill-translate'));
-    }
+	recalculate(parameters: EvaluationParameters, availableImages: string[]) {
+		super.recalculate(parameters, availableImages);
 
-    queryIntersectsFeature(
-        queryGeometry: Array<Point>,
-        feature: VectorTileFeature,
-        featureState: FeatureState,
-        geometry: Array<Array<Point>>,
-        zoom: number,
-        transform: Transform,
-        pixelsToTileUnits: number
-    ): boolean {
-        const translatedPolygon = translate(queryGeometry,
-            this.paint.get('fill-translate'),
-            this.paint.get('fill-translate-anchor'),
-            transform.angle, pixelsToTileUnits);
-        return polygonIntersectsMultiPolygon(translatedPolygon, geometry);
-    }
+		const outlineColor = this.paint._values['fill-outline-color'];
+		if (outlineColor.value.kind === 'constant' && outlineColor.value.value === undefined) {
+			this.paint._values['fill-outline-color'] = this.paint._values['fill-color'];
+		}
+	}
 
-    isTileClipped() {
-        return true;
-    }
+	isTileClipped() {
+		return true;
+	}
 }
