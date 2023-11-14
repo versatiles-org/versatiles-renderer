@@ -51,6 +51,9 @@ export class SVGRenderer extends Renderer {
 				`stroke="${style.color.hex}"`,
 				`stroke-width="${this.#round(style.width)}"`,
 				style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
+				`stroke-linecap="${style.cap}"`,
+				`stroke-linejoin="${style.join}"`,
+				`stroke-miterlimit="${style.miterLimit}"`,
 				'/>',
 			].join(' '));
 		});
