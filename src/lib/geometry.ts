@@ -1,17 +1,30 @@
+import type { Feature as MapLibreFeature, Point2D as MapLibrePoint2D } from '@maplibre/maplibre-gl-style-spec';
 
-type Properties = Record<string, boolean | number | string>;
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
+interface Properties {
+	[_: string]: unknown;
+}
 
-export class Point {
+
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
+interface Patterns {
+	[_: string]: {
+		'min': string;
+		'mid': string;
+		'max': string;
+	};
+}
+
+type Geometry = Point2D[][];
+
+export class Point2D implements MapLibrePoint2D {
 	public x: number;
 
 	public y: number;
 
-	public readonly properties?: Properties;
-
-	public constructor(x: number, y: number, properties?: Properties) {
+	public constructor(x: number, y: number) {
 		this.x = x;
 		this.y = y;
-		this.properties = properties;
 	}
 
 	public isZero(): boolean {
@@ -24,40 +37,43 @@ export class Point {
 		return this;
 	}
 
-	public translate(offset: Point): this {
-		this.x *= offset.x;
-		this.y *= offset.y;
+	public translate(offset: Point2D): this {
+		this.x += offset.x;
+		this.y += offset.y;
 		return this;
 	}
 
-	public getProject2Pixel(): Point {
+	public getProject2Pixel(): Point2D {
 		const s = Math.sin(this.y * Math.PI / 180.0);
-		return new Point(
+		return new Point2D(
 			this.x / 360.0 + 0.5,
 			0.5 - 0.25 * Math.log((1 + s) / (1 - s)) / Math.PI,
-			this.properties,
 		);
 	}
 }
 
-export class Polyline {
-	public ring: Point[];
+export class Feature implements MapLibreFeature {
+	public readonly type: 'LineString' | 'Point' | 'Polygon';
 
-	public readonly properties?: Properties;
+	public readonly id: unknown;
 
-	public constructor(ring: Point[], properties?: Properties) {
-		this.ring = ring;
-		this.properties = properties;
-	}
-}
+	public readonly properties: Properties;
 
-export class Polygon {
-	public rings: Point[][];
+	public readonly patterns?: Patterns;
 
-	public readonly properties?: Properties;
+	public readonly geometry: Geometry;
 
-	public constructor(rings: Point[][], properties?: Properties) {
-		this.rings = rings;
-		this.properties = properties;
+	public constructor(opt: {
+		type: 'LineString' | 'Point' | 'Polygon';
+		id?: unknown;
+		properties: Properties;
+		patterns?: Patterns;
+		geometry: Geometry;
+	}) {
+		this.type = opt.type;
+		this.id = opt.id;
+		this.properties = opt.properties;
+		this.patterns = opt.patterns;
+		this.geometry = opt.geometry;
 	}
 }

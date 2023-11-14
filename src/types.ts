@@ -1,11 +1,11 @@
 import type { VersaTiles } from '@versatiles/container';
 import type { RendererClass } from './renderer/renderer.js';
-import type { Point } from './lib/geometry.js';
+import type { Point2D } from './lib/geometry.js';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { Color } from './lib/color.js';
 
 export interface View {
-	center: Point;
+	center: Point2D;
 	zoom: number;
 }
 
@@ -34,21 +34,21 @@ export interface BackgroundStyle {
 export interface FillStyle {
 	color: Color;
 	opacity: number;
-	translate: Point;
+	translate: Point2D;
 }
 
 export interface LineStyle {
 	blur: number;
 	cap: 'butt' | 'round' | 'square';
 	color: Color;
-	dasharray: number[];
+	dasharray?: number[];
 	gapWidth: number;
 	join: 'bevel' | 'miter' | 'round';
 	miterLimit: number;
 	offset: number;
 	opacity: number;
 	roundLimit: number;
-	translate: Point;
+	translate: Point2D;
 	width: number;
 }
 

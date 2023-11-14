@@ -1,4 +1,4 @@
-import type { Polygon, Polyline, Point } from '../lib/geometry.js';
+import type { Feature, Point2D } from '../lib/geometry.js';
 import { Color } from '../lib/color.js';
 import { Renderer } from './renderer.js';
 import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle, RendererOptions } from '../types.js';
@@ -18,15 +18,15 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public drawBackgroundFill(style: BackgroundStyle): void {
-		console.log(style);
-		this.#backgroundColor = style.color;
+		const color = style.color.clone();
+		color.alpha *= style.opacity;
+		this.#backgroundColor = color;
 	}
 
-	public drawPolygon(polygon: Polygon, style: FillStyle): void {
-		const path: string = polygon.rings.map(ring =>
-			ring.map((p, i) =>
-				(i === 0 ? 'M' : 'L') + this.#roundPoint(p),
-			).join('') + 'z',
+	public drawPolygon(feature: Feature, style: FillStyle): void {
+		const path: string = feature.geometry.map(ring =>
+			ring.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p))
+				.join('') + 'z',
 		).join('');
 		this.#svg.push([
 			'<path',
@@ -38,26 +38,30 @@ export class SVGRenderer extends Renderer {
 		].join(' '));
 	}
 
-	public drawLineString(polyline: Polyline, style: LineStyle): void {
-		const path: string = polyline.ring.map((p, i) =>
-			(i === 0 ? 'M' : 'L') + this.#roundPoint(p),
-		).join('');
-		this.#svg.push([
-			'<path',
-			`d="${path}"`,
-			(style.opacity === 1) ? '' : `stroke-opacity="${style.opacity.toFixed(3)}"`,
-			`stroke="${style.color.hex}"`,
-			`stroke-width="${this.#round(style.width)}"`,
-			style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
-			'/>',
-		].join(' '));
+	public drawLineString(feature: Feature, style: LineStyle): void {
+		feature.geometry.forEach(line => {
+			const path: string = line.map((p, i) =>
+				(i === 0 ? 'M' : 'L') + this.#roundPoint(p),
+			).join('');
+			this.#svg.push([
+				'<path',
+				`d="${path}"`,
+				(style.opacity === 1) ? '' : `stroke-opacity="${style.opacity.toFixed(3)}"`,
+				`stroke="${style.color.hex}"`,
+				`stroke-width="${this.#round(style.width)}"`,
+				style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
+				'/>',
+			].join(' '));
+		});
 	}
 
-	public drawText(position: Point, text: string, style: TextStyle): void {
+	public drawText(feature: Feature, text: string, style: TextStyle): void {
+		throw Error('implement me');
 		// implement me!
 	}
 
-	public drawSymbol(position: Point, symbol: symbol, style: SymbolStyle): void {
+	public drawSymbol(feature: Feature, symbol: symbol, style: SymbolStyle): void {
+		throw Error('implement me');
 		// implement me!
 	}
 
@@ -73,7 +77,7 @@ export class SVGRenderer extends Renderer {
 		return (v * this.#scale).toFixed(3);
 	}
 
-	#roundPoint(p: Point): string {
-		return (p.x * this.#scale).toFixed(3) + ',' + (p.y * this.#scale).toFixed(3);
+	#roundPoint(p: Point2D): string {
+		return (p.x * this.#scale).toFixed(1) + ',' + (p.y * this.#scale).toFixed(1);
 	}
 }

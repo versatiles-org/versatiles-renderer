@@ -10,10 +10,10 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/explicit-member-accessibility */
-import { StyleLayer } from '../style_layer';
+import { StyleLayer } from '../style_layer.js';
 
-import { resolveTokens } from '../../util/resolve_tokens';
-import properties from './symbol_style_layer_properties.g';
+import { resolveTokens } from '../../util/resolve_tokens.js';
+import properties from './symbol_style_layer_properties.g.js';
 
 import type {
 	Transitionable,
@@ -21,10 +21,10 @@ import type {
 	Layout,
 	PossiblyEvaluated,
 	PropertyValue,
-} from '../properties';
+} from '../properties.js';
 import {
 	PossiblyEvaluatedPropertyValue,
-} from '../properties';
+} from '../properties.js';
 
 import {
 	isExpression,
@@ -35,23 +35,24 @@ import {
 	typeOf,
 	Formatted,
 	FormatExpression,
-	Literal } from '@maplibre/maplibre-gl-style-spec';
+	Literal,
+} from '@maplibre/maplibre-gl-style-spec';
 
 import type { SymbolLayoutProps, SymbolPaintProps, SymbolLayoutPropsPossiblyEvaluated, SymbolPaintPropsPossiblyEvaluated } from './symbol_style_layer_properties.g';
-import type { EvaluationParameters } from '../evaluation_parameters';
-import type { Expression, Feature, SourceExpression, LayerSpecification } from '@maplibre/maplibre-gl-style-spec';
-import { FormatSectionOverride } from '../format_section_override';
+import type { EvaluationParameters } from '../evaluation_parameters.js';
+import type { Expression, Feature, SourceExpression, LayerSpecification, FormattedSection, FormattedSectionExpression } from '@maplibre/maplibre-gl-style-spec';
+import { FormatSectionOverride } from '../format_section_override.js';
 
 export class SymbolStyleLayer extends StyleLayer {
-	_unevaluatedLayout: Layout<SymbolLayoutProps>;
+	declare _unevaluatedLayout: Layout<SymbolLayoutProps>;
 
-	layout: PossiblyEvaluated<SymbolLayoutProps, SymbolLayoutPropsPossiblyEvaluated>;
+	declare layout: PossiblyEvaluated<SymbolLayoutProps, SymbolLayoutPropsPossiblyEvaluated>;
 
-	_transitionablePaint: Transitionable<SymbolPaintProps>;
+	declare _transitionablePaint: Transitionable<SymbolPaintProps>;
 
-	_transitioningPaint: Transitioning<SymbolPaintProps>;
+	declare _transitioningPaint: Transitioning<SymbolPaintProps>;
 
-	paint: PossiblyEvaluated<SymbolPaintProps, SymbolPaintPropsPossiblyEvaluated>;
+	declare paint: PossiblyEvaluated<SymbolPaintProps, SymbolPaintPropsPossiblyEvaluated>;
 
 	constructor(layer: LayerSpecification) {
 		super(layer, properties);
@@ -145,7 +146,7 @@ export class SymbolStyleLayer extends StyleLayer {
 		const property = properties.paint.properties[propertyName];
 		let hasOverrides = false;
 
-		const checkSections = (sections) => {
+		const checkSections = (sections: FormattedSection[] | FormattedSectionExpression[]) => {
 			for (const section of sections) {
 				if (property.overrides?.hasOverride(section)) {
 					hasOverrides = true;
@@ -162,7 +163,7 @@ export class SymbolStyleLayer extends StyleLayer {
 				if (hasOverrides) return;
 
 				if (expression instanceof Literal && typeOf(expression.value) === FormattedType) {
-					const formatted: Formatted = (expression.value as any);
+					const formatted = expression.value as Formatted;
 					checkSections(formatted.sections);
 				} else if (expression instanceof FormatExpression) {
 					checkSections(expression.sections);
@@ -171,7 +172,7 @@ export class SymbolStyleLayer extends StyleLayer {
 				}
 			};
 
-			const expr: ZoomConstantExpression<'source'> = (textField.value as any);
+			const expr: ZoomConstantExpression<'source'> = textField.value;
 			if (expr._styleExpression) {
 				checkExpression(expr._styleExpression.expression);
 			}

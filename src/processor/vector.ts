@@ -1,5 +1,4 @@
-import { Polygon, Polyline } from '../lib/geometry.js';
-import { Point } from '../lib/geometry.js';
+import { Point2D, Feature } from '../lib/geometry.js';
 import type { RenderJob } from '../types.js';
 import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
@@ -12,10 +11,11 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const zoomLevel = Math.floor(zoom);
 	const tileCenterCoordinate = center.getProject2Pixel().scale(2 ** zoomLevel);
 
-	const scale = 2 ** (zoom - zoomLevel + 8);
+	const tileSize = 2 ** (zoom - zoomLevel + 8);
+	console.log(tileSize);
 
-	const tileCols = width / scale;
-	const tileRows = height / scale;
+	const tileCols = width / tileSize;
+	const tileRows = height / tileSize;
 	const tileMinX = Math.floor(tileCenterCoordinate.x - tileCols / 2);
 	const tileMinY = Math.floor(tileCenterCoordinate.y - tileRows / 2);
 	const tileMaxX = Math.floor(tileCenterCoordinate.x + tileCols / 2);
@@ -30,10 +30,11 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const layerFeatures: LayerFeatures = new Map();
 
 	await Promise.all(tileCoordinates.map(async ({ x, y }: { x: number; y: number }): Promise<void> => {
-		const offset = new Point(
-			width / 2 + (x - tileCenterCoordinate.x) * scale,
-			height / 2 + (y - tileCenterCoordinate.y) * scale,
+		const offset = new Point2D(
+			width / 2 + (x - tileCenterCoordinate.x) * tileSize,
+			height / 2 + (y - tileCenterCoordinate.y) * tileSize,
 		);
+		console.log(offset);
 
 		const buffer = await job.container.getTileUncompressed(zoomLevel, x, y);
 		if (!buffer) return;
@@ -51,38 +52,38 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 			}
 
 			for (let i = 0; i < layer.length; i++) {
-				const feature = layer.feature(i);
-				const geometry = feature.loadGeometry();
-				switch (feature.type) {
+				const featureSrc = layer.feature(i);
+				const geometry = featureSrc.loadGeometry().map(ring =>
+					ring.map(point =>
+						new Point2D(point.x, point.y).scale(tileSize / 4096).translate(offset),
+					),
+				);
+
+				let type: 'LineString' | 'Point' | 'Polygon';
+				let list: Feature[];
+				switch (featureSrc.type) {
 					case 0: //Unknown
+						throw Error();
 						continue; //ignore;
 					case 1: //Point
-						geometry.forEach(ring => {
-							ring.forEach(p => {
-								features.points.push(new Point(
-									p.x,
-									p.y,
-									feature.properties,
-								).scale(scale / 4096).translate(offset));
-							});
-						});
+						type = 'Point';
+						list = features.points;
 						break;
 					case 2: //LineString
-						geometry.forEach(ring => {
-							features.linestrings.push(new Polyline(
-								ring.map(p => new Point(p.x, p.y).scale(scale / 4096).translate(offset)),
-								feature.properties,
-							));
-						});
+						type = 'LineString';
+						list = features.linestrings;
 						break;
 					case 3: //Polygon
-						features.polygons.push(new Polygon(
-							geometry.map(ring =>
-								ring.map(p => new Point(p.x, p.y).scale(scale / 4096).translate(offset)),
-							), feature.properties,
-						));
+						type = 'Polygon';
+						list = features.polygons;
 						break;
 				}
+
+				list.push(new Feature({
+					type,
+					geometry,
+					properties: featureSrc.properties,
+				}));
 			}
 		}
 	}));
@@ -91,9 +92,9 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 }
 
 interface Features {
-	points: Point[];
-	linestrings: Polyline[];
-	polygons: Polygon[];
+	points: Feature[];
+	linestrings: Feature[];
+	polygons: Feature[];
 }
 
 type LayerFeatures = Map<string, Features>;

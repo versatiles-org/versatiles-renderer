@@ -2,7 +2,7 @@
 import { Color as MaplibreColor } from '@maplibre/maplibre-gl-style-spec';
 
 export class Color {
-	readonly #values: [number, number, number, number];
+	public readonly values: [number, number, number, number];
 
 	public constructor(...args: [MaplibreColor] | [number, number, number, number] | [number, number, number] | [string]) {
 		switch (args.length) {
@@ -10,11 +10,11 @@ export class Color {
 				if (args[0] instanceof MaplibreColor) {
 					const value: MaplibreColor = args[0];
 					if (value.a <= 0) {
-						this.#values = [0, 0, 0, 0];
+						this.values = [0, 0, 0, 0];
 						return;
 					}
 
-					this.#values = [
+					this.values = [
 						Math.round(255 * value.r / value.a),
 						Math.round(255 * value.g / value.a),
 						Math.round(255 * value.b / value.a),
@@ -26,7 +26,7 @@ export class Color {
 					const value: string = args[0];
 					if (value.startsWith('#')) {
 						if (value.length === 7) {
-							this.#values = [
+							this.values = [
 								h2d(value.slice(1, 3)),
 								h2d(value.slice(3, 5)),
 								h2d(value.slice(5, 7)),
@@ -34,7 +34,7 @@ export class Color {
 							];
 							return;
 						} else if (value.length === 9) {
-							this.#values = [
+							this.values = [
 								h2d(value.slice(1, 3)),
 								h2d(value.slice(3, 5)),
 								h2d(value.slice(5, 7)),
@@ -45,11 +45,11 @@ export class Color {
 					}
 				}
 				break;
-			case 4:
-				this.#values = [Number(args[0]), Number(args[1]), Number(args[2]), Number(args[3])];
-				return;
 			case 3:
-				this.#values = [Number(args[0]), Number(args[1]), Number(args[2]), 255];
+				this.values = [Number(args[0]), Number(args[1]), Number(args[2]), 255];
+				return;
+			case 4:
+				this.values = [Number(args[0]), Number(args[1]), Number(args[2]), Number(args[3])];
 				return;
 			default:
 		}
@@ -66,7 +66,7 @@ export class Color {
 	}
 
 	public get hex(): string {
-		return `#${d2h(this.#values[0])}${d2h(this.#values[1])}${d2h(this.#values[2])}${(this.#values[3] === 255) ? '' : d2h(this.#values[3])}`;
+		return `#${d2h(this.values[0])}${d2h(this.values[1])}${d2h(this.values[2])}${(this.values[3] === 255) ? '' : d2h(this.values[3])}`;
 
 		function d2h(num: number): string {
 			if (num < 0) num = 0;
@@ -77,10 +77,14 @@ export class Color {
 	}
 
 	public get alpha(): number {
-		return this.#values[3];
+		return this.values[3];
 	}
 
-	public set alpha(v: number) {
-		this.#values[3] = v;
+	public set alpha(byte: number) {
+		this.values[3] = Math.min(255, Math.max(0, Math.round(byte)));
+	}
+
+	public clone(): Color {
+		return new Color(...this.values);
 	}
 }

@@ -1,54 +1,118 @@
+import type { Feature, Color as MaplibreColor } from '@maplibre/maplibre-gl-style-spec';
 import { Color } from '../lib/color.js';
 import { getLayerFeatures } from './vector.js';
 import { getLayerStyles } from './styles.js';
-import type { BackgroundPaintProps, StyleLayer, PossiblyEvaluated, BackgroundPaintPropsPossiblyEvaluated, FillPaintProps, FillPaintPropsPossiblyEvaluated } from '../maplibre/index.js';
+import type { StyleLayer } from '../maplibre/index.js';
 import type { RenderJob } from '../types.js';
-import { Polygon } from '../lib/geometry.js';
 import { EvaluationParameters } from '../maplibre/index.js';
-import { BackgroundStyleLayer } from '../maplibre/style/style_layer/background_style_layer.js';
+import type { PossiblyEvaluatedPropertyValue } from '../maplibre/style/properties.js';
+import { Point2D } from '../lib/geometry.js';
 
 export async function renderVectorTiles(job: RenderJob): Promise<void> {
+	//console.table(layerStyles.map(l => ({ id: l.id, type: l.type })));
+
+	await render(job);
+
+	job.renderer.save('test.svg');
+}
+
+async function render(job: RenderJob): Promise<void> {
 	const { renderer } = job;
 	const { zoom } = job.view;
-
 	const layerFeatures = await getLayerFeatures(job);
 	const layerStyles = getLayerStyles(job.style.layers);
 	const evaluationParameters = new EvaluationParameters(zoom);
 	const availableImages: string[] = [];
+	const featureState = {};
 
 	layerStyles.forEach((layerStyle: StyleLayer) => {
 		if (layerStyle.isHidden(zoom)) return;
 
 		layerStyle.recalculate(evaluationParameters, availableImages);
 
+		//console.log(layerFeatures);
 		//const { paint: PossiblyEvaluated, layout } = layerStyle;
+		//console.log(layerStyle);
 
 		switch (layerStyle.type) {
 			case 'background':
-				const { paint: paintB } = layerStyle as BackgroundStyleLayer;
-				renderer.drawBackgroundFill({
-					color: new Color(paintB.get('background-color')),
-					opacity: Number(paintB.get('background-opacity')),
-				});
-				break;
+				{
+					//const layer = layerStyle as BackgroundStyleLayer;
+					renderer.drawBackgroundFill({
+						color: new Color(getPaint<MaplibreColor>('background-color')),
+						opacity: Number(getPaint<number>('background-opacity')),
+					});
+				}
+				return;
 			case 'fill':
-				const polygons: Polygon[] | undefined = layerFeatures.get(layerStyle.id)?.polygons;
-				if (!polygons || polygons.length === 0) return;
+				{
+					const polygons = layerFeatures.get(layerStyle.sourceLayer)?.polygons;
+					if (!polygons || polygons.length === 0) return;
 
+					polygons.forEach(feature => {
+						renderer.drawPolygon(feature, {
+							color: new Color(getPaint<MaplibreColor>('fill-color', feature)),
+							opacity: getPaint<number>('fill-opacity', feature),
+							translate: new Point2D(...getPaint<[number, number]>('fill-translate', feature)),
+						});
+					});
+				}
+				return;
+			case 'line':
+				{
+					const polygons = layerFeatures.get(layerStyle.sourceLayer)?.linestrings;
+					if (!polygons || polygons.length === 0) return;
 
-				const { layout: layoutF, paint: paintF } = layerStyle as BackgroundStyleLayer;
-
-				polygons.forEach(polygon => {
-					renderer.drawPolygon(polygon,
-						{
-							color: new Color(paintF.get('background-color')),
-							opacity: Number(paintF.get('background-opacity')),
-						}
-					);
-				})
-				break;
+					polygons.forEach(feature => {
+						renderer.drawLineString(feature, {
+							color: new Color(getPaint<MaplibreColor>('line-color', feature)),
+							opacity: getPaint<number>('line-opacity', feature),
+							translate: new Point2D(...getPaint<[number, number]>('line-translate', feature)),
+							blur: getPaint<number>('line-blur', feature),
+							cap: getLayout<'butt' | 'round' | 'square'>('line-cap', feature),
+							dasharray: getPaint<number[] | undefined>('line-dasharray', feature),
+							gapWidth: getPaint<number>('line-gap-width', feature),
+							join: getLayout<'bevel' | 'miter' | 'round'>('line-join', feature),
+							miterLimit: getLayout<number>('line-miter-limit', feature),
+							offset: getPaint<number>('line-offset', feature),
+							roundLimit: getLayout<number>('line-round-limit', feature),
+							width: getPaint<number>('line-width', feature),
+						});
+					});
+				}
+				return;
+			case 'symbol':
+				console.log('implement symbols');
+				return;
 			default:
 				throw Error('layerStyle.type: ' + layerStyle.type);
 		}
+
+		function getPaint<I>(key: string, feature?: Feature): I {
+			// @ts-expect-error: unsure to handle that
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+			const value = layerStyle.paint.get(key) as PossiblyEvaluatedPropertyValue<I>;
+			if (!value) return value;
+			//console.log('getPaint', value);
+			if (!value.evaluate) {
+				// @ts-expect-error: unsure to handle that
+				return value;
+			}
+			return value.evaluate(feature, featureState, availableImages);
+		}
+
+		function getLayout<I>(key: string, feature?: Feature): I {
+			// @ts-expect-error: unsure to handle that
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+			const value = layerStyle.layout.get(key) as PossiblyEvaluatedPropertyValue<I>;
+			if (!value) return value;
+			//console.log('getLayout', value);
+			if (!value.evaluate) {
+				// @ts-expect-error: unsure to handle that
+				return value;
+			}
+			return value.evaluate(feature, featureState, availableImages);
+		}
+
 	});
 }
