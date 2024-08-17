@@ -24,6 +24,7 @@
 		"@turf/union": "^7.2.0",
 		"@versatiles/container": "^1.0.2",
 		"brace-expansion": "^3.0.0",
+		"canvas": "^2.11.2",
 		"commander": "^11.1.0",
 		"pbf": "^3.2.1"
 	},
