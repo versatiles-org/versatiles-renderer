@@ -1,5 +1,6 @@
 import { Point2D, Feature } from '../lib/geometry.js';
 import type { RenderJob } from '../types.js';
+import { mergePolygons } from './helper.js';
 import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
 
@@ -87,6 +88,14 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 			}
 		}
 	}));
+
+	for (const [name, features] of layerFeatures) {
+		layerFeatures.set(name, {
+			points: features.points,
+			linestrings: features.linestrings,
+			polygons: mergePolygons(features.polygons),
+		});
+	}
 
 	return layerFeatures;
 }
