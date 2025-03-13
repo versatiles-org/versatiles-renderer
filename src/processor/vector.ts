@@ -81,6 +81,7 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 				const feature = new Feature({
 					type,
 					geometry,
+					id: featureSrc.id,
 					properties: featureSrc.properties,
 				});
 
