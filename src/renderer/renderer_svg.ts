@@ -1,7 +1,7 @@
-import type { Feature, Point2D } from '../lib/geometry.js';
-import { Color } from '../lib/color.js';
-import { Renderer } from './renderer.js';
-import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle, RendererOptions } from '../types.js';
+import type { Feature, Point2D } from '../lib/geometry';
+import { Color } from '../lib/color';
+import { Renderer } from './renderer';
+import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle, RendererOptions } from '../types';
 
 export class SVGRenderer extends Renderer {
 	readonly #svg: string[];
@@ -65,15 +65,15 @@ export class SVGRenderer extends Renderer {
 		this.#svg.push('</g>');
 	}
 
-	public drawText(feature: Feature, text: string, style: TextStyle): void {
-		throw Error('implement me');
+//	public drawText(feature: Feature, text: string, style: TextStyle): void {
+//		throw Error('implement me');
 		// implement me!
-	}
+//	}
 
-	public drawSymbol(feature: Feature, symbol: symbol, style: SymbolStyle): void {
-		throw Error('implement me');
+//	public drawSymbol(feature: Feature, symbol: symbol, style: SymbolStyle): void {
+//		throw Error('implement me');
 		// implement me!
-	}
+//	}
 
 	public getBuffer(): Buffer {
 		return Buffer.from([

@@ -23,8 +23,8 @@ export abstract class Renderer {
 	public abstract drawBackgroundFill(style: BackgroundStyle): void;
 	public abstract drawPolygons(features: [Feature, FillStyle][], opacity: number): void;
 	public abstract drawLineStrings(features: [Feature, LineStyle][], opacity: number): void;
-	public abstract drawText(position: Point2D, text: string, style: TextStyle): void;
-	public abstract drawSymbol(position: Point2D, symbol: symbol, style: SymbolStyle): void;
+	//public abstract drawText(position: Point2D, text: string, style: TextStyle): void;
+	//public abstract drawSymbol(position: Point2D, symbol: symbol, style: SymbolStyle): void;
 
 	public abstract getBuffer(): Buffer;
 }

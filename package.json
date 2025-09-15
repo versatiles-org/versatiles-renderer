@@ -32,6 +32,7 @@
 		"@maplibre/maplibre-gl-style-spec": "^23.1.0",
 		"@turf/union": "^7.2.0",
 		"@versatiles/container": "^1.2.3",
+		"@versatiles/style": "^5.2.3",
 		"brace-expansion": "^4.0.0",
 		"canvas": "^3.1.0",
 		"commander": "^13.1.0",
