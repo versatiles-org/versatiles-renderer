@@ -2,7 +2,7 @@ import { Container } from '@versatiles/container';
 import { Point2D } from './lib/geometry.js';
 import { resolve } from 'path';
 import { styles } from '@versatiles/style';
-import {} from './index';
+import { renderVectorTiles, SVGRenderer } from './index';
 
 const DIRNAME = new URL('../', import.meta.url).pathname;
 

@@ -3,7 +3,7 @@ import type { Polygon, Feature as GeoJsonFeature, GeoJsonProperties, Position, M
 import { Point2D, Feature } from '../lib/geometry.js';
 
 
-function geojsonToFeature(id: number, polygonFeature: GeoJsonFeature<Polygon, GeoJsonProperties>): Feature {
+function geojsonToFeature(id: number, polygonFeature: GeoJsonFeature<Polygon>): Feature {
 	const geometry = polygonFeature.geometry.coordinates.map((ring) => {
 		return ring.map((coord: Position) => new Point2D(coord[0], coord[1]));
 	});
@@ -11,7 +11,7 @@ function geojsonToFeature(id: number, polygonFeature: GeoJsonFeature<Polygon, Ge
 		type: 'Polygon',
 		geometry,
 		id,
-		properties: polygonFeature.properties || {}
+		properties: polygonFeature.properties || {},
 	});
 }
 
@@ -33,7 +33,7 @@ export function mergePolygons(features: Feature[]): Feature[] {
 			mergedFeatures.push(features[0]);
 			continue;
 		}
-		const turfFeatures: GeoJsonFeature<Polygon, GeoJsonProperties>[] = [];
+		const turfFeatures: GeoJsonFeature<Polygon>[] = [];
 		features.forEach(f => {
 			const rings = f.geometry.map(ring => ring.map(p => [p.x, p.y]));
 			rings.forEach(ring => {
@@ -41,31 +41,31 @@ export function mergePolygons(features: Feature[]): Feature[] {
 					type: 'Feature' as const,
 					geometry: {
 						type: 'Polygon' as const,
-						coordinates: [ring]
+						coordinates: [ring],
 					},
-					properties: f.properties
+					properties: f.properties,
 				});
 			});
 		});
 		const merged = union({
 			type: 'FeatureCollection' as const,
-			features: turfFeatures
+			features: turfFeatures,
 		});
 		if (merged) {
 			if (merged.geometry.type === 'Polygon') {
-				const typedMerged = merged as GeoJsonFeature<Polygon, GeoJsonProperties>;
+				const typedMerged = merged as GeoJsonFeature<Polygon>;
 				mergedFeatures.push(geojsonToFeature(id, typedMerged));
 			} else {
-				const typedMerged = merged as GeoJsonFeature<MultiPolygon, GeoJsonProperties>;
+				const typedMerged = merged as GeoJsonFeature<MultiPolygon>;
 				for (const polygon of typedMerged.geometry.coordinates) {
-					const currentPolygon: GeoJsonFeature<Polygon, GeoJsonProperties> = {
+					const currentPolygon: GeoJsonFeature<Polygon> = {
 						type: 'Feature',
 						geometry: {
 							type: 'Polygon',
-							coordinates: polygon
+							coordinates: polygon,
 						},
-						properties: typedMerged.properties
-					}
+						properties: typedMerged.properties,
+					};
 					mergedFeatures.push(geojsonToFeature(id, currentPolygon));
 				}
 			}

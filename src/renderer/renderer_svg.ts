@@ -65,15 +65,15 @@ export class SVGRenderer extends Renderer {
 		this.#svg.push('</g>');
 	}
 
-//	public drawText(feature: Feature, text: string, style: TextStyle): void {
-//		throw Error('implement me');
-		// implement me!
-//	}
+	//	public drawText(feature: Feature, text: string, style: TextStyle): void {
+	//		throw Error('implement me');
+	// implement me!
+	//	}
 
-//	public drawSymbol(feature: Feature, symbol: symbol, style: SymbolStyle): void {
-//		throw Error('implement me');
-		// implement me!
-//	}
+	//	public drawSymbol(feature: Feature, symbol: symbol, style: SymbolStyle): void {
+	//		throw Error('implement me');
+	// implement me!
+	//	}
 
 	public getBuffer(): Buffer {
 		return Buffer.from([

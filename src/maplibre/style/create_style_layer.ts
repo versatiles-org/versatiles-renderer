@@ -10,6 +10,7 @@ import { BackgroundStyleLayer } from './style_layer/background_style_layer.js';
 //import { CustomStyleLayer, type CustomLayerInterface } from './style_layer/custom_style_layer.js';
 
 import type { LayerSpecification } from '@maplibre/maplibre-gl-style-spec';
+import type { StyleLayer } from './style_layer.js';
 
 export function createStyleLayer(layer: LayerSpecification): StyleLayer {
 	switch (layer.type) {

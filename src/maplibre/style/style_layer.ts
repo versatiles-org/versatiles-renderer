@@ -217,7 +217,7 @@ export abstract class StyleLayer extends Evented {
 	serialize(): LayerSpecification {
 		const output: LayerSpecification = {
 			'id': this.id,
-			'type': this.type as LayerSpecification['type'],
+			'type': this.type,
 			'source': this.source,
 			'source-layer': this.sourceLayer,
 			'metadata': this.metadata,
