@@ -12,6 +12,9 @@ export default [
 		files: [
 			'**/src/**/*.ts',
 		],
+		ignores: [
+			'**/src/maplibre/**/*.ts',
+		],
 		languageOptions: {
 			ecmaVersion: 'latest',
 			sourceType: 'module',
@@ -189,7 +192,7 @@ export default [
 			'space-before-blocks': 'error',
 			'space-infix-ops': 'error',
 			'@typescript-eslint/strict-boolean-expressions': 'error',
-			'@typescript-eslint/switch-exhaustiveness-check': 'error',
+			'@typescript-eslint/switch-exhaustiveness-check': ['error', { allowDefaultCaseForExhaustiveSwitch: true }],
 			'@typescript-eslint/triple-slash-reference': 'error',
 			'@typescript-eslint/typedef': 'error',
 			'@typescript-eslint/unbound-method': 'error',

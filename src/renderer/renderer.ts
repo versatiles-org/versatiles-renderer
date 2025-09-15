@@ -1,7 +1,7 @@
 import { writeFileSync } from 'fs';
-import type { Feature, Point2D } from '../lib/geometry.js';
+import type { Feature } from '../lib/geometry.js';
 import type { SVGRenderer } from './renderer_svg.js';
-import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle, RendererOptions } from '../types.js';
+import type { BackgroundStyle, FillStyle, LineStyle, RendererOptions } from '../types.js';
 
 export abstract class Renderer {
 	public readonly width: number;

@@ -1,7 +1,7 @@
 import type { Feature, Point2D } from '../lib/geometry';
 import { Color } from '../lib/color';
 import { Renderer } from './renderer';
-import type { BackgroundStyle, FillStyle, LineStyle, SymbolStyle, TextStyle, RendererOptions } from '../types';
+import type { BackgroundStyle, FillStyle, LineStyle, RendererOptions } from '../types';
 
 export class SVGRenderer extends Renderer {
 	readonly #svg: string[];

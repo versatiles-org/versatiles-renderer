@@ -1,5 +1,5 @@
 import { union } from '@turf/union';
-import type { Polygon, Feature as GeoJsonFeature, GeoJsonProperties, Position, MultiPolygon } from 'geojson';
+import type { Polygon, Feature as GeoJsonFeature, Position, MultiPolygon } from 'geojson';
 import { Point2D, Feature } from '../lib/geometry.js';
 
 
@@ -11,22 +11,24 @@ function geojsonToFeature(id: number, polygonFeature: GeoJsonFeature<Polygon>): 
 		type: 'Polygon',
 		geometry,
 		id,
-		properties: polygonFeature.properties || {},
+		properties: polygonFeature.properties ?? {},
 	});
 }
 
-export function mergePolygons(features: Feature[]): Feature[] {
+export function mergePolygons(featureList: Feature[]): Feature[] {
 	const featuresById = new Map<number, Feature[]>();
-	for (const feature of features) {
+	for (const feature of featureList) {
 		if (typeof feature.id !== 'number') {
 			throw new Error('Feature id is not a number');
 		}
-		if (featuresById.has(feature.id)) {
-			featuresById.get(feature.id)!.push(feature);
+		const features = featuresById.get(feature.id);
+		if (features) {
+			features.push(feature);
 		} else {
 			featuresById.set(feature.id, [feature]);
 		}
 	}
+
 	const mergedFeatures: Feature[] = [];
 	for (const [id, features] of featuresById) {
 		if (features.length === 1) {
