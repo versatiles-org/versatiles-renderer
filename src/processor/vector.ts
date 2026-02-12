@@ -4,6 +4,8 @@ import { mergePolygons } from './helper.js';
 import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
 
+const TILE_EXTENT = 4096;
+
 export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const { width, height } = job.renderer;
 	const { zoom, center } = job.view;
@@ -56,14 +58,13 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 					const featureSrc = layer.feature(i);
 					const geometry = featureSrc
 						.loadGeometry()
-						.map((ring) => ring.map((point) => new Point2D(point.x, point.y).scale(tileSize / 4096).translate(offset)));
+						.map((ring) => ring.map((point) => new Point2D(point.x, point.y).scale(tileSize / TILE_EXTENT).translate(offset)));
 
 					let type: 'LineString' | 'Point' | 'Polygon';
 					let list: Feature[];
 					switch (featureSrc.type) {
 						case 0: //Unknown
-							throw Error();
-							continue; //ignore;
+							throw Error('Unknown feature type in vector tile');
 						case 1: //Point
 							type = 'Point';
 							list = features.points;
