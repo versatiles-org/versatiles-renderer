@@ -2,7 +2,6 @@ import { union } from '@turf/union';
 import type { Polygon, Feature as GeoJsonFeature, Position, MultiPolygon } from 'geojson';
 import { Point2D, Feature } from '../lib/geometry.js';
 
-
 function geojsonToFeature(id: number, polygonFeature: GeoJsonFeature<Polygon>): Feature {
 	const geometry = polygonFeature.geometry.coordinates.map((ring) => {
 		return ring.map((coord: Position) => new Point2D(coord[0], coord[1]));
@@ -35,9 +34,9 @@ export function mergePolygons(featureList: Feature[]): Feature[] {
 			continue;
 		}
 		const turfFeatures: GeoJsonFeature<Polygon>[] = [];
-		features.forEach(f => {
-			const rings = f.geometry.map(ring => ring.map(p => [p.x, p.y]));
-			rings.forEach(ring => {
+		features.forEach((f) => {
+			const rings = f.geometry.map((ring) => ring.map((p) => [p.x, p.y]));
+			rings.forEach((ring) => {
 				turfFeatures.push({
 					type: 'Feature' as const,
 					geometry: {

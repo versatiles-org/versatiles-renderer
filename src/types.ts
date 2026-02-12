@@ -55,4 +55,3 @@ export interface TextStyle {
 export interface SymbolStyle {
 	color: Color;
 }
-

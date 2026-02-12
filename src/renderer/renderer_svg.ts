@@ -26,17 +26,18 @@ export class SVGRenderer extends Renderer {
 	public drawPolygons(features: [Feature, FillStyle][], opacity: number): void {
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
 		features.forEach(([feature, style]) => {
-			const path: string = feature.geometry.map(ring =>
-				ring.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p))
-					.join('') + 'z',
-			).join('');
-			this.#svg.push([
-				'<path',
-				`d="${path}"`,
-				`fill="${style.color.hex}"`,
-				style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
-				'/>',
-			].join(' '));
+			const path: string = feature.geometry
+				.map((ring) => ring.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p)).join('') + 'z')
+				.join('');
+			this.#svg.push(
+				[
+					'<path',
+					`d="${path}"`,
+					`fill="${style.color.hex}"`,
+					style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
+					'/>',
+				].join(' '),
+			);
 		});
 		this.#svg.push('</g>');
 	}
@@ -44,22 +45,22 @@ export class SVGRenderer extends Renderer {
 	public drawLineStrings(features: [Feature, LineStyle][], opacity: number): void {
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
 		features.forEach(([feature, style]) => {
-			feature.geometry.forEach(line => {
-				const path: string = line.map((p, i) =>
-					(i === 0 ? 'M' : 'L') + this.#roundPoint(p),
-				).join('');
-				this.#svg.push([
-					'<path',
-					`d="${path}"`,
-					'fill="none"',
-					`stroke="${style.color.hex}"`,
-					`stroke-width="${this.#round(style.width)}"`,
-					style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
-					`stroke-linecap="${style.cap}"`,
-					`stroke-linejoin="${style.join}"`,
-					`stroke-miterlimit="${String(style.miterLimit)}"`,
-					'/>',
-				].join(' '));
+			feature.geometry.forEach((line) => {
+				const path: string = line.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p)).join('');
+				this.#svg.push(
+					[
+						'<path',
+						`d="${path}"`,
+						'fill="none"',
+						`stroke="${style.color.hex}"`,
+						`stroke-width="${this.#round(style.width)}"`,
+						style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
+						`stroke-linecap="${style.cap}"`,
+						`stroke-linejoin="${style.join}"`,
+						`stroke-miterlimit="${String(style.miterLimit)}"`,
+						'/>',
+					].join(' '),
+				);
 			});
 		});
 		this.#svg.push('</g>');
