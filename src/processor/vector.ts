@@ -8,6 +8,13 @@ import Protobuf from 'pbf';
 export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const { width, height } = job.renderer;
 	const { zoom, center } = job.view;
+	const { sources } = job.style;
+	const source = sources['versatiles-shortbread'];
+	if (!source || source.type !== 'vector' || !source.tiles) {
+		console.log('Invalid source', sources);
+		throw Error('Invalid source')
+	};
+	const sourceUrl: string = source.tiles[0];
 
 	const zoomLevel = Math.floor(zoom);
 	const tileCenterCoordinate = center.getProject2Pixel().scale(2 ** zoomLevel);
@@ -35,7 +42,7 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 			height / 2 + (y - tileCenterCoordinate.y) * tileSize,
 		);
 
-		const buffer = await job.container.getTileUncompressed(zoomLevel, x, y);
+		const buffer = await getTile(sourceUrl, zoomLevel, x, y);
 		if (!buffer) return;
 
 		const vectorTile = new VectorTile(new Protobuf(buffer));
@@ -108,3 +115,15 @@ interface Features {
 }
 
 type LayerFeatures = Map<string, Features>;
+
+async function getTile(url: string, z: number, x: number, y: number): Promise<ArrayBuffer | null> {
+	const tileUrl = url.replace('{z}', String(z)).replace('{x}', String(x)).replace('{y}', String(y));
+	try {
+		const response = await fetch(tileUrl);
+		if (!response.ok) return null;
+		return await response.arrayBuffer();
+	} catch (e) {
+		console.warn(`Failed to load tile: ${tileUrl}`);
+		return null;
+	}
+}

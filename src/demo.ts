@@ -1,4 +1,3 @@
-import { Container } from '@versatiles/container';
 import { Point2D } from './lib/geometry.js';
 import { resolve } from 'path';
 import { styles } from '@versatiles/style';
@@ -12,7 +11,6 @@ const style = styles.colorful({});
 const svgString = await renderVectorTiles(
 	{
 		renderer: new SVGRenderer({ width: 512, height: 384, scale: 1 }),
-		container: new Container('https://download.versatiles.org/osm.versatiles'),
 		style,
 		view: {
 			center: new Point2D(13.408333, 52.518611),
