@@ -29,16 +29,14 @@
 	"engines": {
 		"node": ">= 22"
 	},
-	"dependencies": {},
 	"devDependencies": {
+		"@eslint/js": "^9.39.2",
 		"@mapbox/vector-tile": "^2.0.4",
 		"@maplibre/maplibre-gl-style-spec": "^24.4.1",
 		"@maplibre/vt-pbf": "^4.2.1",
 		"@turf/union": "^7.3.4",
 		"@types/node": "^24.10.13",
 		"@types/pbf": "^3.0.5",
-		"@typescript-eslint/eslint-plugin": "^8.55.0",
-		"@typescript-eslint/parser": "^8.55.0",
 		"@versatiles/release-tool": "^2.7.1",
 		"@versatiles/style": "^5.9.3",
 		"eslint": "^9.39.2",
@@ -47,6 +45,7 @@
 		"pbf": "^4.0.1",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.55.0",
 		"vitest": "^4.0.18"
 	}
 }
