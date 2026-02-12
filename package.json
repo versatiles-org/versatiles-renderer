@@ -33,7 +33,6 @@
 		"@mapbox/vector-tile": "^2.0.4",
 		"@maplibre/maplibre-gl-style-spec": "^24.4.1",
 		"@turf/union": "^7.3.0",
-		"@versatiles/container": "^1.2.7",
 		"@versatiles/style": "^5.7.0",
 		"brace-expansion": "^4.0.1",
 		"canvas": "^3.2.0",
