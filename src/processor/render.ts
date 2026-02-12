@@ -31,8 +31,8 @@ async function render(job: RenderJob): Promise<void> {
 			case 'background':
 				{
 					renderer.drawBackgroundFill({
-						color: new Color(getPaint<MaplibreColor>('background-color')),
-						opacity: getPaint<number>('background-opacity'),
+						color: new Color(getPaint('background-color') as MaplibreColor),
+						opacity: getPaint('background-opacity') as number,
 					});
 				}
 				return;
@@ -47,10 +47,10 @@ async function render(job: RenderJob): Promise<void> {
 
 					renderer.drawPolygons(
 						polygonFeatures.map(feature => [feature, {
-							color: new Color(getPaint<MaplibreColor>('fill-color', feature)),
-							translate: new Point2D(...getPaint<[number, number]>('fill-translate', feature)),
+							color: new Color(getPaint('fill-color', feature) as MaplibreColor),
+							translate: new Point2D(...(getPaint('fill-translate', feature) as [number, number])),
 						}]),
-						getPaint<number>('fill-opacity', polygonFeatures[0]),
+						getPaint('fill-opacity', polygonFeatures[0]) as number,
 					);
 				}
 				return;
@@ -65,19 +65,19 @@ async function render(job: RenderJob): Promise<void> {
 
 					renderer.drawLineStrings(
 						lineStringFeatures.map(feature => [feature, {
-							color: new Color(getPaint<MaplibreColor>('line-color', feature)),
-							translate: new Point2D(...getPaint<[number, number]>('line-translate', feature)),
-							blur: getPaint<number>('line-blur', feature),
-							cap: getLayout<'butt' | 'round' | 'square'>('line-cap', feature),
-							dasharray: getPaint<number[] | undefined>('line-dasharray', feature),
-							gapWidth: getPaint<number>('line-gap-width', feature),
-							join: getLayout<'bevel' | 'miter' | 'round'>('line-join', feature),
-							miterLimit: getLayout<number>('line-miter-limit', feature),
-							offset: getPaint<number>('line-offset', feature),
-							roundLimit: getLayout<number>('line-round-limit', feature),
-							width: getPaint<number>('line-width', feature),
+							color: new Color(getPaint('line-color', feature) as MaplibreColor),
+							translate: new Point2D(...(getPaint('line-translate', feature) as [number, number])),
+							blur: getPaint('line-blur', feature) as number,
+							cap: getLayout('line-cap', feature) as 'butt' | 'round' | 'square',
+							dasharray: getPaint('line-dasharray', feature) as number[] | undefined,
+							gapWidth: getPaint('line-gap-width', feature) as number,
+							join: getLayout('line-join', feature) as 'bevel' | 'miter' | 'round',
+							miterLimit: getLayout('line-miter-limit', feature) as number,
+							offset: getPaint('line-offset', feature) as number,
+							roundLimit: getLayout('line-round-limit', feature) as number,
+							width: getPaint('line-width', feature) as number,
 						}]),
-						getPaint<number>('line-opacity', lineStringFeatures[0]),
+						getPaint('line-opacity', lineStringFeatures[0]) as number,
 					);
 				}
 				return;
@@ -94,22 +94,22 @@ async function render(job: RenderJob): Promise<void> {
 				throw Error('layerStyle.type: ' + String(layerStyle.type));
 		}
 
-		function getPaint<T>(key: string, feature?: Feature): T {
-			const paint = layerStyle.paint as unknown as { get(k: string): PossiblyEvaluatedPropertyValue<T> | T };
-			const value = paint.get(key);
+		function getStyleValue(obj: unknown, key: string, feature?: Feature): unknown {
+			const getter = obj as { get(k: string): unknown };
+			const value = getter.get(key);
 			if (typeof value === 'object' && value !== null && 'evaluate' in value) {
-				return (value as PossiblyEvaluatedPropertyValue<T>).evaluate(feature ?? ({} as Feature), featureState, undefined, availableImages);
+				const evaluatable = value as PossiblyEvaluatedPropertyValue<unknown>;
+				return evaluatable.evaluate(feature ?? ({} as Feature), featureState, undefined, availableImages);
 			}
-			return value as T;
+			return value;
 		}
 
-		function getLayout<T>(key: string, feature?: Feature): T {
-			const layout = layerStyle.layout as unknown as { get(k: string): PossiblyEvaluatedPropertyValue<T> | T };
-			const value = layout.get(key);
-			if (typeof value === 'object' && value !== null && 'evaluate' in value) {
-				return (value as PossiblyEvaluatedPropertyValue<T>).evaluate(feature ?? ({} as Feature), featureState, undefined, availableImages);
-			}
-			return value as T;
+		function getPaint(key: string, feature?: Feature): unknown {
+			return getStyleValue(layerStyle.paint, key, feature);
+		}
+
+		function getLayout(key: string, feature?: Feature): unknown {
+			return getStyleValue(layerStyle.layout, key, feature);
 		}
 
 	});
