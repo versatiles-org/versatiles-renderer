@@ -11,6 +11,7 @@
 	"scripts": {
 		"update-maplibre": "cd lib/maplibre-gl-js && git reset --hard && git fetch --tags && git checkout $(git tag -l 'v*' --sort=-v:refname | head -1) && cd ../.. && npm run sync-maplibre",
 		"sync-maplibre": "cd lib/maplibre-gl-js && npm install && npx tsx build/generate-style-code.ts && cd ../.. && npx tsx scripts/sync-maplibre.ts",
+		"demo": "tsx src/demo.ts",
 		"build-node": "rm -rf dist && tsc -p tsconfig.node.json && chmod +x dist/index.js",
 		"build": "rm -rf release; npm run build-node",
 		"check": "npm run lint && npm run test && npm run build",
@@ -20,7 +21,7 @@
 		"start": "tsx src/index.ts",
 		"test-coverage": "vitest run --coverage",
 		"test": "vitest run",
-		"upgrade": "npm-check-updates -u && rm -f package-lock.json && rm -rf node_modules; npm i"
+		"upgrade": "npm-check-updates -u; rm -f package-lock.json; rm -rf node_modules; npm i"
 	},
 	"type": "module",
 	"author": "Michael Kreil <versatiles@michael-kreil.de>",
