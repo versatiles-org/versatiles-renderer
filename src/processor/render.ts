@@ -94,7 +94,6 @@ async function render(job: RenderJob): Promise<void> {
 			case 'hillshade':
 			case 'raster':
 			case 'symbol':
-				console.log(`implementation is missing: ${layerStyle.id} (${layerStyle.type})`);
 				return;
 			default:
 				throw Error('layerStyle.type: ' + String(layerStyle.type));
