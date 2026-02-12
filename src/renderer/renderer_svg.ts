@@ -66,16 +66,6 @@ export class SVGRenderer extends Renderer {
 		this.#svg.push('</g>');
 	}
 
-	//	public drawText(feature: Feature, text: string, style: TextStyle): void {
-	//		throw Error('implement me');
-	// implement me!
-	//	}
-
-	//	public drawSymbol(feature: Feature, symbol: symbol, style: SymbolStyle): void {
-	//		throw Error('implement me');
-	// implement me!
-	//	}
-
 	public getString(): string {
 		return [
 			`<svg viewBox="0 0 ${String(this.width)} ${String(this.height)}" width="${String(this.width)}" height="${String(this.height)}" xmlns="http://www.w3.org/2000/svg" style="background-color:${this.#backgroundColor.hex}">`,
