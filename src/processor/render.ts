@@ -2,10 +2,8 @@ import { featureFilter, type Feature, type Color as MaplibreColor } from '@mapli
 import { Color } from '../lib/color.js';
 import { getLayerFeatures } from './vector.js';
 import { getLayerStyles } from './styles.js';
-import type { StyleLayer } from '../maplibre/index.js';
+import { type StyleLayer, PossiblyEvaluatedPropertyValue } from '../lib/style_layer.js';
 import type { RenderJob } from '../types.js';
-import { EvaluationParameters } from '../maplibre/index.js';
-import type { PossiblyEvaluatedPropertyValue } from '../maplibre/style/properties.js';
 import { Point2D } from '../lib/geometry.js';
 
 export async function renderVectorTiles(job: RenderJob): Promise<string> {
@@ -18,14 +16,13 @@ async function render(job: RenderJob): Promise<void> {
 	const { zoom } = job.view;
 	const layerFeatures = await getLayerFeatures(job);
 	const layerStyles = getLayerStyles(job.style.layers);
-	const evaluationParameters = new EvaluationParameters(zoom);
 	const availableImages: string[] = [];
 	const featureState = {};
 
 	layerStyles.forEach((layerStyle: StyleLayer) => {
 		if (layerStyle.isHidden(zoom)) return;
 
-		layerStyle.recalculate(evaluationParameters, availableImages);
+		layerStyle.recalculate({ zoom }, availableImages);
 
 		switch (layerStyle.type) {
 			case 'background':

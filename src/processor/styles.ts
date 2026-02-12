@@ -1,6 +1,5 @@
 import type { LayerSpecification } from '@maplibre/maplibre-gl-style-spec';
-import { createStyleLayer } from '../maplibre/index.js';
-import type { StyleLayer } from '../maplibre/style/style_layer.js';
+import { createStyleLayer, type StyleLayer } from '../lib/style_layer.js';
 
 export function getLayerStyles(layers: LayerSpecification[]): StyleLayer[] {
 	return layers.map((layerSpecification) => {
