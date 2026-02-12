@@ -36,15 +36,15 @@ let lineFloorwidthProperty: LineFloorwidthProperty;
 export const isLineStyleLayer = (layer: StyleLayer): layer is LineStyleLayer => layer.type === 'line';
 
 export class LineStyleLayer extends StyleLayer {
-    _unevaluatedLayout: Layout<LineLayoutProps>;
-    layout: PossiblyEvaluated<LineLayoutProps, LineLayoutPropsPossiblyEvaluated>;
+    declare _unevaluatedLayout: Layout<LineLayoutProps>;
+    declare layout: PossiblyEvaluated<LineLayoutProps, LineLayoutPropsPossiblyEvaluated>;
 
     gradientVersion: number;
     stepInterpolant: boolean;
 
-    _transitionablePaint: Transitionable<LinePaintProps>;
-    _transitioningPaint: Transitioning<LinePaintProps>;
-    paint: PossiblyEvaluated<LinePaintProps, LinePaintPropsPossiblyEvaluated>;
+    declare _transitionablePaint: Transitionable<LinePaintProps>;
+    declare _transitioningPaint: Transitioning<LinePaintProps>;
+    declare paint: PossiblyEvaluated<LinePaintProps, LinePaintPropsPossiblyEvaluated>;
 
     constructor(layer: LayerSpecification, globalState: Record<string, any>) {
         super(layer, properties, globalState);

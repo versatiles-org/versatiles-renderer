@@ -81,6 +81,29 @@ function removeBlock(content: string, startPattern: string | RegExp, endPattern:
 	return result.join('\n');
 }
 
+/**
+ * Add 'declare' to class field declarations that override parent fields.
+ * Without 'declare', ES2022+ useDefineForClassFields overwrites parent assignments with undefined.
+ */
+function declareClassFields(content: string): string {
+	const fieldPatterns = [
+		'_transitionablePaint:',
+		'_transitioningPaint:',
+		'_unevaluatedLayout:',
+		/^\s+paint:/,
+		/^\s+layout:/,
+	];
+	return content.split('\n').map(line => {
+		const matches = fieldPatterns.some(p =>
+			typeof p === 'string' ? line.includes(p) : p.test(line)
+		);
+		if (matches && !line.includes('declare') && !line.includes('=')) {
+			return line.replace(/^(\s+)/, '$1declare ');
+		}
+		return line;
+	}).join('\n');
+}
+
 /** Remove a method block from a class (handles destructured params and nested braces) */
 function removeMethod(content: string, methodSignature: string | RegExp): string {
 	const lines = content.split('\n');
@@ -269,6 +292,7 @@ function syncFormatSectionOverride(): void {
 // ============================================================================
 function syncBackgroundStyleLayer(): void {
 	let c = read('style/style_layer/background_style_layer.ts');
+	c = declareClassFields(c);
 	c = fixExtensions(c);
 	write('style/style_layer/background_style_layer.ts', c);
 }
@@ -298,6 +322,7 @@ function syncFillStyleLayer(): void {
 	c = removeMethod(c, 'queryRadius(');
 	c = removeMethod(c, 'queryIntersectsFeature(');
 
+	c = declareClassFields(c);
 	c = fixExtensions(c);
 	write('style/style_layer/fill_style_layer.ts', c);
 }
@@ -330,6 +355,7 @@ function syncLineStyleLayer(): void {
 	// Remove getLineWidth helper function
 	c = removeBlock(c, 'function getLineWidth(', /^\}/);
 
+	c = declareClassFields(c);
 	c = fixExtensions(c);
 	write('style/style_layer/line_style_layer.ts', c);
 }
@@ -370,6 +396,7 @@ function syncSymbolStyleLayer(): void {
 		', type SymbolFeature',
 	]);
 
+	c = declareClassFields(c);
 	c = fixExtensions(c);
 	write('style/style_layer/symbol_style_layer.ts', c);
 }

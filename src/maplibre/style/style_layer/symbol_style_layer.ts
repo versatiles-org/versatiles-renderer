@@ -36,12 +36,12 @@ import {FormatSectionOverride} from '../format_section_override.js';
 export const isSymbolStyleLayer = (layer: StyleLayer): layer is SymbolStyleLayer => layer.type === 'symbol';
 
 export class SymbolStyleLayer extends StyleLayer {
-    _unevaluatedLayout: Layout<SymbolLayoutProps>;
-    layout: PossiblyEvaluated<SymbolLayoutProps, SymbolLayoutPropsPossiblyEvaluated>;
+    declare _unevaluatedLayout: Layout<SymbolLayoutProps>;
+    declare layout: PossiblyEvaluated<SymbolLayoutProps, SymbolLayoutPropsPossiblyEvaluated>;
 
-    _transitionablePaint: Transitionable<SymbolPaintProps>;
-    _transitioningPaint: Transitioning<SymbolPaintProps>;
-    paint: PossiblyEvaluated<SymbolPaintProps, SymbolPaintPropsPossiblyEvaluated>;
+    declare _transitionablePaint: Transitionable<SymbolPaintProps>;
+    declare _transitioningPaint: Transitioning<SymbolPaintProps>;
+    declare paint: PossiblyEvaluated<SymbolPaintProps, SymbolPaintPropsPossiblyEvaluated>;
 
     constructor(layer: LayerSpecification, globalState: Record<string, any>) {
         super(layer, properties, globalState);

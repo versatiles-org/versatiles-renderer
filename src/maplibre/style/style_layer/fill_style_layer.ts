@@ -13,12 +13,12 @@ import type {EvaluationParameters} from '../evaluation_parameters.js';
 export const isFillStyleLayer = (layer: StyleLayer): layer is FillStyleLayer => layer.type === 'fill';
 
 export class FillStyleLayer extends StyleLayer {
-    _unevaluatedLayout: Layout<FillLayoutProps>;
-    layout: PossiblyEvaluated<FillLayoutProps, FillLayoutPropsPossiblyEvaluated>;
+    declare _unevaluatedLayout: Layout<FillLayoutProps>;
+    declare layout: PossiblyEvaluated<FillLayoutProps, FillLayoutPropsPossiblyEvaluated>;
 
-    _transitionablePaint: Transitionable<FillPaintProps>;
-    _transitioningPaint: Transitioning<FillPaintProps>;
-    paint: PossiblyEvaluated<FillPaintProps, FillPaintPropsPossiblyEvaluated>;
+    declare _transitionablePaint: Transitionable<FillPaintProps>;
+    declare _transitioningPaint: Transitioning<FillPaintProps>;
+    declare paint: PossiblyEvaluated<FillPaintProps, FillPaintPropsPossiblyEvaluated>;
 
     constructor(layer: LayerSpecification, globalState: Record<string, any>) {
         super(layer, properties, globalState);
