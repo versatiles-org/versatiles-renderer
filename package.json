@@ -34,13 +34,9 @@
 		"@maplibre/maplibre-gl-style-spec": "^24.4.1",
 		"@turf/union": "^7.3.0",
 		"@versatiles/style": "^5.7.0",
-		"brace-expansion": "^4.0.1",
-		"canvas": "^3.2.0",
-		"commander": "^14.0.2",
 		"pbf": "^4.0.1"
 	},
 	"devDependencies": {
-		"@types/color": "^4.2.0",
 		"@types/node": "^24.10.13",
 		"@types/pbf": "^3.0.5",
 		"@typescript-eslint/eslint-plugin": "^8.46.4",

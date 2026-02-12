@@ -16,7 +16,7 @@
 		"allowImportingTsExtensions": true,
 		"noEmit": true,
 		"types": [
-			"Node"
+			"node"
 		]
 	},
 	"include": [
