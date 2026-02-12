@@ -18,9 +18,8 @@
 		"prepack": "npm run build",
 		"release": "npx vrt release-npm",
 		"start": "tsx src/index.ts",
-		"test-coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
-		"test-typescript": "NODE_OPTIONS=--experimental-vm-modules jest",
-		"test": "npm run test-typescript",
+		"test-coverage": "vitest run --coverage",
+		"test": "vitest run",
 		"upgrade": "npm-check-updates -u && rm -f package-lock.json && rm -rf node_modules; npm i"
 	},
 	"type": "module",
@@ -50,6 +49,7 @@
 		"eslint": "^9.39.1",
 		"npm-check-updates": "^19.1.2",
 		"tsx": "^4.20.6",
-		"typescript": "^5.9.3"
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.18"
 	}
 }
