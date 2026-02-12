@@ -9,7 +9,7 @@
 		"dist/**/*.d.ts"
 	],
 	"scripts": {
-		"update-maplibre": "cd lib/maplibre-gl-js && git fetch --tags && git checkout $(git tag -l 'v*' --sort=-v:refname | head -1) && cd ../.. && npm run sync-maplibre",
+		"update-maplibre": "cd lib/maplibre-gl-js && git reset --hard && git fetch --tags && git checkout $(git tag -l 'v*' --sort=-v:refname | head -1) && cd ../.. && npm run sync-maplibre",
 		"sync-maplibre": "cd lib/maplibre-gl-js && npm install && npx tsx build/generate-style-code.ts && cd ../.. && npx tsx scripts/sync-maplibre.ts",
 		"build-node": "rm -rf dist && tsc -p tsconfig.node.json && chmod +x dist/index.js",
 		"build": "rm -rf release; npm run build-node",
