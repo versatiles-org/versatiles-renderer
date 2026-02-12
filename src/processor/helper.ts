@@ -17,15 +17,14 @@ function geojsonToFeature(id: number, polygonFeature: GeoJsonFeature<Polygon>): 
 
 export function mergePolygons(featureList: Feature[]): Feature[] {
 	const featuresById = new Map<number, Feature[]>();
+	let nextId = -1;
 	for (const feature of featureList) {
-		if (typeof feature.id !== 'number') {
-			throw new Error('Feature id is not a number');
-		}
-		const features = featuresById.get(feature.id);
+		const id = typeof feature.id === 'number' ? feature.id : nextId--;
+		const features = featuresById.get(id);
 		if (features) {
 			features.push(feature);
 		} else {
-			featuresById.set(feature.id, [feature]);
+			featuresById.set(id, [feature]);
 		}
 	}
 
