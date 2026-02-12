@@ -27,17 +27,12 @@ async function render(job: RenderJob): Promise<void> {
 
 		layerStyle.recalculate(evaluationParameters, availableImages);
 
-		//console.log(layerFeatures);
-		//const { paint: PossiblyEvaluated, layout } = layerStyle;
-		//console.log(layerStyle);
-
 		switch (layerStyle.type) {
 			case 'background':
 				{
-					//const layer = layerStyle as BackgroundStyleLayer;
 					renderer.drawBackgroundFill({
 						color: new Color(getPaint<MaplibreColor>('background-color')),
-						opacity: Number(getPaint<number>('background-opacity')),
+						opacity: getPaint<number>('background-opacity'),
 					});
 				}
 				return;
@@ -99,29 +94,23 @@ async function render(job: RenderJob): Promise<void> {
 				throw Error('layerStyle.type: ' + String(layerStyle.type));
 		}
 
-		/* eslint-disable @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-non-null-assertion */
-		function getPaint<I>(key: string, feature?: Feature): I {
-			// @ts-expect-error: paint.get returns dynamic types
-			const value = layerStyle.paint.get(key) as PossiblyEvaluatedPropertyValue<I>;
-			if (!value) return value;
-			if (!value.evaluate) {
-				// @ts-expect-error: value may be scalar
-				return value;
+		function getPaint<T>(key: string, feature?: Feature): T {
+			const paint = layerStyle.paint as unknown as { get(k: string): PossiblyEvaluatedPropertyValue<T> | T };
+			const value = paint.get(key);
+			if (typeof value === 'object' && value !== null && 'evaluate' in value) {
+				return (value as PossiblyEvaluatedPropertyValue<T>).evaluate(feature ?? ({} as Feature), featureState, undefined, availableImages);
 			}
-			return value.evaluate(feature!, featureState, undefined, availableImages);
+			return value as T;
 		}
 
-		function getLayout<I>(key: string, feature?: Feature): I {
-			// @ts-expect-error: layout.get returns dynamic types
-			const value = layerStyle.layout.get(key) as PossiblyEvaluatedPropertyValue<I>;
-			if (!value) return value;
-			if (!value.evaluate) {
-				// @ts-expect-error: value may be scalar
-				return value;
+		function getLayout<T>(key: string, feature?: Feature): T {
+			const layout = layerStyle.layout as unknown as { get(k: string): PossiblyEvaluatedPropertyValue<T> | T };
+			const value = layout.get(key);
+			if (typeof value === 'object' && value !== null && 'evaluate' in value) {
+				return (value as PossiblyEvaluatedPropertyValue<T>).evaluate(feature ?? ({} as Feature), featureState, undefined, availableImages);
 			}
-			return value.evaluate(feature!, featureState, undefined, availableImages);
+			return value as T;
 		}
-		/* eslint-enable @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-non-null-assertion */
 
 	});
 }

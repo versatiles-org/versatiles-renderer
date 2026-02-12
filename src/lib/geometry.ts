@@ -1,19 +1,12 @@
 import type { Feature as MapLibreFeature, Point2D as MapLibrePoint2D } from '@maplibre/maplibre-gl-style-spec';
 
-// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-interface Properties {
-	[_: string]: unknown;
-}
+type Properties = Record<string, unknown>;
 
-
-// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-interface Patterns {
-	[_: string]: {
-		'min': string;
-		'mid': string;
-		'max': string;
-	};
-}
+type Patterns = Record<string, {
+	min: string;
+	mid: string;
+	max: string;
+}>;
 
 type Geometry = Point2D[][];
 type Bbox = [number, number, number, number];

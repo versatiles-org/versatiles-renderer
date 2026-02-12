@@ -9,11 +9,10 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const { width, height } = job.renderer;
 	const { zoom, center } = job.view;
 	const { sources } = job.style;
-	const source = sources['versatiles-shortbread'];
-	if (!source || source.type !== 'vector' || !source.tiles) {
-		console.log('Invalid source', sources);
-		throw Error('Invalid source')
-	};
+	const source = sources['versatiles-shortbread'] as { type: string; tiles?: string[] } | undefined;
+	if (source?.type !== 'vector' || !source.tiles) {
+		throw Error('Invalid source');
+	}
 	const sourceUrl: string = source.tiles[0];
 
 	const zoomLevel = Math.floor(zoom);
@@ -48,11 +47,8 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 		const vectorTile = new VectorTile(new Protobuf(buffer));
 		for (const [name, layer] of Object.entries(vectorTile.layers)) {
 
-			let features: Features;
-			if (layerFeatures.has(name)) {
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				features = layerFeatures.get(name)!;
-			} else {
+			let features = layerFeatures.get(name);
+			if (!features) {
 				features = { points: [], linestrings: [], polygons: [] };
 				layerFeatures.set(name, features);
 			}
@@ -122,7 +118,7 @@ async function getTile(url: string, z: number, x: number, y: number): Promise<Ar
 		const response = await fetch(tileUrl);
 		if (!response.ok) return null;
 		return await response.arrayBuffer();
-	} catch (e) {
+	} catch {
 		console.warn(`Failed to load tile: ${tileUrl}`);
 		return null;
 	}

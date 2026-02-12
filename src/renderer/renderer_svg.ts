@@ -24,7 +24,7 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public drawPolygons(features: [Feature, FillStyle][], opacity: number): void {
-		this.#svg.push(`<g opacity="${opacity}">`);
+		this.#svg.push(`<g opacity="${String(opacity)}">`);
 		features.forEach(([feature, style]) => {
 			const path: string = feature.geometry.map(ring =>
 				ring.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p))
@@ -42,7 +42,7 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public drawLineStrings(features: [Feature, LineStyle][], opacity: number): void {
-		this.#svg.push(`<g opacity="${opacity}">`);
+		this.#svg.push(`<g opacity="${String(opacity)}">`);
 		features.forEach(([feature, style]) => {
 			feature.geometry.forEach(line => {
 				const path: string = line.map((p, i) =>
@@ -57,7 +57,7 @@ export class SVGRenderer extends Renderer {
 					style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
 					`stroke-linecap="${style.cap}"`,
 					`stroke-linejoin="${style.join}"`,
-					`stroke-miterlimit="${style.miterLimit}"`,
+					`stroke-miterlimit="${String(style.miterLimit)}"`,
 					'/>',
 				].join(' '));
 			});
@@ -77,7 +77,7 @@ export class SVGRenderer extends Renderer {
 
 	public getString(): string {
 		return [
-			`<svg viewBox="0 0 ${this.width} ${this.height}" width="${this.width}" height="${this.height}" xmlns="http://www.w3.org/2000/svg" style="background-color:${this.#backgroundColor.hex}">`,
+			`<svg viewBox="0 0 ${String(this.width)} ${String(this.height)}" width="${String(this.width)}" height="${String(this.height)}" xmlns="http://www.w3.org/2000/svg" style="background-color:${this.#backgroundColor.hex}">`,
 			...this.#svg,
 			'</svg>',
 		].join('\n');
