@@ -53,8 +53,7 @@ export class Color {
 				return;
 			default:
 		}
-		console.log(args);
-		throw Error();
+		throw Error('Unsupported Color arguments: ' + JSON.stringify(args));
 
 		function h2d(text: string): number {
 			return parseInt(text, 16);
