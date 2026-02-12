@@ -89,11 +89,17 @@ async function render(job: RenderJob): Promise<void> {
 					);
 				}
 				return;
+			case 'circle':
+			case 'color-relief':
+			case 'fill-extrusion':
+			case 'heatmap':
+			case 'hillshade':
+			case 'raster':
 			case 'symbol':
-				console.log('implement symbols');
+				console.log(`implementation is missing: ${layerStyle.id} (${layerStyle.type})`);
 				return;
 			default:
-				throw Error('layerStyle.type: ' + layerStyle.type);
+				throw Error('layerStyle.type: ' + String(layerStyle.type));
 		}
 
 		/* eslint-disable @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-non-null-assertion */
