@@ -72,10 +72,10 @@ export class Feature implements MapLibreFeature {
 	}
 
 	public getBbox(): Bbox {
-		let xMin = 1e10;
-		let yMin = 1e10;
-		let xMax = -1e10;
-		let yMax = -1e10;
+		let xMin = Infinity;
+		let yMin = Infinity;
+		let xMax = -Infinity;
+		let yMax = -Infinity;
 		this.geometry.forEach(ring => {
 			ring.forEach(point => {
 				if (xMin > point.x) xMin = point.x;
