@@ -1,5 +1,7 @@
-// This file is generated. Edit build/generate-style-code.ts, then run 'npm run codegen'.
+// @ts-nocheck
 /* eslint-disable */
+// Synced from lib/maplibre-gl-js — do not edit manually. Run: npx tsx scripts/sync-maplibre.ts
+
 
 import {latest as styleSpec} from '@maplibre/maplibre-gl-style-spec';
 
@@ -14,7 +16,7 @@ import {
     CrossFaded
 } from '../properties.js';
 
-import type {Color, Formatted, Padding, ResolvedImage, VariableAnchorOffsetCollection} from '@maplibre/maplibre-gl-style-spec';
+import type {Color, Formatted, Padding, NumberArray, ColorArray, ResolvedImage, VariableAnchorOffsetCollection} from '@maplibre/maplibre-gl-style-spec';
 import {StylePropertySpecification} from '@maplibre/maplibre-gl-style-spec';
 
 export type LineLayoutProps = {
@@ -51,7 +53,7 @@ export type LinePaintProps = {
     "line-gap-width": DataDrivenProperty<number>,
     "line-offset": DataDrivenProperty<number>,
     "line-blur": DataDrivenProperty<number>,
-    "line-dasharray": CrossFadedProperty<Array<number>>,
+    "line-dasharray": CrossFadedDataDrivenProperty<Array<number>>,
     "line-pattern": CrossFadedDataDrivenProperty<ResolvedImage>,
     "line-gradient": ColorRampProperty,
 };
@@ -65,7 +67,7 @@ export type LinePaintPropsPossiblyEvaluated = {
     "line-gap-width": PossiblyEvaluatedPropertyValue<number>,
     "line-offset": PossiblyEvaluatedPropertyValue<number>,
     "line-blur": PossiblyEvaluatedPropertyValue<number>,
-    "line-dasharray": CrossFaded<Array<number>>,
+    "line-dasharray": PossiblyEvaluatedPropertyValue<CrossFaded<Array<number>>>,
     "line-pattern": PossiblyEvaluatedPropertyValue<CrossFaded<ResolvedImage>>,
     "line-gradient": ColorRampProperty,
 };
@@ -80,7 +82,7 @@ const getPaint = () => paint = paint || new Properties({
     "line-gap-width": new DataDrivenProperty(styleSpec["paint_line"]["line-gap-width"] as any as StylePropertySpecification),
     "line-offset": new DataDrivenProperty(styleSpec["paint_line"]["line-offset"] as any as StylePropertySpecification),
     "line-blur": new DataDrivenProperty(styleSpec["paint_line"]["line-blur"] as any as StylePropertySpecification),
-    "line-dasharray": new CrossFadedProperty(styleSpec["paint_line"]["line-dasharray"] as any as StylePropertySpecification),
+    "line-dasharray": new CrossFadedDataDrivenProperty(styleSpec["paint_line"]["line-dasharray"] as any as StylePropertySpecification),
     "line-pattern": new CrossFadedDataDrivenProperty(styleSpec["paint_line"]["line-pattern"] as any as StylePropertySpecification),
     "line-gradient": new ColorRampProperty(styleSpec["paint_line"]["line-gradient"] as any as StylePropertySpecification),
 });

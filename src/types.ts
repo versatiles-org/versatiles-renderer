@@ -1,4 +1,4 @@
-import type { VersaTiles } from '@versatiles/container';
+import type { Container } from '@versatiles/container';
 import type { RendererClass } from './renderer/renderer.js';
 import type { Point2D } from './lib/geometry.js';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
@@ -10,7 +10,7 @@ export interface View {
 }
 
 export interface RenderJob {
-	container: VersaTiles;
+	container: Container;
 	style: StyleSpecification;
 	view: View;
 	renderer: RendererClass;

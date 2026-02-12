@@ -1,42 +1,42 @@
- 
- 
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
-import { StyleLayer } from '../style_layer.js';
+// @ts-nocheck
+/* eslint-disable */
+// Synced from lib/maplibre-gl-js — do not edit manually. Run: npx tsx scripts/sync-maplibre.ts
 
-import properties from './fill_style_layer_properties.g.js';
-import type { Transitionable, Transitioning, Layout, PossiblyEvaluated } from '../properties.js';
+import {StyleLayer} from '../style_layer.js';
+import properties, {type FillLayoutPropsPossiblyEvaluated, type FillPaintPropsPossiblyEvaluated} from './fill_style_layer_properties.g.js';
 
-import type { LayerSpecification } from '@maplibre/maplibre-gl-style-spec';
-import type { FillLayoutProps, FillPaintProps, FillLayoutPropsPossiblyEvaluated, FillPaintPropsPossiblyEvaluated } from './fill_style_layer_properties.g';
-import type { EvaluationParameters } from '../evaluation_parameters.js';
+import type {Transitionable, Transitioning, Layout, PossiblyEvaluated} from '../properties.js';
+import type {LayerSpecification} from '@maplibre/maplibre-gl-style-spec';
+import type {FillLayoutProps, FillPaintProps} from './fill_style_layer_properties.g.js';
+import type {EvaluationParameters} from '../evaluation_parameters.js';
+
+export const isFillStyleLayer = (layer: StyleLayer): layer is FillStyleLayer => layer.type === 'fill';
 
 export class FillStyleLayer extends StyleLayer {
-	declare _unevaluatedLayout!: Layout<FillLayoutProps>;
+    _unevaluatedLayout: Layout<FillLayoutProps>;
+    layout: PossiblyEvaluated<FillLayoutProps, FillLayoutPropsPossiblyEvaluated>;
 
-	declare layout: PossiblyEvaluated<FillLayoutProps, FillLayoutPropsPossiblyEvaluated>;
+    _transitionablePaint: Transitionable<FillPaintProps>;
+    _transitioningPaint: Transitioning<FillPaintProps>;
+    paint: PossiblyEvaluated<FillPaintProps, FillPaintPropsPossiblyEvaluated>;
 
-	declare _transitionablePaint: Transitionable<FillPaintProps>;
+    constructor(layer: LayerSpecification, globalState: Record<string, any>) {
+        super(layer, properties, globalState);
+    }
 
-	declare _transitioningPaint: Transitioning<FillPaintProps>;
+    recalculate(parameters: EvaluationParameters, availableImages: Array<string>) {
+        super.recalculate(parameters, availableImages);
 
-	declare paint: PossiblyEvaluated<FillPaintProps, FillPaintPropsPossiblyEvaluated>;
+        const outlineColor = this.paint._values['fill-outline-color'];
+        if (outlineColor.value.kind === 'constant' && outlineColor.value.value === undefined) {
+            this.paint._values['fill-outline-color'] = this.paint._values['fill-color'];
+        }
+    }
 
-	constructor(layer: LayerSpecification) {
-		super(layer, properties);
-	}
 
-	recalculate(parameters: EvaluationParameters, availableImages: string[]) {
-		super.recalculate(parameters, availableImages);
 
-		const outlineColor = this.paint._values['fill-outline-color'];
-		if (outlineColor.value.kind === 'constant' && outlineColor.value.value === undefined) {
-			this.paint._values['fill-outline-color'] = this.paint._values['fill-color'];
-		}
-	}
 
-	isTileClipped() {
-		return true;
-	}
+    isTileClipped() {
+        return true;
+    }
 }

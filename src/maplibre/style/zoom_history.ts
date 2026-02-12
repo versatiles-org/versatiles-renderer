@@ -1,47 +1,44 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
+// @ts-nocheck
+/* eslint-disable */
+// Synced from lib/maplibre-gl-js — do not edit manually. Run: npx tsx scripts/sync-maplibre.ts
+
 export class ZoomHistory {
-	lastZoom: number;
+    lastZoom: number;
+    lastFloorZoom: number;
+    lastIntegerZoom: number;
+    lastIntegerZoomTime: number;
+    first: boolean;
 
-	lastFloorZoom: number;
+    constructor() {
+        this.first = true;
+    }
 
-	lastIntegerZoom: number;
+    update(z: number, now: number) {
+        const floorZ = Math.floor(z);
 
-	lastIntegerZoomTime: number;
+        if (this.first) {
+            this.first = false;
+            this.lastIntegerZoom = floorZ;
+            this.lastIntegerZoomTime = 0;
+            this.lastZoom = z;
+            this.lastFloorZoom = floorZ;
+            return true;
+        }
 
-	first: boolean;
+        if (this.lastFloorZoom > floorZ) {
+            this.lastIntegerZoom = floorZ + 1;
+            this.lastIntegerZoomTime = now;
+        } else if (this.lastFloorZoom < floorZ) {
+            this.lastIntegerZoom = floorZ;
+            this.lastIntegerZoomTime = now;
+        }
 
-	constructor() {
-		this.first = true;
-	}
+        if (z !== this.lastZoom) {
+            this.lastZoom = z;
+            this.lastFloorZoom = floorZ;
+            return true;
+        }
 
-	update(z: number, now: number) {
-		const floorZ = Math.floor(z);
-
-		if (this.first) {
-			this.first = false;
-			this.lastIntegerZoom = floorZ;
-			this.lastIntegerZoomTime = 0;
-			this.lastZoom = z;
-			this.lastFloorZoom = floorZ;
-			return true;
-		}
-
-		if (this.lastFloorZoom > floorZ) {
-			this.lastIntegerZoom = floorZ + 1;
-			this.lastIntegerZoomTime = now;
-		} else if (this.lastFloorZoom < floorZ) {
-			this.lastIntegerZoom = floorZ;
-			this.lastIntegerZoomTime = now;
-		}
-
-		if (z !== this.lastZoom) {
-			this.lastZoom = z;
-			this.lastFloorZoom = floorZ;
-			return true;
-		}
-
-		return false;
-	}
+        return false;
+    }
 }

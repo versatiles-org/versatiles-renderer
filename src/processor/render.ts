@@ -96,31 +96,29 @@ async function render(job: RenderJob): Promise<void> {
 				throw Error('layerStyle.type: ' + layerStyle.type);
 		}
 
+		/* eslint-disable @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-non-null-assertion */
 		function getPaint<I>(key: string, feature?: Feature): I {
-			// @ts-expect-error: unsure to handle that
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+			// @ts-expect-error: paint.get returns dynamic types
 			const value = layerStyle.paint.get(key) as PossiblyEvaluatedPropertyValue<I>;
 			if (!value) return value;
-			//console.log('getPaint', value);
 			if (!value.evaluate) {
-				// @ts-expect-error: unsure to handle that
+				// @ts-expect-error: value may be scalar
 				return value;
 			}
-			return value.evaluate(feature, featureState, availableImages);
+			return value.evaluate(feature!, featureState, undefined, availableImages);
 		}
 
 		function getLayout<I>(key: string, feature?: Feature): I {
-			// @ts-expect-error: unsure to handle that
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+			// @ts-expect-error: layout.get returns dynamic types
 			const value = layerStyle.layout.get(key) as PossiblyEvaluatedPropertyValue<I>;
 			if (!value) return value;
-			//console.log('getLayout', value);
 			if (!value.evaluate) {
-				// @ts-expect-error: unsure to handle that
+				// @ts-expect-error: value may be scalar
 				return value;
 			}
-			return value.evaluate(feature, featureState, availableImages);
+			return value.evaluate(feature!, featureState, undefined, availableImages);
 		}
+		/* eslint-enable @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-non-null-assertion */
 
 	});
 }

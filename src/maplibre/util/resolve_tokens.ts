@@ -1,3 +1,7 @@
+// @ts-nocheck
+/* eslint-disable */
+// Synced from lib/maplibre-gl-js — do not edit manually. Run: npx tsx scripts/sync-maplibre.ts
+
 /**
  * Replace tokens in a string template with values in an object
  *
@@ -6,10 +10,12 @@
  * @returns the template with tokens replaced
  */
 export function resolveTokens(
-	properties: Readonly<Record<string, unknown>> | null,
-	text: string,
+    properties: {
+        readonly [x: string]: unknown;
+    } | null,
+    text: string
 ): string {
-	return text.replace(/{([^{}]+)}/g, (match, key: string) => {
-		return properties && key in properties ? String(properties[key]) : '';
-	});
+    return text.replace(/{([^{}]+)}/g, (match, key: string) => {
+        return properties && key in properties ? String(properties[key]) : '';
+    });
 }

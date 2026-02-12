@@ -6,6 +6,7 @@ export default [
 		ignores: [
 			'**/dist/**/*.*',
 			'**/coverage/**/*.*',
+			'**/lib/**/*.*',
 		]
 	},
 	{

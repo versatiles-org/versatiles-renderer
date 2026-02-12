@@ -1,5 +1,7 @@
-// This file is generated. Edit build/generate-style-code.ts, then run 'npm run codegen'.
+// @ts-nocheck
 /* eslint-disable */
+// Synced from lib/maplibre-gl-js — do not edit manually. Run: npx tsx scripts/sync-maplibre.ts
+
 
 import {latest as styleSpec} from '@maplibre/maplibre-gl-style-spec';
 
@@ -12,9 +14,9 @@ import {
     ColorRampProperty,
     PossiblyEvaluatedPropertyValue,
     CrossFaded
-} from '../properties';
+} from '../properties.js';
 
-import type {Color, Formatted, Padding, ResolvedImage, VariableAnchorOffsetCollection} from '@maplibre/maplibre-gl-style-spec';
+import type {Color, Formatted, Padding, NumberArray, ColorArray, ResolvedImage, VariableAnchorOffsetCollection} from '@maplibre/maplibre-gl-style-spec';
 import {StylePropertySpecification} from '@maplibre/maplibre-gl-style-spec';
 
 import {
