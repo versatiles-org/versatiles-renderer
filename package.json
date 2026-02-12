@@ -9,6 +9,7 @@
 		"dist/**/*.d.ts"
 	],
 	"scripts": {
+		"sync-maplibre": "cd lib/maplibre-gl-js && npm install && npx tsx build/generate-style-code.ts && cd ../.. && npx tsx scripts/sync-maplibre.ts",
 		"build-node": "rm -rf dist && tsc -p tsconfig.node.json && chmod +x dist/index.js",
 		"build": "rm -rf release; npm run build-node",
 		"check": "npm run lint && npm run test && npm run build",
