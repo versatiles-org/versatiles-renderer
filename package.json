@@ -29,20 +29,21 @@
 	"engines": {
 		"node": ">= 22"
 	},
-	"dependencies": {
+	"dependencies": {},
+	"devDependencies": {
 		"@mapbox/vector-tile": "^2.0.4",
 		"@maplibre/maplibre-gl-style-spec": "^24.4.1",
 		"@turf/union": "^7.3.0",
 		"@versatiles/style": "^5.7.0",
-		"pbf": "^4.0.1"
-	},
-	"devDependencies": {
+		"pbf": "^4.0.1",
+		"@maplibre/vt-pbf": "^4.2.1",
 		"@types/node": "^24.10.13",
 		"@types/pbf": "^3.0.5",
 		"@typescript-eslint/eslint-plugin": "^8.46.4",
 		"@typescript-eslint/parser": "^8.46.4",
 		"@versatiles/release-tool": "^2.4.4",
 		"eslint": "^9.39.1",
+		"geojson": "^0.5.0",
 		"npm-check-updates": "^19.1.2",
 		"tsx": "^4.20.6",
 		"typescript": "^5.9.3",
