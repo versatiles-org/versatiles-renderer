@@ -1,0 +1,3 @@
+[submodule "lib/maplibre-gl-js"]
+	path = lib/maplibre-gl-js
+	url = https://github.com/maplibre/maplibre-gl-js.git
