@@ -75,12 +75,12 @@ export class SVGRenderer extends Renderer {
 	// implement me!
 	//	}
 
-	public getBuffer(): Buffer {
-		return Buffer.from([
+	public getString(): string {
+		return [
 			`<svg viewBox="0 0 ${this.width} ${this.height}" width="${this.width}" height="${this.height}" xmlns="http://www.w3.org/2000/svg" style="background-color:${this.#backgroundColor.hex}">`,
 			...this.#svg,
 			'</svg>',
-		].join('\n'));
+		].join('\n');
 	}
 
 	#round(v: number): string {

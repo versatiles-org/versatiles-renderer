@@ -1,10 +1,11 @@
 {
 	"compilerOptions": {
 		"lib": [
+			"DOM",
 			"ESNext"
 		],
 		"module": "ESNext",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"target": "ES2022",
 		"strict": true,
 		"esModuleInterop": true,
@@ -14,6 +15,9 @@
 		"allowJs": true,
 		"allowImportingTsExtensions": true,
 		"noEmit": true,
+		"types": [
+			"Node"
+		]
 	},
 	"include": [
 		"src/**/*.ts"

@@ -8,12 +8,9 @@ import { EvaluationParameters } from '../maplibre/index.js';
 import type { PossiblyEvaluatedPropertyValue } from '../maplibre/style/properties.js';
 import { Point2D } from '../lib/geometry.js';
 
-export async function renderVectorTiles(job: RenderJob, filename: string): Promise<void> {
-	//console.table(layerStyles.map(l => ({ id: l.id, type: l.type })));
-
+export async function renderVectorTiles(job: RenderJob): Promise<string> {
 	await render(job);
-
-	job.renderer.save(filename);
+	return job.renderer.getString();
 }
 
 async function render(job: RenderJob): Promise<void> {
