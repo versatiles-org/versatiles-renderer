@@ -38,11 +38,17 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
       - name: Build
         run: npm run build
 
       - name: Run tests
         run: npm run test
+
+      - name: Run MapLibre plugin E2E test
+        run: npm run e2e:maplibre
 
       - name: Generate test coverage
         run: npm run test-coverage
