@@ -53,9 +53,8 @@ B["helper.ts"]
 end
 subgraph C["renderer"]
 D["renderer_svg.ts"]
-E["renderer.ts"]
 end
-F["types.ts"]
+E["types.ts"]
 end
 1-->2
 2-->4
@@ -70,7 +69,6 @@ A-->4
 A-->B
 B-->4
 D-->7
-D-->E
 
 class 0,3,5,C subgraphs;
 classDef subgraphs fill-opacity:0.1, fill:#888, color:#888, stroke:#888;

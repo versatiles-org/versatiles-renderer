@@ -1,11 +1,14 @@
 import type { Feature, Point2D } from '../lib/geometry.js';
 import { Color } from '../lib/color.js';
-import { Renderer } from './renderer.js';
 import type { BackgroundStyle, FillStyle, LineStyle, RendererOptions } from '../types.js';
 
 type Segment = [number, number][];
 
-export class SVGRenderer extends Renderer {
+export class SVGRenderer {
+	public readonly width: number;
+
+	public readonly height: number;
+
 	readonly #svg: string[];
 
 	readonly #scale: number;
@@ -13,7 +16,8 @@ export class SVGRenderer extends Renderer {
 	#backgroundColor: Color;
 
 	public constructor(opt: RendererOptions) {
-		super(opt);
+		this.width = opt.width;
+		this.height = opt.height;
 		this.#svg = [];
 		this.#scale = opt.scale;
 		this.#backgroundColor = Color.transparent;

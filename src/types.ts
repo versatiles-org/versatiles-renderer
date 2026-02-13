@@ -1,4 +1,4 @@
-import type { RendererClass } from './renderer/renderer.js';
+import type { SVGRenderer } from './renderer/renderer_svg.js';
 import type { Point2D } from './lib/geometry.js';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { Color } from './lib/color.js';
@@ -11,7 +11,7 @@ export interface View {
 export interface RenderJob {
 	style: StyleSpecification;
 	view: View;
-	renderer: RendererClass;
+	renderer: SVGRenderer;
 }
 
 export interface RendererOptions {
