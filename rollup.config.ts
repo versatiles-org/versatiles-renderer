@@ -14,7 +14,7 @@ export default defineConfig([
 		plugins: [
 			resolve(),
 			typescript({ tsconfig: './tsconfig.build.json' }),
-			visualizer({ filename: 'dist/bundle-stats.html', template: 'treemap' }),
+			visualizer({ filename: 'bundle-stats.html', template: 'treemap' }),
 		],
 	},
 	{
