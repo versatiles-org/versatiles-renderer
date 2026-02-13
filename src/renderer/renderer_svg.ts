@@ -31,31 +31,28 @@ export class SVGRenderer extends Renderer {
 
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
 
-		const groups = new Map<string, { paths: string[]; attrs: string }>();
+		const groups = new Map<string, { segments: Segment[]; attrs: string }>();
 		features.forEach(([feature, style]) => {
 			if (style.color.alpha <= 0) return;
 
-			const path: string = feature.geometry
-				.map(
-					(ring) => ring.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p)).join('') + 'z',
-				)
-				.join('');
-
 			const translate = style.translate.isZero()
 				? ''
-				: ` transform="translate(${this.#roundPoint(style.translate)})"`;
+				: ` transform="translate(${this.#formatPoint(style.translate)})"`;
 			const key = style.color.hex + translate;
 
 			let group = groups.get(key);
 			if (!group) {
-				group = { paths: [], attrs: `fill="${style.color.hex}"${translate}` };
+				group = { segments: [], attrs: `fill="${style.color.hex}"${translate}` };
 				groups.set(key, group);
 			}
-			group.paths.push(path);
+			feature.geometry.forEach((ring) => {
+				group.segments.push(ring.map((p) => this.#roundXY(p)));
+			});
 		});
 
-		for (const { paths, attrs } of groups.values()) {
-			this.#svg.push(`<path d="${paths.join('')}" ${attrs} />`);
+		for (const { segments, attrs } of groups.values()) {
+			const d = segmentsToPath(segments, true);
+			this.#svg.push(`<path d="${d}" ${attrs} />`);
 		}
 
 		this.#svg.push('</g>');
@@ -73,7 +70,7 @@ export class SVGRenderer extends Renderer {
 
 			const translate = style.translate.isZero()
 				? ''
-				: ` transform="translate(${this.#roundPoint(style.translate)})"`;
+				: ` transform="translate(${this.#formatPoint(style.translate)})"`;
 			const key = [
 				style.color.hex,
 				this.#round(style.width),
@@ -126,8 +123,9 @@ export class SVGRenderer extends Renderer {
 		return (v * this.#scale).toFixed(3);
 	}
 
-	#roundPoint(p: Point2D): string {
-		return (p.x * this.#scale).toFixed(1) + ',' + (p.y * this.#scale).toFixed(1);
+	#formatPoint(p: Point2D): string {
+		const [x, y] = this.#roundXY(p);
+		return formatNum(x) + ',' + formatNum(y);
 	}
 
 	#roundXY(p: Point2D): [number, number] {
@@ -193,7 +191,7 @@ function greedyChain(segments: Segment[]): Segment[] {
 	return chains;
 }
 
-function segmentsToPath(chains: Segment[]): string {
+function segmentsToPath(chains: Segment[], close = false): string {
 	let d = '';
 	for (const chain of chains) {
 		d += 'M' + formatNum(chain[0][0]) + ',' + formatNum(chain[0][1]);
@@ -220,6 +218,7 @@ function segmentsToPath(chains: Segment[]): string {
 			px = x;
 			py = y;
 		}
+		if (close) d += 'z';
 	}
 	return d;
 }
