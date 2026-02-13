@@ -6,7 +6,101 @@ Renders vector maps as SVG.
 
 [Download SVG](docs/demo.svg)
 
-Currently only background, fill and line layers are supported.
+Currently supported layer types: background, fill, line, and raster.
+
+## Installation
+
+```bash
+npm install @versatiles/svg-renderer
+```
+
+## Usage
+
+### Node.js
+
+```typescript
+import { renderToSVG } from '@versatiles/svg-renderer';
+import { styles } from '@versatiles/style';
+import { writeFileSync } from 'node:fs';
+
+const svg = await renderToSVG({
+	style: styles.colorful(),
+	width: 800,
+	height: 600,
+	lon: 13.4,
+	lat: 52.5,
+	zoom: 10,
+});
+
+writeFileSync('map.svg', svg);
+```
+
+### Browser
+
+```typescript
+import { renderToSVG } from '@versatiles/svg-renderer';
+
+const svg = await renderToSVG({
+	style: await fetch('https://tiles.versatiles.org/assets/styles/colorful/style.json').then((r) =>
+		r.json(),
+	),
+	width: 800,
+	height: 600,
+	lon: 13.4,
+	lat: 52.5,
+	zoom: 10,
+});
+
+document.body.innerHTML = svg;
+```
+
+### MapLibre Plugin
+
+The package includes an `SVGExportControl` that adds an export button to any MapLibre GL JS map.
+
+```bash
+npm install @versatiles/svg-renderer maplibre-gl
+```
+
+```typescript
+import maplibregl from 'maplibre-gl';
+import { SVGExportControl } from '@versatiles/svg-renderer/maplibre';
+
+const map = new maplibregl.Map({
+	container: 'map',
+	style: 'https://tiles.versatiles.org/assets/styles/colorful/style.json',
+	center: [13.4, 52.5],
+	zoom: 10,
+});
+
+map.addControl(new SVGExportControl(), 'top-right');
+```
+
+The control opens a panel where the user can set width, height, and scale, preview the SVG, download it, or open it in a new tab. Map interactions are disabled while the panel is open.
+
+Options:
+
+```typescript
+new SVGExportControl({
+	defaultWidth: 1024, // default: 1024
+	defaultHeight: 1024, // default: 1024
+	defaultScale: 1, // default: 1
+});
+```
+
+## API
+
+### `renderToSVG(options): Promise<string>`
+
+| Option   | Type                 | Default      | Description                  |
+| -------- | -------------------- | ------------ | ---------------------------- |
+| `style`  | `StyleSpecification` | _(required)_ | MapLibre style specification |
+| `width`  | `number`             | `1024`       | Output width in pixels       |
+| `height` | `number`             | `1024`       | Output height in pixels      |
+| `scale`  | `number`             | `1`          | Scale factor                 |
+| `lon`    | `number`             | `0`          | Center longitude             |
+| `lat`    | `number`             | `0`          | Center latitude              |
+| `zoom`   | `number`             | `2`          | Zoom level                   |
 
 ## E2E Visual Comparison
 
