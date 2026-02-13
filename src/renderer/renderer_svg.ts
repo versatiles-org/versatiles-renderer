@@ -123,7 +123,26 @@ export class SVGRenderer extends Renderer {
 }
 
 function chainSegments(segments: string[][]): string {
-	// Build adjacency map: start point -> list of segments starting there
+	// Phase 1: normalize segments left-to-right, then chain
+	normalizeSegments(segments, 0);
+	let chains = greedyChain(segments);
+
+	// Phase 2: normalize remaining chains top-to-bottom, then chain again
+	normalizeSegments(chains, 1);
+	chains = greedyChain(chains);
+
+	return chains.map((chain) => 'M' + chain[0] + chain.slice(1).map((p) => 'L' + p).join('')).join('');
+}
+
+function normalizeSegments(segments: string[][], coordIndex: number): void {
+	for (const seg of segments) {
+		const startVal = parseFloat(seg[0].split(',')[coordIndex]);
+		const endVal = parseFloat(seg[seg.length - 1].split(',')[coordIndex]);
+		if (endVal < startVal) seg.reverse();
+	}
+}
+
+function greedyChain(segments: string[][]): string[][] {
 	const byStart = new Map<string, string[][]>();
 	for (const seg of segments) {
 		const start = seg[0];
@@ -135,7 +154,6 @@ function chainSegments(segments: string[][]): string {
 		list.push(seg);
 	}
 
-	// Greedy forward chaining: follow unvisited segments sharing endpoints
 	const visited = new Set<string[]>();
 	const chains: string[][] = [];
 	for (const seg of segments) {
@@ -161,5 +179,5 @@ function chainSegments(segments: string[][]): string {
 		chains.push(chain);
 	}
 
-	return chains.map((chain) => 'M' + chain[0] + chain.slice(1).map((p) => 'L' + p).join('')).join('');
+	return chains;
 }
