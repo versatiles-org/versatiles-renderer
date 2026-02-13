@@ -1,87 +1,87 @@
 {
-	"name": "@versatiles/svg-renderer",
-	"version": "0.0.1",
-	"description": "Renders vector maps as SVG.",
-	"keywords": [
-		"svg",
-		"map",
-		"renderer",
-		"vector-tiles",
-		"versatiles"
-	],
-	"homepage": "https://github.com/versatiles-org/versatiles-svg-renderer",
-	"bugs": "https://github.com/versatiles-org/versatiles-svg-renderer/issues",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/versatiles-org/versatiles-svg-renderer.git"
-	},
-	"main": "dist/index.cjs",
-	"module": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"exports": {
-		".": {
-			"import": {
-				"types": "./dist/index.d.ts",
-				"default": "./dist/index.js"
-			},
-			"require": {
-				"types": "./dist/index.d.ts",
-				"default": "./dist/index.cjs"
-			}
-		}
-	},
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"build": "rm -rf dist && rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript && rm -rf dist/types",
-		"build-analyze": "npm run build && node scripts/analyze-bundle.mjs",
-		"check": "npm run format && npm run lint && npm run test && npm run build",
-		"demo": "tsx src/demo.ts",
-		"doc-graph": "vrt deps-graph | vrt doc-insert README.md '## Dependency Graph'",
-		"e2e": "tsx e2e/run.ts",
-		"format": "prettier --write 'src/**/*.ts' 'e2e/**/*.ts'",
-		"lint": "eslint --color .",
-		"prepack": "npm run doc-graph && npm run build",
-		"release": "npx vrt release-npm",
-		"start": "tsx src/index.ts",
-		"test-coverage": "vitest run --coverage",
-		"test": "vitest run",
-		"upgrade": "npm-check-updates -u -t minor; rm -f package-lock.json; rm -rf node_modules; npm i"
-	},
-	"type": "module",
-	"author": "Michael Kreil <versatiles@michael-kreil.de>",
-	"license": "Unlicense",
-	"engines": {
-		"node": ">= 22"
-	},
-	"devDependencies": {
-		"@eslint/js": "^9.39.2",
-		"@mapbox/vector-tile": "^2.0.4",
-		"@maplibre/maplibre-gl-style-spec": "^24.4.1",
-		"@rollup/plugin-node-resolve": "^16.0.3",
-		"@rollup/plugin-typescript": "^12.3.0",
-		"@turf/union": "^7.3.4",
-		"@types/node": "^25.2.3",
-		"@types/pbf": "^3.0.5",
-		"@types/pngjs": "^6.0.5",
-		"@versatiles/release-tool": "^2.7.1",
-		"@versatiles/style": "^5.9.3",
-		"@vitest/coverage-v8": "^4.0.18",
-		"eslint": "^9.39.2",
-		"geojson": "^0.5.0",
-		"npm-check-updates": "^19.3.2",
-		"pbf": "^4.0.1",
-		"pixelmatch": "^7.1.0",
-		"playwright": "^1.58.2",
-		"pngjs": "^7.0.0",
-		"prettier": "^3.8.1",
-		"rollup": "^4.57.1",
-		"rollup-plugin-dts": "^6.3.0",
-		"rollup-plugin-visualizer": "^6.0.5",
-		"tsx": "^4.21.0",
-		"typescript": "^5.9.3",
-		"typescript-eslint": "^8.55.0",
-		"vitest": "^4.0.18"
-	}
+  "name": "@versatiles/svg-renderer",
+  "version": "0.1.0",
+  "description": "Renders vector maps as SVG.",
+  "keywords": [
+    "svg",
+    "map",
+    "renderer",
+    "vector-tiles",
+    "versatiles"
+  ],
+  "homepage": "https://github.com/versatiles-org/versatiles-svg-renderer",
+  "bugs": "https://github.com/versatiles-org/versatiles-svg-renderer/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/versatiles-org/versatiles-svg-renderer.git"
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript && rm -rf dist/types",
+    "build-analyze": "npm run build && node scripts/analyze-bundle.mjs",
+    "check": "npm run format && npm run lint && npm run test && npm run build",
+    "demo": "tsx src/demo.ts",
+    "doc-graph": "vrt deps-graph | vrt doc-insert README.md '## Dependency Graph'",
+    "e2e": "tsx e2e/run.ts",
+    "format": "prettier --write 'src/**/*.ts' 'e2e/**/*.ts'",
+    "lint": "eslint --color .",
+    "prepack": "npm run doc-graph && npm run build",
+    "release": "npx vrt release-npm",
+    "start": "tsx src/index.ts",
+    "test-coverage": "vitest run --coverage",
+    "test": "vitest run",
+    "upgrade": "npm-check-updates -u -t minor; rm -f package-lock.json; rm -rf node_modules; npm i"
+  },
+  "type": "module",
+  "author": "Michael Kreil <versatiles@michael-kreil.de>",
+  "license": "Unlicense",
+  "engines": {
+    "node": ">= 22"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@mapbox/vector-tile": "^2.0.4",
+    "@maplibre/maplibre-gl-style-spec": "^24.4.1",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@turf/union": "^7.3.4",
+    "@types/node": "^25.2.3",
+    "@types/pbf": "^3.0.5",
+    "@types/pngjs": "^6.0.5",
+    "@versatiles/release-tool": "^2.7.1",
+    "@versatiles/style": "^5.9.3",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^9.39.2",
+    "geojson": "^0.5.0",
+    "npm-check-updates": "^19.3.2",
+    "pbf": "^4.0.1",
+    "pixelmatch": "^7.1.0",
+    "playwright": "^1.58.2",
+    "pngjs": "^7.0.0",
+    "prettier": "^3.8.1",
+    "rollup": "^4.57.1",
+    "rollup-plugin-dts": "^6.3.0",
+    "rollup-plugin-visualizer": "^6.0.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.55.0",
+    "vitest": "^4.0.18"
+  }
 }
