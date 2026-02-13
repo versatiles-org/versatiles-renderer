@@ -30,9 +30,29 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const tileCoordinates = [];
 	for (let x = tileMinX; x <= tileMaxX; x++) {
 		for (let y = tileMinY; y <= tileMaxY; y++) {
-			tileCoordinates.push({ x, y });
+			tiles.push({
+				x,
+				y,
+				offsetX: width / 2 + (x - tileCenterCoordinate.x) * tileSize,
+				offsetY: height / 2 + (y - tileCenterCoordinate.y) * tileSize,
+			});
 		}
 	}
+
+	return { zoomLevel, tileSize, tiles };
+}
+
+export async function getTile(url: string, z: number, x: number, y: number): Promise<ArrayBuffer | null> {
+	const tileUrl = url.replace('{z}', String(z)).replace('{x}', String(x)).replace('{y}', String(y));
+	try {
+		const response = await fetch(tileUrl);
+		if (!response.ok) return null;
+		return await response.arrayBuffer();
+	} catch {
+		console.warn(`Failed to load tile: ${tileUrl}`);
+		return null;
+	}
+}
 
 	const layerFeatures: LayerFeatures = new Map();
 
@@ -114,15 +134,3 @@ interface Features {
 }
 
 type LayerFeatures = Map<string, Features>;
-
-async function getTile(url: string, z: number, x: number, y: number): Promise<ArrayBuffer | null> {
-	const tileUrl = url.replace('{z}', String(z)).replace('{x}', String(x)).replace('{y}', String(y));
-	try {
-		const response = await fetch(tileUrl);
-		if (!response.ok) return null;
-		return await response.arrayBuffer();
-	} catch {
-		console.warn(`Failed to load tile: ${tileUrl}`);
-		return null;
-	}
-}
