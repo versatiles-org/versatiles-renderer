@@ -4,14 +4,14 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
 	{
 		ignores: [
-			'**/dist/**',
-			'**/coverage/**',
-			'**/lib/**',
-			'**/src/maplibre/**',
+			'dist/**',
+			'coverage/**',
+			'lib/**',
+			'src/maplibre/**',
 		],
 	},
 	{
-		files: ['**/src/**/*.ts'],
+		files: ['src/**/*.ts'],
 		extends: [
 			eslint.configs.recommended,
 			...tseslint.configs.strictTypeChecked,
