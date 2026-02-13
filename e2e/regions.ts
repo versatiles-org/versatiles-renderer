@@ -10,6 +10,6 @@ export const regions: Region[] = [
 	{ name: 'paris', lon: 2.295, lat: 48.858, zoom: 14.9 },
 	{ name: 'warsaw', lon: 21.013, lat: 52.249, zoom: 14.9 },
 	{ name: 'tokyo', lon: 139.692, lat: 35.69, zoom: 10 },
-	{ name: 'roma', lon: 12.489, lat: 41.89, zoom: 15 },
+	{ name: 'roma', lon: 12.489, lat: 41.89, zoom: 14.9 },
 	{ name: 'sao-paulo', lon: -46.635, lat: -23.548, zoom: 14 },
 ];
