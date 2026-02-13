@@ -1,0 +1,141 @@
+export const PANEL_CSS = `
+.svg-export-control button.svg-export-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 29px;
+	height: 29px;
+}
+
+.svg-export-control button.svg-export-btn svg {
+	width: 19px;
+	height: 19px;
+	fill: #333;
+}
+
+.svg-export-panel {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+	padding: 16px;
+	z-index: 1000;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	color: #333;
+	min-width: 320px;
+	max-width: 90vw;
+	max-height: 90vh;
+	overflow: auto;
+}
+
+.svg-export-panel .panel-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.svg-export-panel .panel-header h3 {
+	margin: 0;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.svg-export-panel .panel-close {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 18px;
+	color: #666;
+	padding: 2px 6px;
+	border-radius: 4px;
+}
+
+.svg-export-panel .panel-close:hover {
+	background: #f0f0f0;
+}
+
+.svg-export-panel .panel-inputs {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+.svg-export-panel .panel-inputs label {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	font-size: 12px;
+	color: #666;
+}
+
+.svg-export-panel .panel-inputs input {
+	padding: 4px 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	font-size: 13px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.svg-export-panel .preview-container {
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	overflow: hidden;
+	margin-bottom: 12px;
+	background: #f9f9f9;
+	min-height: 150px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.svg-export-panel .preview-container iframe {
+	border: none;
+	width: 100%;
+	height: 200px;
+	display: block;
+}
+
+.svg-export-panel .preview-loading {
+	color: #999;
+	font-size: 13px;
+}
+
+.svg-export-panel .panel-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.svg-export-panel .panel-actions button {
+	flex: 1;
+	padding: 8px 12px;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.svg-export-panel .btn-export {
+	background: #4264fb;
+	color: #fff;
+}
+
+.svg-export-panel .btn-export:hover {
+	background: #3352d9;
+}
+
+.svg-export-panel .btn-export:disabled {
+	background: #a0b0e0;
+	cursor: not-allowed;
+}
+`;

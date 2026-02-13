@@ -22,4 +22,21 @@ export default defineConfig([
 		output: { file: 'dist/index.d.ts', format: 'es' },
 		plugins: [dts()],
 	},
+	{
+		input: 'src/maplibre/index.ts',
+		output: [
+			{ file: 'dist/maplibre.js', format: 'es', sourcemap: true },
+			{ file: 'dist/maplibre.cjs', format: 'cjs', sourcemap: true },
+		],
+		external: ['maplibre-gl'],
+		plugins: [
+			resolve(),
+			typescript({ tsconfig: './tsconfig.build.json' }),
+		],
+	},
+	{
+		input: 'dist/types/maplibre/index.d.ts',
+		output: { file: 'dist/maplibre.d.ts', format: 'es' },
+		plugins: [dts()],
+	},
 ]);

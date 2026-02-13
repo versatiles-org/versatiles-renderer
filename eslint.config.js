@@ -7,7 +7,6 @@ export default tseslint.config(
 			'dist/**',
 			'coverage/**',
 			'lib/**',
-			'src/maplibre/**',
 		],
 	},
 	{
