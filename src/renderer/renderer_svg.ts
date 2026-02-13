@@ -1,6 +1,13 @@
 import type { Feature, Point2D } from '../lib/geometry.js';
 import { Color } from '../lib/color.js';
-import type { BackgroundStyle, FillStyle, LineStyle, RasterStyle, RasterTile, RendererOptions } from '../types.js';
+import type {
+	BackgroundStyle,
+	FillStyle,
+	LineStyle,
+	RasterStyle,
+	RasterTile,
+	RendererOptions,
+} from '../types.js';
 
 type Segment = [number, number][];
 

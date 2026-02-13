@@ -19,7 +19,12 @@ export interface TileGrid {
 	tiles: TileInfo[];
 }
 
-export function calculateTileGrid(width: number, height: number, center: Point2D, zoom: number): TileGrid {
+export function calculateTileGrid(
+	width: number,
+	height: number,
+	center: Point2D,
+	zoom: number,
+): TileGrid {
 	const zoomLevel = Math.floor(zoom);
 	const tileCenterCoordinate = center.getProject2Pixel().scale(2 ** zoomLevel);
 	const tileSize = 2 ** (zoom - zoomLevel + 9); // 512 (2^9) is the standard tile size
@@ -51,7 +56,12 @@ export interface TileResponse {
 	contentType: string;
 }
 
-export async function getTile(url: string, z: number, x: number, y: number): Promise<TileResponse | null> {
+export async function getTile(
+	url: string,
+	z: number,
+	x: number,
+	y: number,
+): Promise<TileResponse | null> {
 	const tileUrl = url.replace('{z}', String(z)).replace('{x}', String(x)).replace('{y}', String(y));
 	try {
 		const response = await fetch(tileUrl);
@@ -80,7 +90,11 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	}
 	const sourceUrl: string = source.tiles[0];
 
-	const { zoomLevel, tileSize, tiles: tileCoordinates } = calculateTileGrid(width, height, center, zoom);
+	const {
+		zoomLevel,
+		tileSize,
+		tiles: tileCoordinates,
+	} = calculateTileGrid(width, height, center, zoom);
 
 	const layerFeatures: LayerFeatures = new Map();
 
