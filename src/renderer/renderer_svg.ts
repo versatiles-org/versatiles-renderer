@@ -3,6 +3,8 @@ import { Color } from '../lib/color.js';
 import { Renderer } from './renderer.js';
 import type { BackgroundStyle, FillStyle, LineStyle, RendererOptions } from '../types.js';
 
+type Segment = [number, number][];
+
 export class SVGRenderer extends Renderer {
 	readonly #svg: string[];
 
@@ -59,7 +61,7 @@ export class SVGRenderer extends Renderer {
 	public drawLineStrings(features: [Feature, LineStyle][], opacity: number): void {
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
 
-		const groups = new Map<string, { segments: string[][]; attrs: string }>();
+		const groups = new Map<string, { segments: Segment[]; attrs: string }>();
 		features.forEach(([feature, style]) => {
 			if (style.width <= 0 || style.color.alpha <= 0) return;
 
@@ -93,12 +95,13 @@ export class SVGRenderer extends Renderer {
 			}
 
 			feature.geometry.forEach((line) => {
-				group.segments.push(line.map((p) => this.#roundPoint(p)));
+				group.segments.push(line.map((p) => this.#roundXY(p)));
 			});
 		});
 
 		for (const { segments, attrs } of groups.values()) {
-			const d = chainSegments(segments);
+			const chains = chainSegments(segments);
+			const d = segmentsToPath(chains);
 			this.#svg.push(`<path d="${d}" ${attrs} />`);
 		}
 
@@ -120,9 +123,13 @@ export class SVGRenderer extends Renderer {
 	#roundPoint(p: Point2D): string {
 		return (p.x * this.#scale).toFixed(1) + ',' + (p.y * this.#scale).toFixed(1);
 	}
+
+	#roundXY(p: Point2D): [number, number] {
+		return [Math.round(p.x * this.#scale * 10), Math.round(p.y * this.#scale * 10)];
+	}
 }
 
-function chainSegments(segments: string[][]): string {
+function chainSegments(segments: Segment[]): Segment[] {
 	// Phase 1: normalize segments left-to-right, then chain
 	normalizeSegments(segments, 0);
 	let chains = greedyChain(segments);
@@ -131,39 +138,37 @@ function chainSegments(segments: string[][]): string {
 	normalizeSegments(chains, 1);
 	chains = greedyChain(chains);
 
-	return chains.map((chain) => 'M' + chain[0] + chain.slice(1).map((p) => 'L' + p).join('')).join('');
+	return chains;
 }
 
-function normalizeSegments(segments: string[][], coordIndex: number): void {
+function normalizeSegments(segments: Segment[], coordIndex: number): void {
 	for (const seg of segments) {
-		const startVal = parseFloat(seg[0].split(',')[coordIndex]);
-		const endVal = parseFloat(seg[seg.length - 1].split(',')[coordIndex]);
-		if (endVal < startVal) seg.reverse();
+		if (seg[seg.length - 1][coordIndex] < seg[0][coordIndex]) seg.reverse();
 	}
 }
 
-function greedyChain(segments: string[][]): string[][] {
-	const byStart = new Map<string, string[][]>();
+function greedyChain(segments: Segment[]): Segment[] {
+	const byStart = new Map<string, Segment[]>();
 	for (const seg of segments) {
-		const start = seg[0];
-		let list = byStart.get(start);
+		const key = String(seg[0][0]) + ',' + String(seg[0][1]);
+		let list = byStart.get(key);
 		if (!list) {
 			list = [];
-			byStart.set(start, list);
+			byStart.set(key, list);
 		}
 		list.push(seg);
 	}
 
-	const visited = new Set<string[]>();
-	const chains: string[][] = [];
+	const visited = new Set<Segment>();
+	const chains: Segment[] = [];
 	for (const seg of segments) {
 		if (visited.has(seg)) continue;
 		visited.add(seg);
-		const chain = [...seg];
+		const chain: Segment = [...seg];
 		let endPoint = chain[chain.length - 1];
-		let candidates = byStart.get(endPoint);
+		let candidates = byStart.get(String(endPoint[0]) + ',' + String(endPoint[1]));
 		while (candidates) {
-			let next: string[] | undefined;
+			let next: Segment | undefined;
 			for (const c of candidates) {
 				if (!visited.has(c)) {
 					next = c;
@@ -174,10 +179,50 @@ function greedyChain(segments: string[][]): string[][] {
 			visited.add(next);
 			for (let i = 1; i < next.length; i++) chain.push(next[i]);
 			endPoint = chain[chain.length - 1];
-			candidates = byStart.get(endPoint);
+			candidates = byStart.get(String(endPoint[0]) + ',' + String(endPoint[1]));
 		}
 		chains.push(chain);
 	}
 
 	return chains;
+}
+
+function segmentsToPath(chains: Segment[]): string {
+	let d = '';
+	for (const chain of chains) {
+		d += 'M' + formatNum(chain[0][0]) + ',' + formatNum(chain[0][1]);
+		let px = chain[0][0];
+		let py = chain[0][1];
+		for (let i = 1; i < chain.length; i++) {
+			const x = chain[i][0];
+			const y = chain[i][1];
+			const dx = x - px;
+			const dy = y - py;
+			if (dy === 0) {
+				const rel = 'h' + formatNum(dx);
+				const abs = 'H' + formatNum(x);
+				d += rel.length <= abs.length ? rel : abs;
+			} else if (dx === 0) {
+				const rel = 'v' + formatNum(dy);
+				const abs = 'V' + formatNum(y);
+				d += rel.length <= abs.length ? rel : abs;
+			} else {
+				const rel = 'l' + formatNum(dx) + ',' + formatNum(dy);
+				const abs = 'L' + formatNum(x) + ',' + formatNum(y);
+				d += rel.length <= abs.length ? rel : abs;
+			}
+			px = x;
+			py = y;
+		}
+	}
+	return d;
+}
+
+function formatNum(tenths: number): string {
+	if (tenths % 10 === 0) return String(tenths / 10);
+	const negative = tenths < 0;
+	if (negative) tenths = -tenths;
+	const whole = Math.floor(tenths / 10);
+	const frac = tenths % 10;
+	return (negative ? '-' : '') + String(whole) + '.' + String(frac);
 }
