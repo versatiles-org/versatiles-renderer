@@ -28,7 +28,7 @@
 		"check": "npm run format && npm run lint && npm run test && npm run build",
 		"demo": "tsx src/demo.ts",
 		"e2e": "tsx e2e/run.ts",
-		"format": "prettier --write 'src/**/*.ts'",
+		"format": "prettier --write 'src/**/*.ts' 'e2e/**/*.ts'",
 		"lint": "eslint --color .",
 		"prepack": "npm run build",
 		"release": "npx vrt release-npm",
