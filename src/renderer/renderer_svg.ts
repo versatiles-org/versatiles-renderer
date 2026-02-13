@@ -37,7 +37,7 @@ export class SVGRenderer extends Renderer {
 
 			const translate = style.translate.isZero()
 				? ''
-				: ` transform="translate(${this.#formatPoint(style.translate)})"`;
+				: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
 			const key = style.color.hex + translate;
 
 			let group = groups.get(key);
@@ -46,7 +46,7 @@ export class SVGRenderer extends Renderer {
 				groups.set(key, group);
 			}
 			feature.geometry.forEach((ring) => {
-				group.segments.push(ring.map((p) => this.#roundXY(p)));
+				group.segments.push(ring.map((p) => roundXY(p, this.#scale)));
 			});
 		});
 
@@ -70,10 +70,11 @@ export class SVGRenderer extends Renderer {
 
 			const translate = style.translate.isZero()
 				? ''
-				: ` transform="translate(${this.#formatPoint(style.translate)})"`;
+				: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
+			const roundedWidth = roundValue(style.width, this.#scale);
 			const key = [
 				style.color.hex,
-				this.#round(style.width),
+				roundedWidth,
 				style.cap,
 				style.join,
 				String(style.miterLimit),
@@ -88,7 +89,7 @@ export class SVGRenderer extends Renderer {
 						[
 							'fill="none"',
 							`stroke="${style.color.hex}"`,
-							`stroke-width="${this.#round(style.width)}"`,
+							`stroke-width="${roundedWidth}"`,
 							`stroke-linecap="${style.cap}"`,
 							`stroke-linejoin="${style.join}"`,
 							`stroke-miterlimit="${String(style.miterLimit)}"`,
@@ -98,7 +99,7 @@ export class SVGRenderer extends Renderer {
 			}
 
 			feature.geometry.forEach((line) => {
-				group.segments.push(line.map((p) => this.#roundXY(p)));
+				group.segments.push(line.map((p) => roundXY(p, this.#scale)));
 			});
 		});
 
@@ -119,18 +120,19 @@ export class SVGRenderer extends Renderer {
 		].join('\n');
 	}
 
-	#round(v: number): string {
-		return (v * this.#scale).toFixed(3);
-	}
+}
 
-	#formatPoint(p: Point2D): string {
-		const [x, y] = this.#roundXY(p);
-		return formatNum(x) + ',' + formatNum(y);
-	}
+function roundValue(v: number, scale: number): string {
+	return (v * scale).toFixed(3);
+}
 
-	#roundXY(p: Point2D): [number, number] {
-		return [Math.round(p.x * this.#scale * 10), Math.round(p.y * this.#scale * 10)];
-	}
+function roundXY(p: Point2D, scale: number): [number, number] {
+	return [Math.round(p.x * scale * 10), Math.round(p.y * scale * 10)];
+}
+
+function formatPoint(p: Point2D, scale: number): string {
+	const [x, y] = roundXY(p, scale);
+	return formatNum(x) + ',' + formatNum(y);
 }
 
 function chainSegments(segments: Segment[]): Segment[] {
