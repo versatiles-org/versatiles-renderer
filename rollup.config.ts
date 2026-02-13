@@ -2,17 +2,19 @@ import { defineConfig } from 'rollup';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import dts from 'rollup-plugin-dts';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig([
 	{
 		input: 'src/index.ts',
 		output: [
-			{ file: 'dist/index.js', format: 'es' },
-			{ file: 'dist/index.cjs', format: 'cjs' },
+			{ file: 'dist/index.js', format: 'es', sourcemap: true },
+			{ file: 'dist/index.cjs', format: 'cjs', sourcemap: true },
 		],
 		plugins: [
 			resolve(),
 			typescript({ tsconfig: './tsconfig.build.json' }),
+			visualizer({ filename: 'dist/bundle-stats.html', template: 'treemap' }),
 		],
 	},
 	{
