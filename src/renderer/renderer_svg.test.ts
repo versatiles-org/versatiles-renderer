@@ -244,10 +244,7 @@ describe('SVGRenderer', () => {
 
 		test('multiple tiles generate multiple image elements', () => {
 			const r = makeRenderer();
-			const tiles = [
-				makeTile({ x: 0, y: 0 }),
-				makeTile({ x: 256, y: 0 }),
-			];
+			const tiles = [makeTile({ x: 0, y: 0 }), makeTile({ x: 256, y: 0 })];
 			r.drawRasterTiles(tiles, defaultRasterStyle());
 			const svg = r.getString();
 			const imageCount = (svg.match(/<image /g) ?? []).length;
@@ -299,7 +296,10 @@ describe('SVGRenderer', () => {
 
 		test('applies brightness filter', () => {
 			const r = makeRenderer();
-			r.drawRasterTiles([makeTile()], defaultRasterStyle({ brightnessMin: 0.2, brightnessMax: 0.8 }));
+			r.drawRasterTiles(
+				[makeTile()],
+				defaultRasterStyle({ brightnessMin: 0.2, brightnessMax: 0.8 }),
+			);
 			const svg = r.getString();
 			expect(svg).toContain('brightness(0.5)');
 		});
