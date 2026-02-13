@@ -1,9 +1,10 @@
 name: E2E Visual Comparison
 
 on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
   workflow_dispatch:
-  schedule:
-    - cron: '0 6 * * 1' # Weekly on Monday at 06:00 UTC
 
 permissions:
   pages: write
@@ -11,6 +12,7 @@ permissions:
 
 jobs:
   e2e:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.58.2-noble
