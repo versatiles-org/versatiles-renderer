@@ -26,6 +26,8 @@ export class SVGRenderer extends Renderer {
 	public drawPolygons(features: [Feature, FillStyle][], opacity: number): void {
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
 		features.forEach(([feature, style]) => {
+			if (style.color.alpha <= 0) return;
+
 			const path: string = feature.geometry
 				.map(
 					(ring) => ring.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p)).join('') + 'z',
@@ -50,6 +52,8 @@ export class SVGRenderer extends Renderer {
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
 		features.forEach(([feature, style]) => {
 			feature.geometry.forEach((line) => {
+				if (style.width <= 0 || style.color.alpha <= 0) return;
+
 				const path: string = line
 					.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p))
 					.join('');
