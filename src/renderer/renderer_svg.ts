@@ -59,7 +59,7 @@ export class SVGRenderer extends Renderer {
 	public drawLineStrings(features: [Feature, LineStyle][], opacity: number): void {
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
 
-		const groups = new Map<string, { paths: string[]; attrs: string }>();
+		const groups = new Map<string, { segments: string[][]; attrs: string }>();
 		features.forEach(([feature, style]) => {
 			if (style.width <= 0 || style.color.alpha <= 0) return;
 
@@ -78,7 +78,7 @@ export class SVGRenderer extends Renderer {
 			let group = groups.get(key);
 			if (!group) {
 				group = {
-					paths: [],
+					segments: [],
 					attrs:
 						[
 							'fill="none"',
@@ -93,12 +93,52 @@ export class SVGRenderer extends Renderer {
 			}
 
 			feature.geometry.forEach((line) => {
-				group.paths.push(line.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p)).join(''));
+				group.segments.push(line.map((p) => this.#roundPoint(p)));
 			});
 		});
 
-		for (const { paths, attrs } of groups.values()) {
-			this.#svg.push(`<path d="${paths.join('')}" ${attrs} />`);
+		for (const { segments, attrs } of groups.values()) {
+			// Build adjacency map: start point -> list of segments starting there
+			const byStart = new Map<string, string[][]>();
+			for (const seg of segments) {
+				const start = seg[0];
+				let list = byStart.get(start);
+				if (!list) {
+					list = [];
+					byStart.set(start, list);
+				}
+				list.push(seg);
+			}
+
+			// Greedy forward chaining
+			const visited = new Set<string[]>();
+			const chains: string[][] = [];
+			for (const seg of segments) {
+				if (visited.has(seg)) continue;
+				visited.add(seg);
+				const chain = [...seg];
+				// Follow forward: look for unvisited segments starting at current end
+				let endPoint = chain[chain.length - 1];
+				let candidates = byStart.get(endPoint);
+				while (candidates) {
+					let next: string[] | undefined;
+					for (const c of candidates) {
+						if (!visited.has(c)) {
+							next = c;
+							break;
+						}
+					}
+					if (!next) break;
+					visited.add(next);
+					for (let i = 1; i < next.length; i++) chain.push(next[i]);
+					endPoint = chain[chain.length - 1];
+					candidates = byStart.get(endPoint);
+				}
+				chains.push(chain);
+			}
+
+			const d = chains.map((chain) => 'M' + chain[0] + chain.slice(1).map((p) => 'L' + p).join('')).join('');
+			this.#svg.push(`<path d="${d}" ${attrs} />`);
 		}
 
 		this.#svg.push('</g>');
