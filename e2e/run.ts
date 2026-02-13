@@ -28,6 +28,7 @@ const browser = await chromium.launch({
 
 // Generate SVG screenshots
 console.log('\n--- SVG Screenshots ---');
+const svgSizes = new Map<string, number>();
 for (const region of regions) {
 	console.log(`  Rendering SVG: ${region.name}...`);
 	const svg = await renderToSVG({
@@ -38,6 +39,8 @@ for (const region of regions) {
 		lat: region.lat,
 		zoom: region.zoom,
 	});
+
+	svgSizes.set(region.name, Buffer.byteLength(svg, 'utf8'));
 
 	const page = await browser.newPage({
 		viewport: { width: WIDTH, height: HEIGHT },
@@ -105,6 +108,7 @@ console.log('\n--- Comparing ---');
 interface Result {
 	region: Region;
 	diffPercent: number;
+	svgSizeKB: number;
 	maplibrePng: Buffer;
 	svgPng: Buffer;
 	diffPng: Buffer;
@@ -129,6 +133,7 @@ for (const region of regions) {
 	results.push({
 		region,
 		diffPercent,
+		svgSizeKB: (svgSizes.get(region.name) ?? 0) / 1024,
 		maplibrePng: readFileSync(resolve(maplibreDir, `${region.name}.png`)),
 		svgPng: readFileSync(resolve(svgDir, `${region.name}.png`)),
 		diffPng: PNG.sync.write(diff),
@@ -148,6 +153,7 @@ const rows = results
 		lon: ${r.region.lon}<br>
 		lat: ${r.region.lat}<br>
 		zoom: ${r.region.zoom}<br>
+		SVG size: ${r.svgSizeKB.toFixed(0)} KB<br>
 		<span style="color:${r.diffPercent > 50 ? 'red' : r.diffPercent > 20 ? 'orange' : 'green'}">
 			diff: ${r.diffPercent.toFixed(2)}%
 		</span>
