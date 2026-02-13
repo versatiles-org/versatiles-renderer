@@ -55,6 +55,7 @@
 		"@types/pbf": "^3.0.5",
 		"@versatiles/release-tool": "^2.7.1",
 		"@versatiles/style": "^5.9.3",
+		"@vitest/coverage-v8": "^4.0.18",
 		"eslint": "^9.39.2",
 		"geojson": "^0.5.0",
 		"npm-check-updates": "^19.3.2",
