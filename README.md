@@ -62,18 +62,28 @@ The package includes an `SVGExportControl` that adds an export button to any Map
 npm install @versatiles/svg-renderer maplibre-gl
 ```
 
-```typescript
-import maplibregl from 'maplibre-gl';
-import { SVGExportControl } from '@versatiles/svg-renderer/maplibre';
-
-const map = new maplibregl.Map({
-	container: 'map',
-	style: 'https://tiles.versatiles.org/assets/styles/colorful/style.json',
-	center: [13.4, 52.5],
-	zoom: 10,
-});
-
-map.addControl(new SVGExportControl(), 'top-right');
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css" />
+		<script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+		<script src="…/svg-renderer/dist/maplibre.cjs"></script>
+		<style></style>
+	</head>
+	<body>
+		<div id="map"></div>
+		<script>
+			const map = new maplibregl.Map({
+				container: 'map',
+				style: 'https://tiles.versatiles.org/assets/styles/colorful/style.json',
+				center: [13.4, 52.5],
+				zoom: 10,
+			});
+			map.addControl(new SVGExportControl(), 'top-right');
+		</script>
+	</body>
+</html>
 ```
 
 The control opens a panel where the user can set width, height, and scale, preview the SVG, download it, or open it in a new tab. Map interactions are disabled while the panel is open.
