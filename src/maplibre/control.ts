@@ -165,7 +165,7 @@ export class SVGExportControl implements IControl {
 			this.currentSVG = svg;
 
 			const iframe = document.createElement('iframe');
-			iframe.srcdoc = `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;overflow:hidden;}svg{width:100%;height:100%;}</style></head><body>${svg}</body></html>`;
+			iframe.srcdoc = `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;overflow:hidden;}body{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;}svg{max-width:100%;max-height:100%;width:auto;height:auto;display:block;}</style></head><body>${svg}</body></html>`;
 			previewContainer.innerHTML = '';
 			previewContainer.appendChild(iframe);
 			exportBtn.disabled = false;

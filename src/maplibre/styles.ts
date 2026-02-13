@@ -92,7 +92,8 @@ export const PANEL_CSS = `
 	overflow: hidden;
 	margin-bottom: 12px;
 	background: #f9f9f9;
-	min-height: 150px;
+	width: 320px;
+	height: 240px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -101,7 +102,7 @@ export const PANEL_CSS = `
 .svg-export-panel .preview-container iframe {
 	border: none;
 	width: 100%;
-	height: 200px;
+	height: 100%;
 	display: block;
 }
 
