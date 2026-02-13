@@ -42,12 +42,19 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	return { zoomLevel, tileSize, tiles };
 }
 
-export async function getTile(url: string, z: number, x: number, y: number): Promise<ArrayBuffer | null> {
+export interface TileResponse {
+	buffer: ArrayBuffer;
+	contentType: string;
+}
+
+export async function getTile(url: string, z: number, x: number, y: number): Promise<TileResponse | null> {
 	const tileUrl = url.replace('{z}', String(z)).replace('{x}', String(x)).replace('{y}', String(y));
 	try {
 		const response = await fetch(tileUrl);
 		if (!response.ok) return null;
-		return await response.arrayBuffer();
+		const buffer = await response.arrayBuffer();
+		const contentType = response.headers.get('content-type') ?? 'application/octet-stream';
+		return { buffer, contentType };
 	} catch {
 		console.warn(`Failed to load tile: ${tileUrl}`);
 		return null;
@@ -63,10 +70,10 @@ export async function getTile(url: string, z: number, x: number, y: number): Pro
 				height / 2 + (y - tileCenterCoordinate.y) * tileSize,
 			);
 
-			const buffer = await getTile(sourceUrl, zoomLevel, x, y);
-			if (!buffer) return;
+			const tile = await getTile(sourceUrl, zoomLevel, x, y);
+			if (!tile) return;
 
-			const vectorTile = new VectorTile(new Protobuf(buffer));
+			const vectorTile = new VectorTile(new Protobuf(tile.buffer));
 			for (const [name, layer] of Object.entries(vectorTile.layers)) {
 				let features = layerFeatures.get(name);
 				if (!features) {
