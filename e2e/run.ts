@@ -158,8 +158,8 @@ const rows = results
 			diff: ${r.diffPercent.toFixed(2)}%
 		</span>
 	</td>
-	<td><img src="data:image/png;base64,${mlB64}" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
 	<td><img src="data:image/png;base64,${svgB64}" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
+	<td><img src="data:image/png;base64,${mlB64}" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
 	<td><img src="data:image/png;base64,${diffB64}" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
 </tr>`;
 	})
@@ -181,7 +181,7 @@ const html = `<!DOCTYPE html>
 <h1>E2E Visual Comparison Report</h1>
 <p>Generated: ${new Date().toISOString()}</p>
 <table>
-<tr><th>Region</th><th>MapLibre</th><th>SVG Renderer</th><th>Diff</th></tr>
+<tr><th>Region</th><th>SVG Renderer</th><th>MapLibre screenshot</th><th>Diff</th></tr>
 ${rows}
 </table>
 </body></html>`;
