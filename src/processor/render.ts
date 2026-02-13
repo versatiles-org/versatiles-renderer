@@ -1,4 +1,8 @@
-import { featureFilter, type Feature, type Color as MaplibreColor } from '@maplibre/maplibre-gl-style-spec';
+import {
+	featureFilter,
+	type Feature,
+	type Color as MaplibreColor,
+} from '@maplibre/maplibre-gl-style-spec';
 import { Color } from '../lib/color.js';
 import { getLayerFeatures } from './vector.js';
 import { getLayerStyles } from './styles.js';
@@ -47,7 +51,9 @@ async function render(job: RenderJob): Promise<void> {
 							feature,
 							{
 								color: new Color(getPaint('fill-color', feature) as MaplibreColor),
-								translate: new Point2D(...(getPaint('fill-translate', feature) as [number, number])),
+								translate: new Point2D(
+									...(getPaint('fill-translate', feature) as [number, number]),
+								),
 							},
 						]),
 						getPaint('fill-opacity', polygonFeatures[0]) as number,
@@ -59,7 +65,9 @@ async function render(job: RenderJob): Promise<void> {
 					const lineStrings = layerFeatures.get(layerStyle.sourceLayer)?.linestrings;
 					if (!lineStrings || lineStrings.length === 0) return;
 					const filter = featureFilter(layerStyle.filter);
-					const lineStringFeatures = lineStrings.filter((feature) => filter.filter({ zoom }, feature));
+					const lineStringFeatures = lineStrings.filter((feature) =>
+						filter.filter({ zoom }, feature),
+					);
 
 					if (lineStringFeatures.length === 0) return;
 
@@ -68,7 +76,9 @@ async function render(job: RenderJob): Promise<void> {
 							feature,
 							{
 								color: new Color(getPaint('line-color', feature) as MaplibreColor),
-								translate: new Point2D(...(getPaint('line-translate', feature) as [number, number])),
+								translate: new Point2D(
+									...(getPaint('line-translate', feature) as [number, number]),
+								),
 								blur: getPaint('line-blur', feature) as number,
 								cap: getLayout('line-cap', feature) as 'butt' | 'round' | 'square',
 								dasharray: getPaint('line-dasharray', feature) as number[] | undefined,
@@ -101,7 +111,12 @@ async function render(job: RenderJob): Promise<void> {
 			const value = getter.get(key);
 			if (typeof value === 'object' && value !== null && 'evaluate' in value) {
 				const evaluatable = value as PossiblyEvaluatedPropertyValue<unknown>;
-				return evaluatable.evaluate(feature ?? ({} as Feature), featureState, undefined, availableImages);
+				return evaluatable.evaluate(
+					feature ?? ({} as Feature),
+					featureState,
+					undefined,
+					availableImages,
+				);
 			}
 			return value;
 		}

@@ -59,7 +59,9 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 					const geometry = featureSrc
 						.loadGeometry()
 						.map((ring) =>
-							ring.map((point) => new Point2D(point.x, point.y).scale(tileSize / TILE_EXTENT).translate(offset)),
+							ring.map((point) =>
+								new Point2D(point.x, point.y).scale(tileSize / TILE_EXTENT).translate(offset),
+							),
 						);
 
 					let type: 'LineString' | 'Point' | 'Polygon';

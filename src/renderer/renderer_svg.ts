@@ -27,14 +27,18 @@ export class SVGRenderer extends Renderer {
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
 		features.forEach(([feature, style]) => {
 			const path: string = feature.geometry
-				.map((ring) => ring.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p)).join('') + 'z')
+				.map(
+					(ring) => ring.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p)).join('') + 'z',
+				)
 				.join('');
 			this.#svg.push(
 				[
 					'<path',
 					`d="${path}"`,
 					`fill="${style.color.hex}"`,
-					style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
+					style.translate.isZero()
+						? ''
+						: `transform="translate(${this.#roundPoint(style.translate)})"`,
 					'/>',
 				].join(' '),
 			);
@@ -46,7 +50,9 @@ export class SVGRenderer extends Renderer {
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
 		features.forEach(([feature, style]) => {
 			feature.geometry.forEach((line) => {
-				const path: string = line.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p)).join('');
+				const path: string = line
+					.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p))
+					.join('');
 				this.#svg.push(
 					[
 						'<path',
@@ -54,7 +60,9 @@ export class SVGRenderer extends Renderer {
 						'fill="none"',
 						`stroke="${style.color.hex}"`,
 						`stroke-width="${this.#round(style.width)}"`,
-						style.translate.isZero() ? '' : `transform="translate(${this.#roundPoint(style.translate)})"`,
+						style.translate.isZero()
+							? ''
+							: `transform="translate(${this.#roundPoint(style.translate)})"`,
 						`stroke-linecap="${style.cap}"`,
 						`stroke-linejoin="${style.join}"`,
 						`stroke-miterlimit="${String(style.miterLimit)}"`,

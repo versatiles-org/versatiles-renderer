@@ -1,12 +1,18 @@
-import type { Feature as MapLibreFeature, Point2D as MapLibrePoint2D } from '@maplibre/maplibre-gl-style-spec';
+import type {
+	Feature as MapLibreFeature,
+	Point2D as MapLibrePoint2D,
+} from '@maplibre/maplibre-gl-style-spec';
 
 type Properties = Record<string, unknown>;
 
-type Patterns = Record<string, {
-	min: string;
-	mid: string;
-	max: string;
-}>;
+type Patterns = Record<
+	string,
+	{
+		min: string;
+		mid: string;
+		max: string;
+	}
+>;
 
 type Geometry = Point2D[][];
 type Bbox = [number, number, number, number];
@@ -22,7 +28,7 @@ export class Point2D implements MapLibrePoint2D {
 	}
 
 	public isZero(): boolean {
-		return (this.x === 0) && (this.y === 0);
+		return this.x === 0 && this.y === 0;
 	}
 
 	public scale(factor: number): this {
@@ -38,11 +44,8 @@ export class Point2D implements MapLibrePoint2D {
 	}
 
 	public getProject2Pixel(): Point2D {
-		const s = Math.sin(this.y * Math.PI / 180.0);
-		return new Point2D(
-			this.x / 360.0 + 0.5,
-			0.5 - 0.25 * Math.log((1 + s) / (1 - s)) / Math.PI,
-		);
+		const s = Math.sin((this.y * Math.PI) / 180.0);
+		return new Point2D(this.x / 360.0 + 0.5, 0.5 - (0.25 * Math.log((1 + s) / (1 - s))) / Math.PI);
 	}
 }
 
@@ -76,8 +79,8 @@ export class Feature implements MapLibreFeature {
 		let yMin = Infinity;
 		let xMax = -Infinity;
 		let yMax = -Infinity;
-		this.geometry.forEach(ring => {
-			ring.forEach(point => {
+		this.geometry.forEach((ring) => {
+			ring.forEach((point) => {
 				if (xMin > point.x) xMin = point.x;
 				if (yMin > point.y) yMin = point.y;
 				if (xMax < point.x) xMax = point.x;

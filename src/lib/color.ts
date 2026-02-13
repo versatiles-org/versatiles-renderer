@@ -1,10 +1,15 @@
-
 import { Color as MaplibreColor } from '@maplibre/maplibre-gl-style-spec';
 
 export class Color {
 	public readonly values: [number, number, number, number];
 
-	public constructor(...args: [MaplibreColor] | [number, number, number, number] | [number, number, number] | [string]) {
+	public constructor(
+		...args:
+			| [MaplibreColor]
+			| [number, number, number, number]
+			| [number, number, number]
+			| [string]
+	) {
 		switch (args.length) {
 			case 1:
 				if (args[0] instanceof MaplibreColor) {
@@ -15,9 +20,9 @@ export class Color {
 					}
 
 					this.values = [
-						Math.round(255 * value.r / value.a),
-						Math.round(255 * value.g / value.a),
-						Math.round(255 * value.b / value.a),
+						Math.round((255 * value.r) / value.a),
+						Math.round((255 * value.g) / value.a),
+						Math.round((255 * value.b) / value.a),
 						Math.round(255 * value.a),
 					];
 					return;
@@ -65,13 +70,13 @@ export class Color {
 	}
 
 	public get hex(): string {
-		return `#${d2h(this.values[0])}${d2h(this.values[1])}${d2h(this.values[2])}${(this.values[3] === 255) ? '' : d2h(this.values[3])}`;
+		return `#${d2h(this.values[0])}${d2h(this.values[1])}${d2h(this.values[2])}${this.values[3] === 255 ? '' : d2h(this.values[3])}`;
 
 		function d2h(num: number): string {
 			if (num < 0) num = 0;
 			if (num > 255) num = 255;
 			const str = Math.round(num).toString(16).toUpperCase();
-			return (str.length < 2) ? '0' + str : str;
+			return str.length < 2 ? '0' + str : str;
 		}
 	}
 
