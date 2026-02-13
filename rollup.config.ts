@@ -10,12 +10,6 @@ export default defineConfig([
 			{ file: 'dist/index.js', format: 'es' },
 			{ file: 'dist/index.cjs', format: 'cjs' },
 		],
-		external: [
-			'@maplibre/maplibre-gl-style-spec',
-			'@mapbox/vector-tile',
-			'pbf',
-			'@turf/union',
-		],
 		plugins: [
 			resolve(),
 			typescript({ tsconfig: './tsconfig.build.json' }),
