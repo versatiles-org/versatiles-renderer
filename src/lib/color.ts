@@ -51,10 +51,10 @@ export class Color {
 				}
 				break;
 			case 3:
-				this.values = [Number(args[0]), Number(args[1]), Number(args[2]), 255];
+				this.values = [args[0], args[1], args[2], 255];
 				return;
 			case 4:
-				this.values = [Number(args[0]), Number(args[1]), Number(args[2]), Number(args[3])];
+				this.values = [args[0], args[1], args[2], args[3]];
 				return;
 			default:
 		}

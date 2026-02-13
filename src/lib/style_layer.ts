@@ -34,7 +34,7 @@ export class PossiblyEvaluatedPropertyValue<T> {
 			featureState,
 			canonical,
 			availableImages,
-		);
+		) as T;
 	}
 }
 
@@ -92,13 +92,12 @@ export class StyleLayer {
 			this.filter = (spec as Record<string, unknown>).filter as FilterSpecification | undefined;
 		}
 
-		this.visibility =
-			((spec.layout as Record<string, unknown> | undefined)?.visibility as string) ?? 'visible';
+		this.visibility = (spec.layout?.visibility ?? 'visible') as string;
 
 		// Initialize paint property expressions
-		const paintSpec = (latest as Record<string, Record<string, StylePropertySpecification>>)[
-			`paint_${spec.type}`
-		];
+		const paintSpec = (
+			latest as Record<string, Record<string, StylePropertySpecification> | undefined>
+		)[`paint_${spec.type}`];
 		if (paintSpec) {
 			const paintValues = (spec.paint ?? {}) as Record<string, unknown>;
 			for (const [name, propSpec] of Object.entries(paintSpec)) {
@@ -109,9 +108,9 @@ export class StyleLayer {
 		}
 
 		// Initialize layout property expressions (skip visibility, handled separately)
-		const layoutSpec = (latest as Record<string, Record<string, StylePropertySpecification>>)[
-			`layout_${spec.type}`
-		];
+		const layoutSpec = (
+			latest as Record<string, Record<string, StylePropertySpecification> | undefined>
+		)[`layout_${spec.type}`];
 		if (layoutSpec) {
 			const layoutValues = (spec.layout ?? {}) as Record<string, unknown>;
 			for (const [name, propSpec] of Object.entries(layoutSpec)) {
