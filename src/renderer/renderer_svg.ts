@@ -98,46 +98,7 @@ export class SVGRenderer extends Renderer {
 		});
 
 		for (const { segments, attrs } of groups.values()) {
-			// Build adjacency map: start point -> list of segments starting there
-			const byStart = new Map<string, string[][]>();
-			for (const seg of segments) {
-				const start = seg[0];
-				let list = byStart.get(start);
-				if (!list) {
-					list = [];
-					byStart.set(start, list);
-				}
-				list.push(seg);
-			}
-
-			// Greedy forward chaining
-			const visited = new Set<string[]>();
-			const chains: string[][] = [];
-			for (const seg of segments) {
-				if (visited.has(seg)) continue;
-				visited.add(seg);
-				const chain = [...seg];
-				// Follow forward: look for unvisited segments starting at current end
-				let endPoint = chain[chain.length - 1];
-				let candidates = byStart.get(endPoint);
-				while (candidates) {
-					let next: string[] | undefined;
-					for (const c of candidates) {
-						if (!visited.has(c)) {
-							next = c;
-							break;
-						}
-					}
-					if (!next) break;
-					visited.add(next);
-					for (let i = 1; i < next.length; i++) chain.push(next[i]);
-					endPoint = chain[chain.length - 1];
-					candidates = byStart.get(endPoint);
-				}
-				chains.push(chain);
-			}
-
-			const d = chains.map((chain) => 'M' + chain[0] + chain.slice(1).map((p) => 'L' + p).join('')).join('');
+			const d = chainSegments(segments);
 			this.#svg.push(`<path d="${d}" ${attrs} />`);
 		}
 
@@ -159,4 +120,46 @@ export class SVGRenderer extends Renderer {
 	#roundPoint(p: Point2D): string {
 		return (p.x * this.#scale).toFixed(1) + ',' + (p.y * this.#scale).toFixed(1);
 	}
+}
+
+function chainSegments(segments: string[][]): string {
+	// Build adjacency map: start point -> list of segments starting there
+	const byStart = new Map<string, string[][]>();
+	for (const seg of segments) {
+		const start = seg[0];
+		let list = byStart.get(start);
+		if (!list) {
+			list = [];
+			byStart.set(start, list);
+		}
+		list.push(seg);
+	}
+
+	// Greedy forward chaining: follow unvisited segments sharing endpoints
+	const visited = new Set<string[]>();
+	const chains: string[][] = [];
+	for (const seg of segments) {
+		if (visited.has(seg)) continue;
+		visited.add(seg);
+		const chain = [...seg];
+		let endPoint = chain[chain.length - 1];
+		let candidates = byStart.get(endPoint);
+		while (candidates) {
+			let next: string[] | undefined;
+			for (const c of candidates) {
+				if (!visited.has(c)) {
+					next = c;
+					break;
+				}
+			}
+			if (!next) break;
+			visited.add(next);
+			for (let i = 1; i < next.length; i++) chain.push(next[i]);
+			endPoint = chain[chain.length - 1];
+			candidates = byStart.get(endPoint);
+		}
+		chains.push(chain);
+	}
+
+	return chains.map((chain) => 'M' + chain[0] + chain.slice(1).map((p) => 'L' + p).join('')).join('');
 }
