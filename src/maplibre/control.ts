@@ -107,6 +107,7 @@ export class SVGExportControl implements IControl {
 		});
 
 		mapContainer.appendChild(this.panel);
+		this.setMapInteractions(false);
 		void this.updatePreview();
 	}
 
@@ -119,6 +120,28 @@ export class SVGExportControl implements IControl {
 		this.panel?.remove();
 		this.panel = undefined;
 		this.currentSVG = undefined;
+		this.setMapInteractions(true);
+	}
+
+	private setMapInteractions(enabled: boolean): void {
+		if (!this.map) return;
+		const handlers = [
+			this.map.boxZoom,
+			this.map.doubleClickZoom,
+			this.map.dragPan,
+			this.map.dragRotate,
+			this.map.keyboard,
+			this.map.scrollZoom,
+			this.map.touchPitch,
+			this.map.touchZoomRotate,
+		];
+		for (const handler of handlers) {
+			if (enabled) {
+				handler.enable();
+			} else {
+				handler.disable();
+			}
+		}
 	}
 
 	private schedulePreview(): void {
