@@ -12,38 +12,47 @@ permissions:
 
 jobs:
   e2e:
+    name: Run E2E tests
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.58.2-noble
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-      - run: npm run e2e
+      - name: Run E2E tests
+        run: npm run e2e
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload E2E report artifact
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: e2e-report
           path: e2e/output/
           retention-days: 30
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: e2e/output/
 
   deploy:
+    name: Deploy report to GitHub Pages
     needs: e2e
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - id: deployment
+      - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
