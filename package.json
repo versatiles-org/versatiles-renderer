@@ -4,13 +4,26 @@
 	"description": "Renders vector tiles",
 	"bin": {},
 	"prefix": "./",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			},
+			"require": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.cjs"
+			}
+		}
+	},
 	"files": [
-		"dist/**/*.js",
-		"dist/**/*.d.ts"
+		"dist"
 	],
 	"scripts": {
-		"build-node": "rm -rf dist && tsc -p tsconfig.node.json && chmod +x dist/index.js",
-		"build": "rm -rf release; npm run build-node",
+		"build": "rm -rf dist && rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript && rm -rf dist/types",
 		"check": "npm run format && npm run lint && npm run test && npm run build",
 		"demo": "tsx src/demo.ts",
 		"format": "prettier --write 'src/**/*.ts' 'scripts/**/*.ts'",
@@ -28,12 +41,16 @@
 	"engines": {
 		"node": ">= 22"
 	},
-	"devDependencies": {
-		"@eslint/js": "^9.39.2",
+	"dependencies": {
 		"@mapbox/vector-tile": "^2.0.4",
 		"@maplibre/maplibre-gl-style-spec": "^24.4.1",
-		"@maplibre/vt-pbf": "^4.2.1",
 		"@turf/union": "^7.3.4",
+		"pbf": "^4.0.1"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.39.2",
+		"@rollup/plugin-node-resolve": "^16.0.3",
+		"@rollup/plugin-typescript": "^12.3.0",
 		"@types/node": "^24.10.13",
 		"@types/pbf": "^3.0.5",
 		"@versatiles/release-tool": "^2.7.1",
@@ -41,8 +58,9 @@
 		"eslint": "^9.39.2",
 		"geojson": "^0.5.0",
 		"npm-check-updates": "^19.3.2",
-		"pbf": "^4.0.1",
 		"prettier": "^3.8.1",
+		"rollup": "^4.57.1",
+		"rollup-plugin-dts": "^6.3.0",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.55.0",
