@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { SVGRenderer } from './renderer_svg.js';
 import { Color } from '../lib/color.js';
 import { Feature, Point2D } from '../lib/geometry.js';
+import type { RasterStyle, RasterTile } from '../types.js';
 
 function makeRenderer(scale = 1): SVGRenderer {
 	return new SVGRenderer({ width: 256, height: 256, scale });
@@ -204,6 +205,124 @@ describe('SVGRenderer', () => {
 			r.drawLineStrings([[feature, style]], 1);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
+		});
+	});
+
+	describe('drawRasterTiles', () => {
+		function defaultRasterStyle(overrides: Partial<RasterStyle> = {}): RasterStyle {
+			return {
+				opacity: 1,
+				hueRotate: 0,
+				brightnessMin: 0,
+				brightnessMax: 1,
+				saturation: 0,
+				contrast: 0,
+				resampling: 'linear',
+				...overrides,
+			};
+		}
+
+		function makeTile(overrides: Partial<RasterTile> = {}): RasterTile {
+			return {
+				x: 0,
+				y: 0,
+				width: 256,
+				height: 256,
+				dataUri: 'data:image/png;base64,AAAA',
+				...overrides,
+			};
+		}
+
+		test('generates image elements', () => {
+			const r = makeRenderer();
+			r.drawRasterTiles([makeTile()], defaultRasterStyle());
+			const svg = r.getString();
+			expect(svg).toContain('<image');
+			expect(svg).toContain('href="data:image/png;base64,AAAA"');
+			expect(svg).toContain('<g opacity="1">');
+		});
+
+		test('multiple tiles generate multiple image elements', () => {
+			const r = makeRenderer();
+			const tiles = [
+				makeTile({ x: 0, y: 0 }),
+				makeTile({ x: 256, y: 0 }),
+			];
+			r.drawRasterTiles(tiles, defaultRasterStyle());
+			const svg = r.getString();
+			const imageCount = (svg.match(/<image /g) ?? []).length;
+			expect(imageCount).toBe(2);
+		});
+
+		test('empty tiles produce no output', () => {
+			const r = makeRenderer();
+			r.drawRasterTiles([], defaultRasterStyle());
+			const svg = r.getString();
+			expect(svg).not.toContain('<image');
+			expect(svg).not.toContain('<g');
+		});
+
+		test('zero opacity produces no output', () => {
+			const r = makeRenderer();
+			r.drawRasterTiles([makeTile()], defaultRasterStyle({ opacity: 0 }));
+			const svg = r.getString();
+			expect(svg).not.toContain('<image');
+		});
+
+		test('applies opacity attribute', () => {
+			const r = makeRenderer();
+			r.drawRasterTiles([makeTile()], defaultRasterStyle({ opacity: 0.5 }));
+			const svg = r.getString();
+			expect(svg).toContain('opacity="0.5"');
+		});
+
+		test('applies hue-rotate filter', () => {
+			const r = makeRenderer();
+			r.drawRasterTiles([makeTile()], defaultRasterStyle({ hueRotate: 90 }));
+			const svg = r.getString();
+			expect(svg).toContain('filter="hue-rotate(90deg)"');
+		});
+
+		test('applies saturate filter', () => {
+			const r = makeRenderer();
+			r.drawRasterTiles([makeTile()], defaultRasterStyle({ saturation: 0.5 }));
+			const svg = r.getString();
+			expect(svg).toContain('saturate(1.5)');
+		});
+
+		test('applies contrast filter', () => {
+			const r = makeRenderer();
+			r.drawRasterTiles([makeTile()], defaultRasterStyle({ contrast: -0.5 }));
+			const svg = r.getString();
+			expect(svg).toContain('contrast(0.5)');
+		});
+
+		test('applies brightness filter', () => {
+			const r = makeRenderer();
+			r.drawRasterTiles([makeTile()], defaultRasterStyle({ brightnessMin: 0.2, brightnessMax: 0.8 }));
+			const svg = r.getString();
+			expect(svg).toContain('brightness(0.5)');
+		});
+
+		test('no filter attribute when all defaults', () => {
+			const r = makeRenderer();
+			r.drawRasterTiles([makeTile()], defaultRasterStyle());
+			const svg = r.getString();
+			expect(svg).not.toContain('filter=');
+		});
+
+		test('nearest resampling adds image-rendering:pixelated', () => {
+			const r = makeRenderer();
+			r.drawRasterTiles([makeTile()], defaultRasterStyle({ resampling: 'nearest' }));
+			const svg = r.getString();
+			expect(svg).toContain('image-rendering:pixelated');
+		});
+
+		test('linear resampling does not add image-rendering', () => {
+			const r = makeRenderer();
+			r.drawRasterTiles([makeTile()], defaultRasterStyle({ resampling: 'linear' }));
+			const svg = r.getString();
+			expect(svg).not.toContain('image-rendering');
 		});
 	});
 });
