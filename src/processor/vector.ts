@@ -83,7 +83,7 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 
 	if (!source) return new Map();
 
-	if (source?.type !== 'vector' || !source.tiles) {
+	if (source.type !== 'vector' || !source.tiles) {
 		console.error('Invalid source configuration. Expected a vector source with tile URLs.');
 		console.error('Source config:', source);
 		throw Error('Invalid source');

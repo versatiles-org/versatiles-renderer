@@ -7,7 +7,7 @@ import { Color } from '../lib/color.js';
 import { getLayerFeatures } from './vector.js';
 import { getRasterTiles } from './raster.js';
 import { getLayerStyles } from './styles.js';
-import { type StyleLayer, PossiblyEvaluatedPropertyValue } from '../lib/style_layer.js';
+import type { PossiblyEvaluatedPropertyValue } from '../lib/style_layer.js';
 import type { RenderJob } from '../types.js';
 import { Point2D } from '../lib/geometry.js';
 
