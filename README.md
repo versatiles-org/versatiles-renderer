@@ -43,7 +43,12 @@ end
 subgraph D["renderer"]
 E["renderer_svg.ts"]
 end
-F["types.ts"]
+subgraph F["maplibre"]
+G["control.ts"]
+H["styles.ts"]
+I["index.ts"]
+end
+J["types.ts"]
 end
 1-->2
 2-->4
@@ -60,7 +65,11 @@ end
 A-->4
 B-->C
 E-->7
+G-->2
+G-->H
+I-->2
+I-->G
 
-class 0,3,5,D subgraphs;
+class 0,3,5,D,F subgraphs;
 classDef subgraphs fill-opacity:0.1, fill:#888, color:#888, stroke:#888;
 ```
