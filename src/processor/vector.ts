@@ -6,19 +6,22 @@ import Protobuf from 'pbf';
 
 const TILE_EXTENT = 4096;
 
-export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
-	const { width, height } = job.renderer;
-	const { zoom, center } = job.view;
-	const { sources } = job.style;
-	const source = sources['versatiles-shortbread'] as { type: string; tiles?: string[] } | undefined;
-	if (source?.type !== 'vector' || !source.tiles) {
-		throw Error('Invalid source');
-	}
-	const sourceUrl: string = source.tiles[0];
+export interface TileInfo {
+	x: number;
+	y: number;
+	offsetX: number;
+	offsetY: number;
+}
 
+export interface TileGrid {
+	zoomLevel: number;
+	tileSize: number;
+	tiles: TileInfo[];
+}
+
+export function calculateTileGrid(width: number, height: number, center: Point2D, zoom: number): TileGrid {
 	const zoomLevel = Math.floor(zoom);
 	const tileCenterCoordinate = center.getProject2Pixel().scale(2 ** zoomLevel);
-
 	const tileSize = 2 ** (zoom - zoomLevel + 9); // 512 (2^9) is the standard tile size
 
 	const tileCols = width / tileSize;
@@ -27,7 +30,8 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const tileMinY = Math.floor(tileCenterCoordinate.y - tileRows / 2);
 	const tileMaxX = Math.floor(tileCenterCoordinate.x + tileCols / 2);
 	const tileMaxY = Math.floor(tileCenterCoordinate.y + tileRows / 2);
-	const tileCoordinates = [];
+
+	const tiles: TileInfo[] = [];
 	for (let x = tileMinX; x <= tileMaxX; x++) {
 		for (let y = tileMinY; y <= tileMaxY; y++) {
 			tiles.push({
@@ -61,14 +65,23 @@ export async function getTile(url: string, z: number, x: number, y: number): Pro
 	}
 }
 
+export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
+	const { width, height } = job.renderer;
+	const { zoom, center } = job.view;
+	const { sources } = job.style;
+	const source = sources['versatiles-shortbread'] as { type: string; tiles?: string[] } | undefined;
+	if (source?.type !== 'vector' || !source.tiles) {
+		throw Error('Invalid source');
+	}
+	const sourceUrl: string = source.tiles[0];
+
+	const { zoomLevel, tileSize, tiles: tileCoordinates } = calculateTileGrid(width, height, center, zoom);
+
 	const layerFeatures: LayerFeatures = new Map();
 
 	await Promise.all(
-		tileCoordinates.map(async ({ x, y }: { x: number; y: number }): Promise<void> => {
-			const offset = new Point2D(
-				width / 2 + (x - tileCenterCoordinate.x) * tileSize,
-				height / 2 + (y - tileCenterCoordinate.y) * tileSize,
-			);
+		tileCoordinates.map(async ({ x, y, offsetX, offsetY }): Promise<void> => {
+			const offset = new Point2D(offsetX, offsetY);
 
 			const tile = await getTile(sourceUrl, zoomLevel, x, y);
 			if (!tile) return;
