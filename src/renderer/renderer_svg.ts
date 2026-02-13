@@ -1,6 +1,6 @@
 import type { Feature, Point2D } from '../lib/geometry.js';
 import { Color } from '../lib/color.js';
-import type { BackgroundStyle, FillStyle, LineStyle, RendererOptions } from '../types.js';
+import type { BackgroundStyle, FillStyle, LineStyle, RasterStyle, RasterTile, RendererOptions } from '../types.js';
 
 type Segment = [number, number][];
 
@@ -111,6 +111,35 @@ export class SVGRenderer {
 			const chains = chainSegments(segments);
 			const d = segmentsToPath(chains);
 			this.#svg.push(`<path d="${d}" ${attrs} />`);
+		}
+
+		this.#svg.push('</g>');
+	}
+
+	public drawRasterTiles(tiles: RasterTile[], style: RasterStyle): void {
+		if (tiles.length === 0) return;
+		if (style.opacity <= 0) return;
+
+		const filters: string[] = [];
+		if (style.hueRotate !== 0) filters.push(`hue-rotate(${String(style.hueRotate)}deg)`);
+		if (style.saturation !== 0) filters.push(`saturate(${String(style.saturation + 1)})`);
+		if (style.contrast !== 0) filters.push(`contrast(${String(style.contrast + 1)})`);
+		if (style.brightnessMin !== 0 || style.brightnessMax !== 1) {
+			const brightness = (style.brightnessMin + style.brightnessMax) / 2;
+			filters.push(`brightness(${String(brightness)})`);
+		}
+
+		let gAttrs = `opacity="${String(style.opacity)}"`;
+		if (filters.length > 0) gAttrs += ` filter="${filters.join(' ')}"`;
+
+		this.#svg.push(`<g ${gAttrs}>`);
+
+		const pixelated = style.resampling === 'nearest';
+		for (const tile of tiles) {
+			const s = this.#scale;
+			let attrs = `x="${roundValue(tile.x, s)}" y="${roundValue(tile.y, s)}" width="${roundValue(tile.width, s)}" height="${roundValue(tile.height, s)}" href="${tile.dataUri}"`;
+			if (pixelated) attrs += ' style="image-rendering:pixelated"';
+			this.#svg.push(`<image ${attrs} />`);
 		}
 
 		this.#svg.push('</g>');

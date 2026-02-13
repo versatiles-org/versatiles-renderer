@@ -5,6 +5,7 @@ import {
 } from '@maplibre/maplibre-gl-style-spec';
 import { Color } from '../lib/color.js';
 import { getLayerFeatures } from './vector.js';
+import { getRasterTiles } from './raster.js';
 import { getLayerStyles } from './styles.js';
 import { type StyleLayer, PossiblyEvaluatedPropertyValue } from '../lib/style_layer.js';
 import type { RenderJob } from '../types.js';
@@ -23,8 +24,8 @@ async function render(job: RenderJob): Promise<void> {
 	const availableImages: string[] = [];
 	const featureState = {};
 
-	layerStyles.forEach((layerStyle: StyleLayer) => {
-		if (layerStyle.isHidden(zoom)) return;
+	for (const layerStyle of layerStyles) {
+		if (layerStyle.isHidden(zoom)) continue;
 
 		layerStyle.recalculate({ zoom }, availableImages);
 
@@ -59,15 +60,15 @@ async function render(job: RenderJob): Promise<void> {
 						opacity: getPaint('background-opacity') as number,
 					});
 				}
-				return;
+				continue;
 			case 'fill':
 				{
 					const polygons = layerFeatures.get(layerStyle.sourceLayer)?.polygons;
-					if (!polygons || polygons.length === 0) return;
+					if (!polygons || polygons.length === 0) continue;
 					const filter = featureFilter(layerStyle.filter);
 					const polygonFeatures = polygons.filter((feature) => filter.filter({ zoom }, feature));
 
-					if (polygonFeatures.length === 0) return;
+					if (polygonFeatures.length === 0) continue;
 
 					renderer.drawPolygons(
 						polygonFeatures.map((feature) => [
@@ -82,17 +83,17 @@ async function render(job: RenderJob): Promise<void> {
 						getPaint('fill-opacity', polygonFeatures[0]) as number,
 					);
 				}
-				return;
+				continue;
 			case 'line':
 				{
 					const lineStrings = layerFeatures.get(layerStyle.sourceLayer)?.linestrings;
-					if (!lineStrings || lineStrings.length === 0) return;
+					if (!lineStrings || lineStrings.length === 0) continue;
 					const filter = featureFilter(layerStyle.filter);
 					const lineStringFeatures = lineStrings.filter((feature) =>
 						filter.filter({ zoom }, feature),
 					);
 
-					if (lineStringFeatures.length === 0) return;
+					if (lineStringFeatures.length === 0) continue;
 
 					renderer.drawLineStrings(
 						lineStringFeatures.map((feature) => [
@@ -116,15 +117,28 @@ async function render(job: RenderJob): Promise<void> {
 						getPaint('line-opacity', lineStringFeatures[0]) as number,
 					);
 				}
-				return;
+				continue;
+			case 'raster':
+				{
+					const tiles = await getRasterTiles(job, layerStyle.source);
+					renderer.drawRasterTiles(tiles, {
+						opacity: getPaint('raster-opacity') as number,
+						hueRotate: getPaint('raster-hue-rotate') as number,
+						brightnessMin: getPaint('raster-brightness-min') as number,
+						brightnessMax: getPaint('raster-brightness-max') as number,
+						saturation: getPaint('raster-saturation') as number,
+						contrast: getPaint('raster-contrast') as number,
+						resampling: getPaint('raster-resampling') as 'linear' | 'nearest',
+					});
+				}
+				continue;
 			case 'circle':
 			case 'color-relief':
 			case 'fill-extrusion':
 			case 'heatmap':
 			case 'hillshade':
-			case 'raster':
 			case 'symbol':
-				return;
+				continue;
 			default:
 				throw Error('layerStyle.type: ' + String(layerStyle.type));
 		}
