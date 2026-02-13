@@ -48,6 +48,24 @@ export interface LineStyle {
 	width: number;
 }
 
+export interface RasterStyle {
+	opacity: number;
+	hueRotate: number;
+	brightnessMin: number;
+	brightnessMax: number;
+	saturation: number;
+	contrast: number;
+	resampling: 'linear' | 'nearest';
+}
+
+export interface RasterTile {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	dataUri: string;
+}
+
 export interface TextStyle {
 	color: Color;
 }
