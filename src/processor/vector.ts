@@ -70,7 +70,12 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const { zoom, center } = job.view;
 	const { sources } = job.style;
 	const source = sources['versatiles-shortbread'] as { type: string; tiles?: string[] } | undefined;
+
+	if (!source) return new Map();
+
 	if (source?.type !== 'vector' || !source.tiles) {
+		console.error('Invalid source configuration. Expected a vector source with tile URLs.');
+		console.error('Source config:', source);
 		throw Error('Invalid source');
 	}
 	const sourceUrl: string = source.tiles[0];
