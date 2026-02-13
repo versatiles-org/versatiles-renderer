@@ -1,0 +1,165 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { chromium } from 'playwright';
+
+const MAPLIBRE_VERSION = '5.5.0';
+
+const distDir = resolve(import.meta.dirname, '..', 'dist');
+const pluginJs = readFileSync(resolve(distDir, 'maplibre.js'), 'utf8');
+
+console.log('Launching browser...');
+const browser = await chromium.launch({
+	args: ['--use-gl=angle', '--use-angle=swiftshader'],
+});
+
+const page = await browser.newPage({
+	viewport: { width: 800, height: 600 },
+	deviceScaleFactor: 1,
+});
+
+// Serve the plugin bundle via route interception
+await page.route('**/svg-export-plugin.js', (route) => {
+	void route.fulfill({
+		status: 200,
+		contentType: 'application/javascript',
+		body: pluginJs,
+	});
+});
+
+// Serve the HTML page via route interception so we have a real origin
+await page.route('**/index.html', (route) => {
+	void route.fulfill({
+		status: 200,
+		contentType: 'text/html',
+		body: `<!DOCTYPE html>
+<html><head>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@${MAPLIBRE_VERSION}/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@${MAPLIBRE_VERSION}/dist/maplibre-gl.js"></script>
+<style>* { margin: 0; padding: 0; } #map { width: 800px; height: 600px; }</style>
+</head><body><div id="map"></div></body></html>`,
+	});
+});
+
+await page.goto('http://localhost/index.html');
+
+// Wait for MapLibre GL to load
+await page.waitForFunction(() => typeof (window as any).maplibregl !== 'undefined', {
+	timeout: 15000,
+});
+
+console.log('MapLibre loaded, initializing map...');
+
+// Initialize map with a simple style
+await page.evaluate(
+	({ center, zoom }: { center: [number, number]; zoom: number }) => {
+		return new Promise<void>((resolve, reject) => {
+			const map = new (window as any).maplibregl.Map({
+				container: 'map',
+				style: {
+					version: 8,
+					sources: {},
+					layers: [
+						{
+							id: 'background',
+							type: 'background',
+							paint: { 'background-color': '#e0e0e0' },
+						},
+					],
+				},
+				center,
+				zoom,
+				interactive: false,
+				fadeDuration: 0,
+				attributionControl: false,
+			});
+			(window as any)._map = map;
+			map.once('idle', () => resolve());
+			setTimeout(() => reject(new Error('MapLibre idle timeout')), 30000);
+		});
+	},
+	{ center: [13.4, 52.5] as [number, number], zoom: 10 },
+);
+
+console.log('Map initialized, loading plugin...');
+
+// Add the control to the map using dynamic import of the served plugin
+await page.evaluate(async () => {
+	const mod = await import('/svg-export-plugin.js');
+	const control = new mod.SVGExportControl({ defaultWidth: 400, defaultHeight: 300 });
+	(window as any)._map.addControl(control, 'top-right');
+});
+
+// Test 1: Button is visible
+console.log('Test 1: Checking button visibility...');
+const button = page.locator('.svg-export-btn');
+await button.waitFor({ state: 'visible', timeout: 5000 });
+console.log('  PASS: Export button is visible');
+
+// Test 2: Click opens panel
+console.log('Test 2: Opening panel...');
+await button.click();
+const panel = page.locator('.svg-export-panel');
+await panel.waitFor({ state: 'visible', timeout: 5000 });
+console.log('  PASS: Panel opened');
+
+// Test 3: Inputs are present with correct defaults
+console.log('Test 3: Checking inputs...');
+const widthInput = page.locator('.input-width');
+const heightInput = page.locator('.input-height');
+const scaleInput = page.locator('.input-scale');
+await widthInput.waitFor({ state: 'visible', timeout: 2000 });
+
+const widthVal = await widthInput.inputValue();
+const heightVal = await heightInput.inputValue();
+const scaleVal = await scaleInput.inputValue();
+
+if (widthVal !== '400') throw new Error(`Expected width 400, got ${widthVal}`);
+if (heightVal !== '300') throw new Error(`Expected height 300, got ${heightVal}`);
+if (scaleVal !== '1') throw new Error(`Expected scale 1, got ${scaleVal}`);
+console.log('  PASS: Inputs have correct default values');
+
+// Test 4: Preview renders SVG
+console.log('Test 4: Waiting for preview...');
+const iframe = panel.locator('.preview-container iframe');
+await iframe.waitFor({ state: 'visible', timeout: 30000 });
+console.log('  PASS: Preview iframe rendered');
+
+// Test 5: Export button becomes enabled
+console.log('Test 5: Checking export button...');
+const exportBtn = page.locator('.btn-export');
+await expectEnabled(exportBtn);
+console.log('  PASS: Export button is enabled');
+
+// Test 6: Export triggers download
+console.log('Test 6: Testing SVG export download...');
+const [download] = await Promise.all([
+	page.waitForEvent('download', { timeout: 10000 }),
+	exportBtn.click(),
+]);
+if (!download.suggestedFilename().endsWith('.svg')) {
+	throw new Error(`Expected .svg filename, got ${download.suggestedFilename()}`);
+}
+console.log(`  PASS: Download triggered (${download.suggestedFilename()})`);
+
+// Test 7: Close panel
+console.log('Test 7: Closing panel...');
+const closeBtn = page.locator('.panel-close');
+await closeBtn.click();
+await panel.waitFor({ state: 'detached', timeout: 5000 });
+console.log('  PASS: Panel closed');
+
+await browser.close();
+console.log('\nAll MapLibre control tests passed!');
+
+async function expectEnabled(
+	locator: ReturnType<typeof page.locator>,
+	timeout = 10000,
+): Promise<void> {
+	const start = Date.now();
+	while (Date.now() - start < timeout) {
+		const disabled = await locator.getAttribute('disabled');
+		if (disabled === null) return;
+		await new Promise((r) => setTimeout(r, 200));
+	}
+	throw new Error('Element remained disabled after timeout');
+}
