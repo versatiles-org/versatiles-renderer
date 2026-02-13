@@ -52,7 +52,7 @@
     "doc-graph": "vrt deps-graph | vrt doc-insert README.md '## Dependency Graph'",
     "e2e": "tsx e2e/run.ts",
     "e2e:maplibre": "tsx e2e/maplibre-control.ts",
-    "format": "prettier --write 'src/**/*.ts' 'e2e/**/*.ts'",
+    "format": "prettier --write 'src/**/*.ts' 'e2e/**/*.ts' README.md",
     "lint": "eslint --color .",
     "prepack": "npm run doc-graph && npm run build",
     "release": "npx vrt release-npm",
