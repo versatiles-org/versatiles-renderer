@@ -31,33 +31,36 @@ subgraph 0["src"]
 subgraph 3["lib"]
 4["geometry.ts"]
 7["color.ts"]
-9["style_layer.ts"]
+C["style_layer.ts"]
 end
 subgraph 5["processor"]
 6["render.ts"]
-8["styles.ts"]
-A["vector.ts"]
-B["helper.ts"]
+8["raster.ts"]
+9["vector.ts"]
+A["helper.ts"]
+B["styles.ts"]
 end
-subgraph C["renderer"]
-D["renderer_svg.ts"]
+subgraph D["renderer"]
+E["renderer_svg.ts"]
 end
-E["types.ts"]
+F["types.ts"]
 end
 1-->2
 2-->4
 2-->6
-2-->D
+2-->E
 6-->7
 6-->4
 6-->8
-6-->A
+6-->B
+6-->9
 8-->9
+9-->4
+9-->A
 A-->4
-A-->B
-B-->4
-D-->7
+B-->C
+E-->7
 
-class 0,3,5,C subgraphs;
+class 0,3,5,D subgraphs;
 classDef subgraphs fill-opacity:0.1, fill:#888, color:#888, stroke:#888;
 ```
