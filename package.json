@@ -48,6 +48,7 @@
     "build-analyze": "npm run build && node scripts/analyze-bundle.mjs",
     "check": "npm run format && npm run lint && npm run test && npm run build && npm run e2e:maplibre",
     "demo": "tsx src/demo.ts",
+    "dev": "tsx dev/serve.ts",
     "doc-graph": "vrt deps-graph | vrt doc-insert README.md '## Dependency Graph'",
     "e2e": "tsx e2e/run.ts",
     "e2e:maplibre": "tsx e2e/maplibre-control.ts",

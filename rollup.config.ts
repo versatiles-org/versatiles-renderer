@@ -4,7 +4,9 @@ import typescript from '@rollup/plugin-typescript';
 import dts from 'rollup-plugin-dts';
 import { visualizer } from 'rollup-plugin-visualizer';
 
-export default defineConfig([
+const maplibreOnly = process.env.BUILD_TARGET === 'maplibre';
+
+const allConfigs = [
 	{
 		input: 'src/index.ts',
 		output: [
@@ -39,4 +41,20 @@ export default defineConfig([
 		output: { file: 'dist/maplibre.d.ts', format: 'es' },
 		plugins: [dts()],
 	},
-]);
+];
+
+const maplibreConfig = [
+	{
+		input: 'src/maplibre/index.ts',
+		output: [
+			{ file: 'dist/maplibre.js', format: 'es', sourcemap: true },
+		],
+		external: ['maplibre-gl'],
+		plugins: [
+			resolve(),
+			typescript({ tsconfig: './tsconfig.build.json' }),
+		],
+	},
+];
+
+export default defineConfig(maplibreOnly ? maplibreConfig : allConfigs);
