@@ -27,6 +27,7 @@
 		"build-analyze": "npm run build && node scripts/analyze-bundle.mjs",
 		"check": "npm run format && npm run lint && npm run test && npm run build",
 		"demo": "tsx src/demo.ts",
+		"doc-graph": "vrt deps-graph | vrt doc-insert README.md '## Dependency Graph'",
 		"e2e": "tsx e2e/run.ts",
 		"format": "prettier --write 'src/**/*.ts' 'e2e/**/*.ts'",
 		"lint": "eslint --color .",
