@@ -41,6 +41,7 @@ for (const region of regions) {
 	});
 
 	svgSizes.set(region.name, Buffer.byteLength(svg, 'utf8'));
+	writeFileSync(resolve(svgDir, `${region.name}.svg`), svg);
 
 	const page = await browser.newPage({
 		viewport: { width: WIDTH, height: HEIGHT },
@@ -109,9 +110,6 @@ interface Result {
 	region: Region;
 	diffPercent: number;
 	svgSizeKB: number;
-	maplibrePng: Buffer;
-	svgPng: Buffer;
-	diffPng: Buffer;
 }
 
 const results: Result[] = [];
@@ -134,9 +132,6 @@ for (const region of regions) {
 		region,
 		diffPercent,
 		svgSizeKB: (svgSizes.get(region.name) ?? 0) / 1024,
-		maplibrePng: readFileSync(resolve(maplibreDir, `${region.name}.png`)),
-		svgPng: readFileSync(resolve(svgDir, `${region.name}.png`)),
-		diffPng: PNG.sync.write(diff),
 	});
 }
 
@@ -144,12 +139,10 @@ for (const region of regions) {
 console.log('\n--- Generating Report ---');
 const rows = results
 	.map((r) => {
-		const mlB64 = r.maplibrePng.toString('base64');
-		const svgB64 = r.svgPng.toString('base64');
-		const diffB64 = Buffer.from(r.diffPng).toString('base64');
+		const name = r.region.name;
 		return `<tr>
 	<td>
-		<strong>${r.region.name}</strong><br>
+		<strong>${name}</strong><br>
 		lon: ${r.region.lon}<br>
 		lat: ${r.region.lat}<br>
 		zoom: ${r.region.zoom}<br>
@@ -158,9 +151,9 @@ const rows = results
 			diff: ${r.diffPercent.toFixed(2)}%
 		</span>
 	</td>
-	<td><img src="data:image/png;base64,${svgB64}" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
-	<td><img src="data:image/png;base64,${mlB64}" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
-	<td><img src="data:image/png;base64,${diffB64}" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
+	<td><img src="svg/${name}.svg" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
+	<td><img src="maplibre/${name}.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
+	<td><img src="diff/${name}.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
 </tr>`;
 	})
 	.join('\n');
