@@ -26,6 +26,9 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public drawPolygons(features: [Feature, FillStyle][], opacity: number): void {
+		if (features.length === 0) return;
+		if (opacity <= 0) return;
+
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
 
 		const groups = new Map<string, { paths: string[]; attrs: string }>();
@@ -59,6 +62,9 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public drawLineStrings(features: [Feature, LineStyle][], opacity: number): void {
+		if (features.length === 0) return;
+		if (opacity <= 0) return;
+
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
 
 		const groups = new Map<string, { segments: Segment[]; attrs: string }>();
