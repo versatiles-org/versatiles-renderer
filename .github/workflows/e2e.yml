@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: '0 6 * * 1' # Weekly on Monday at 06:00 UTC
 
+permissions:
+  pages: write
+  id-token: write
+
 jobs:
   e2e:
     runs-on: ubuntu-latest
@@ -12,13 +16,13 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.58.2-noble
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      
+
       - run: npm ci
-      
+
       - run: npm run e2e
 
       - uses: actions/upload-artifact@v4
@@ -27,3 +31,17 @@ jobs:
           name: e2e-report
           path: e2e/output/
           retention-days: 30
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: e2e/output/
+
+  deploy:
+    needs: e2e
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
