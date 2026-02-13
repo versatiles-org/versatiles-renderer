@@ -26,7 +26,7 @@ async function getStyle(type: Region['type']): Promise<StyleSpecification> {
 	if (!style) {
 		switch (type) {
 			case 'vector': style = styles.colorful({ hideLabels: true }); break;
-			case 'satellite': style = await styles.satellite(); break;
+			case 'satellite': style = await styles.satellite({ overlay: false }); break;
 		}
 		styleCache.set(type, style);
 	}
