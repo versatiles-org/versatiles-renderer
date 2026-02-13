@@ -4,6 +4,7 @@ import { chromium } from 'playwright';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 import { styles } from '@versatiles/style';
+import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import { renderToSVG } from '../src/index.js';
 import { regions, type Region } from './regions.js';
 
@@ -19,7 +20,22 @@ for (const dir of [outputDir, maplibreDir, svgDir, diffDir]) {
 	mkdirSync(dir, { recursive: true });
 }
 
-const style = styles.colorful({ hideLabels: true });
+const styleCache = new Map<string, StyleSpecification>();
+async function getStyle(type: Region['type']): Promise<StyleSpecification> {
+	let style = styleCache.get(type);
+	if (!style) {
+		switch (type) {
+			case 'vector': style = styles.colorful({ hideLabels: true }); break;
+			case 'satellite': style = await styles.satellite(); break;
+		}
+		styleCache.set(type, style);
+	}
+	return style;
+}
+
+function regionId(region: Region): string {
+	return `${region.name}-${region.type}`;
+}
 
 console.log('Launching browser...');
 const browser = await chromium.launch({
@@ -30,7 +46,9 @@ const browser = await chromium.launch({
 console.log('\n--- SVG Screenshots ---');
 const svgSizes = new Map<string, number>();
 for (const region of regions) {
-	console.log(`  Rendering SVG: ${region.name}...`);
+	const id = regionId(region);
+	const style = await getStyle(region.type);
+	console.log(`  Rendering SVG: ${id}...`);
 	const svg = await renderToSVG({
 		width: WIDTH,
 		height: HEIGHT,
@@ -40,8 +58,8 @@ for (const region of regions) {
 		zoom: region.zoom,
 	});
 
-	svgSizes.set(region.name, Buffer.byteLength(svg, 'utf8'));
-	writeFileSync(resolve(svgDir, `${region.name}.svg`), svg);
+	svgSizes.set(id, Buffer.byteLength(svg, 'utf8'));
+	writeFileSync(resolve(svgDir, `${id}.svg`), svg);
 
 	const page = await browser.newPage({
 		viewport: { width: WIDTH, height: HEIGHT },
@@ -50,14 +68,16 @@ for (const region of regions) {
 	await page.setContent(`<!DOCTYPE html>
 <html><head><style>* { margin: 0; padding: 0; }</style></head>
 <body>${svg}</body></html>`);
-	await page.screenshot({ path: resolve(svgDir, `${region.name}.png`) });
+	await page.screenshot({ path: resolve(svgDir, `${id}.png`) });
 	await page.close();
 }
 
 // Generate MapLibre screenshots
 console.log('\n--- MapLibre Screenshots ---');
 for (const region of regions) {
-	console.log(`  Rendering MapLibre: ${region.name}...`);
+	const id = regionId(region);
+	const style = await getStyle(region.type);
+	console.log(`  Rendering MapLibre: ${id}...`);
 	const page = await browser.newPage({
 		viewport: { width: WIDTH, height: HEIGHT },
 		deviceScaleFactor: 1,
@@ -98,7 +118,7 @@ for (const region of regions) {
 		},
 	);
 
-	await page.screenshot({ path: resolve(maplibreDir, `${region.name}.png`) });
+	await page.screenshot({ path: resolve(maplibreDir, `${id}.png`) });
 	await page.close();
 }
 
@@ -108,6 +128,7 @@ await browser.close();
 console.log('\n--- Comparing ---');
 interface Result {
 	region: Region;
+	id: string;
 	diffPercent: number;
 	svgSizeKB: number;
 }
@@ -115,8 +136,9 @@ interface Result {
 const results: Result[] = [];
 
 for (const region of regions) {
-	const maplibreData = PNG.sync.read(readFileSync(resolve(maplibreDir, `${region.name}.png`)));
-	const svgData = PNG.sync.read(readFileSync(resolve(svgDir, `${region.name}.png`)));
+	const id = regionId(region);
+	const maplibreData = PNG.sync.read(readFileSync(resolve(maplibreDir, `${id}.png`)));
+	const svgData = PNG.sync.read(readFileSync(resolve(svgDir, `${id}.png`)));
 	const diff = new PNG({ width: WIDTH, height: HEIGHT });
 
 	const mismatch = pixelmatch(maplibreData.data, svgData.data, diff.data, WIDTH, HEIGHT, {
@@ -125,13 +147,14 @@ for (const region of regions) {
 	const totalPixels = WIDTH * HEIGHT;
 	const diffPercent = (mismatch / totalPixels) * 100;
 
-	writeFileSync(resolve(diffDir, `${region.name}.png`), PNG.sync.write(diff));
-	console.log(`  ${region.name}: ${diffPercent.toFixed(2)}% different`);
+	writeFileSync(resolve(diffDir, `${id}.png`), PNG.sync.write(diff));
+	console.log(`  ${id}: ${diffPercent.toFixed(2)}% different`);
 
 	results.push({
 		region,
+		id,
 		diffPercent,
-		svgSizeKB: (svgSizes.get(region.name) ?? 0) / 1024,
+		svgSizeKB: (svgSizes.get(id) ?? 0) / 1024,
 	});
 }
 
@@ -139,21 +162,21 @@ for (const region of regions) {
 console.log('\n--- Generating Report ---');
 const rows = results
 	.map((r) => {
-		const name = r.region.name;
 		return `<tr>
 	<td>
-		<strong>${name}</strong><br>
+		<strong>${r.id}</strong><br>
 		lon: ${r.region.lon}<br>
 		lat: ${r.region.lat}<br>
 		zoom: ${r.region.zoom}<br>
+		type: ${r.region.type}<br>
 		SVG size: ${r.svgSizeKB.toFixed(0)} KB<br>
 		<span style="color:${r.diffPercent > 50 ? 'red' : r.diffPercent > 20 ? 'orange' : 'green'}">
 			diff: ${r.diffPercent.toFixed(2)}%
 		</span>
 	</td>
-	<td><img src="svg/${name}.svg" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
-	<td><img src="maplibre/${name}.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
-	<td><img src="diff/${name}.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
+	<td><img src="svg/${r.id}.svg" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
+	<td><img src="maplibre/${r.id}.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
+	<td><img src="diff/${r.id}.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></td>
 </tr>`;
 	})
 	.join('\n');
