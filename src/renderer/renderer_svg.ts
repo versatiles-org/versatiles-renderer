@@ -136,8 +136,9 @@ export class SVGRenderer {
 
 		const pixelated = style.resampling === 'nearest';
 		for (const tile of tiles) {
+			const overlap = Math.min(tile.width, tile.height) / 10000; // slight overlap to prevent sub-pixel gaps between tiles
 			const s = this.#scale;
-			let attrs = `x="${roundValue(tile.x, s)}" y="${roundValue(tile.y, s)}" width="${roundValue(tile.width, s)}" height="${roundValue(tile.height, s)}" href="${tile.dataUri}"`;
+			let attrs = `x="${roundValue(tile.x - overlap, s)}" y="${roundValue(tile.y - overlap, s)}" width="${roundValue(tile.width + overlap * 2, s)}" height="${roundValue(tile.height + overlap * 2, s)}" href="${tile.dataUri}"`;
 			if (pixelated) attrs += ' style="image-rendering:pixelated"';
 			this.#svg.push(`<image ${attrs} />`);
 		}
