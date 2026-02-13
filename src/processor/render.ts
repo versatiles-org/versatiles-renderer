@@ -28,6 +28,29 @@ async function render(job: RenderJob): Promise<void> {
 
 		layerStyle.recalculate({ zoom }, availableImages);
 
+		function getStyleValue(obj: unknown, key: string, feature?: Feature): unknown {
+			const getter = obj as { get(k: string): unknown };
+			const value = getter.get(key);
+			if (typeof value === 'object' && value !== null && 'evaluate' in value) {
+				const evaluatable = value as PossiblyEvaluatedPropertyValue<unknown>;
+				return evaluatable.evaluate(
+					feature ?? ({} as Feature),
+					featureState,
+					undefined,
+					availableImages,
+				);
+			}
+			return value;
+		}
+
+		function getPaint(key: string, feature?: Feature): unknown {
+			return getStyleValue(layerStyle.paint, key, feature);
+		}
+
+		function getLayout(key: string, feature?: Feature): unknown {
+			return getStyleValue(layerStyle.layout, key, feature);
+		}
+
 		switch (layerStyle.type) {
 			case 'background':
 				{
@@ -105,28 +128,5 @@ async function render(job: RenderJob): Promise<void> {
 			default:
 				throw Error('layerStyle.type: ' + String(layerStyle.type));
 		}
-
-		function getStyleValue(obj: unknown, key: string, feature?: Feature): unknown {
-			const getter = obj as { get(k: string): unknown };
-			const value = getter.get(key);
-			if (typeof value === 'object' && value !== null && 'evaluate' in value) {
-				const evaluatable = value as PossiblyEvaluatedPropertyValue<unknown>;
-				return evaluatable.evaluate(
-					feature ?? ({} as Feature),
-					featureState,
-					undefined,
-					availableImages,
-				);
-			}
-			return value;
-		}
-
-		function getPaint(key: string, feature?: Feature): unknown {
-			return getStyleValue(layerStyle.paint, key, feature);
-		}
-
-		function getLayout(key: string, feature?: Feature): unknown {
-			return getStyleValue(layerStyle.layout, key, feature);
-		}
-	});
+	}
 }
