@@ -1,5 +1,5 @@
 import type { RenderJob, RasterTile } from '../types.js';
-import { calculateTileGrid, getTile } from './vector.js';
+import { calculateTileGrid, getTile } from './tiles.js';
 
 export async function getRasterTiles(job: RenderJob, sourceName: string): Promise<RasterTile[]> {
 	const { width, height } = job.renderer;
