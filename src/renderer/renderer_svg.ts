@@ -119,7 +119,6 @@ export class SVGRenderer extends Renderer {
 			'</svg>',
 		].join('\n');
 	}
-
 }
 
 function roundValue(v: number, scale: number): string {
