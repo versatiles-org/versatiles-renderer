@@ -2,6 +2,19 @@
 	"name": "@versatiles/svg-renderer",
 	"version": "0.0.1",
 	"description": "Renders vector maps as SVG.",
+	"keywords": [
+		"svg",
+		"map",
+		"renderer",
+		"vector-tiles",
+		"versatiles"
+	],
+	"homepage": "https://github.com/versatiles-org/versatiles-renderer-svg",
+	"bugs": "https://github.com/versatiles-org/versatiles-renderer-svg/issues",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/versatiles-org/versatiles-renderer-svg.git"
+	},
 	"main": "dist/index.cjs",
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
