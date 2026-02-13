@@ -83,7 +83,8 @@ export class SVGExportControl implements IControl {
 				<span class="preview-loading">Rendering preview\u2026</span>
 			</div>
 			<div class="panel-actions">
-				<button class="btn-export" disabled>Export SVG</button>
+				<button class="btn-download" disabled>Download</button>
+				<button class="btn-open" disabled>Open in Tab</button>
 			</div>
 		`;
 
@@ -97,8 +98,12 @@ export class SVGExportControl implements IControl {
 			});
 		});
 
-		querySelector(this.panel, '.btn-export').addEventListener('click', () => {
-			this.exportSVG();
+		querySelector(this.panel, '.btn-download').addEventListener('click', () => {
+			this.downloadSVG();
+		});
+
+		querySelector(this.panel, '.btn-open').addEventListener('click', () => {
+			this.openSVGInTab();
 		});
 
 		mapContainer.appendChild(this.panel);
@@ -131,10 +136,12 @@ export class SVGExportControl implements IControl {
 		const map = this.map;
 
 		const previewContainer = querySelector(panel, '.preview-container');
-		const exportBtn = querySelector(panel, '.btn-export') as HTMLButtonElement;
+		const downloadBtn = querySelector(panel, '.btn-download') as HTMLButtonElement;
+		const openBtn = querySelector(panel, '.btn-open') as HTMLButtonElement;
 
 		previewContainer.innerHTML = '<span class="preview-loading">Rendering preview\u2026</span>';
-		exportBtn.disabled = true;
+		downloadBtn.disabled = true;
+		openBtn.disabled = true;
 
 		const width = Number((querySelector(panel, '.input-width') as HTMLInputElement).value);
 		const height = Number((querySelector(panel, '.input-height') as HTMLInputElement).value);
@@ -168,7 +175,8 @@ export class SVGExportControl implements IControl {
 			iframe.srcdoc = `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;overflow:hidden;}body{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;}svg{max-width:100%;max-height:100%;width:auto;height:auto;display:block;}</style></head><body>${svg}</body></html>`;
 			previewContainer.innerHTML = '';
 			previewContainer.appendChild(iframe);
-			exportBtn.disabled = false;
+			downloadBtn.disabled = false;
+			openBtn.disabled = false;
 		} catch (error: unknown) {
 			if (this.renderGeneration !== generation) return;
 			const message = error instanceof Error ? error.message : 'Unknown error';
@@ -176,7 +184,7 @@ export class SVGExportControl implements IControl {
 		}
 	}
 
-	private exportSVG(): void {
+	private downloadSVG(): void {
 		if (!this.currentSVG) return;
 
 		const blob = new Blob([this.currentSVG], { type: 'image/svg+xml' });
@@ -188,5 +196,13 @@ export class SVGExportControl implements IControl {
 		a.click();
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
+	}
+
+	private openSVGInTab(): void {
+		if (!this.currentSVG) return;
+
+		const blob = new Blob([this.currentSVG], { type: 'image/svg+xml' });
+		const url = URL.createObjectURL(blob);
+		window.open(url, '_blank');
 	}
 }

@@ -126,17 +126,31 @@ export const PANEL_CSS = `
 	font-weight: 500;
 }
 
-.svg-export-panel .btn-export {
+.svg-export-panel .btn-download {
 	background: #4264fb;
 	color: #fff;
 }
 
-.svg-export-panel .btn-export:hover {
+.svg-export-panel .btn-download:hover {
 	background: #3352d9;
 }
 
-.svg-export-panel .btn-export:disabled {
+.svg-export-panel .btn-download:disabled {
 	background: #a0b0e0;
+	cursor: not-allowed;
+}
+
+.svg-export-panel .btn-open {
+	background: #555;
+	color: #fff;
+}
+
+.svg-export-panel .btn-open:hover {
+	background: #444;
+}
+
+.svg-export-panel .btn-open:disabled {
+	background: #aaa;
 	cursor: not-allowed;
 }
 `;

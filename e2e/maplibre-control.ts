@@ -124,25 +124,37 @@ const iframe = panel.locator('.preview-container iframe');
 await iframe.waitFor({ state: 'visible', timeout: 30000 });
 console.log('  PASS: Preview iframe rendered');
 
-// Test 5: Export button becomes enabled
-console.log('Test 5: Checking export button...');
-const exportBtn = page.locator('.btn-export');
-await expectEnabled(exportBtn);
-console.log('  PASS: Export button is enabled');
+// Test 5: Action buttons become enabled
+console.log('Test 5: Checking action buttons...');
+const downloadBtn = page.locator('.btn-download');
+const openBtn = page.locator('.btn-open');
+await expectEnabled(downloadBtn);
+await expectEnabled(openBtn);
+console.log('  PASS: Download and Open in Tab buttons are enabled');
 
-// Test 6: Export triggers download
-console.log('Test 6: Testing SVG export download...');
+// Test 6: Download triggers file download
+console.log('Test 6: Testing SVG download...');
 const [download] = await Promise.all([
 	page.waitForEvent('download', { timeout: 10000 }),
-	exportBtn.click(),
+	downloadBtn.click(),
 ]);
 if (!download.suggestedFilename().endsWith('.svg')) {
 	throw new Error(`Expected .svg filename, got ${download.suggestedFilename()}`);
 }
 console.log(`  PASS: Download triggered (${download.suggestedFilename()})`);
 
-// Test 7: Close panel
-console.log('Test 7: Closing panel...');
+// Test 7: Open in Tab opens a new tab
+console.log('Test 7: Testing Open in Tab...');
+const [newPage] = await Promise.all([
+	page.context().waitForEvent('page', { timeout: 10000 }),
+	openBtn.click(),
+]);
+await newPage.waitForLoadState();
+console.log('  PASS: SVG opened in new tab');
+await newPage.close();
+
+// Test 8: Close panel
+console.log('Test 8: Closing panel...');
 const closeBtn = page.locator('.panel-close');
 await closeBtn.click();
 await panel.waitFor({ state: 'detached', timeout: 5000 });
