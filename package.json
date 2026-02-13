@@ -31,7 +31,7 @@
 		"e2e": "tsx e2e/run.ts",
 		"format": "prettier --write 'src/**/*.ts' 'e2e/**/*.ts'",
 		"lint": "eslint --color .",
-		"prepack": "npm run build",
+		"prepack": "npm run doc-graph && npm run build",
 		"release": "npx vrt release-npm",
 		"start": "tsx src/index.ts",
 		"test-coverage": "vitest run --coverage",
