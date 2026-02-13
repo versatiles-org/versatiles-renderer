@@ -25,6 +25,8 @@ export class SVGRenderer extends Renderer {
 
 	public drawPolygons(features: [Feature, FillStyle][], opacity: number): void {
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
+
+		const groups = new Map<string, { paths: string[]; attrs: string }>();
 		features.forEach(([feature, style]) => {
 			if (style.color.alpha <= 0) return;
 
@@ -33,48 +35,72 @@ export class SVGRenderer extends Renderer {
 					(ring) => ring.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p)).join('') + 'z',
 				)
 				.join('');
-			this.#svg.push(
-				[
-					'<path',
-					`d="${path}"`,
-					`fill="${style.color.hex}"`,
-					style.translate.isZero()
-						? ''
-						: `transform="translate(${this.#roundPoint(style.translate)})"`,
-					'/>',
-				].join(' '),
-			);
+
+			const translate = style.translate.isZero()
+				? ''
+				: ` transform="translate(${this.#roundPoint(style.translate)})"`;
+			const key = style.color.hex + translate;
+
+			let group = groups.get(key);
+			if (!group) {
+				group = { paths: [], attrs: `fill="${style.color.hex}"${translate}` };
+				groups.set(key, group);
+			}
+			group.paths.push(path);
 		});
+
+		for (const { paths, attrs } of groups.values()) {
+			this.#svg.push(`<path d="${paths.join('')}" ${attrs} />`);
+		}
+
 		this.#svg.push('</g>');
 	}
 
 	public drawLineStrings(features: [Feature, LineStyle][], opacity: number): void {
 		this.#svg.push(`<g opacity="${String(opacity)}">`);
-		features.forEach(([feature, style]) => {
-			feature.geometry.forEach((line) => {
-				if (style.width <= 0 || style.color.alpha <= 0) return;
 
-				const path: string = line
-					.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p))
-					.join('');
-				this.#svg.push(
-					[
-						'<path',
-						`d="${path}"`,
-						'fill="none"',
-						`stroke="${style.color.hex}"`,
-						`stroke-width="${this.#round(style.width)}"`,
-						style.translate.isZero()
-							? ''
-							: `transform="translate(${this.#roundPoint(style.translate)})"`,
-						`stroke-linecap="${style.cap}"`,
-						`stroke-linejoin="${style.join}"`,
-						`stroke-miterlimit="${String(style.miterLimit)}"`,
-						'/>',
-					].join(' '),
-				);
+		const groups = new Map<string, { paths: string[]; attrs: string }>();
+		features.forEach(([feature, style]) => {
+			if (style.width <= 0 || style.color.alpha <= 0) return;
+
+			const translate = style.translate.isZero()
+				? ''
+				: ` transform="translate(${this.#roundPoint(style.translate)})"`;
+			const key = [
+				style.color.hex,
+				this.#round(style.width),
+				style.cap,
+				style.join,
+				String(style.miterLimit),
+				translate,
+			].join('\0');
+
+			let group = groups.get(key);
+			if (!group) {
+				group = {
+					paths: [],
+					attrs:
+						[
+							'fill="none"',
+							`stroke="${style.color.hex}"`,
+							`stroke-width="${this.#round(style.width)}"`,
+							`stroke-linecap="${style.cap}"`,
+							`stroke-linejoin="${style.join}"`,
+							`stroke-miterlimit="${String(style.miterLimit)}"`,
+						].join(' ') + translate,
+				};
+				groups.set(key, group);
+			}
+
+			feature.geometry.forEach((line) => {
+				group.paths.push(line.map((p, i) => (i === 0 ? 'M' : 'L') + this.#roundPoint(p)).join(''));
 			});
 		});
+
+		for (const { paths, attrs } of groups.values()) {
+			this.#svg.push(`<path d="${paths.join('')}" ${attrs} />`);
+		}
+
 		this.#svg.push('</g>');
 	}
 
