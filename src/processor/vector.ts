@@ -24,8 +24,9 @@ export function calculateTileGrid(
 	height: number,
 	center: Point2D,
 	zoom: number,
+	maxzoom?: number,
 ): TileGrid {
-	const zoomLevel = Math.floor(zoom);
+	const zoomLevel = Math.min(Math.floor(zoom), maxzoom ?? Infinity);
 	const tileCenterCoordinate = center.getProject2Pixel().scale(2 ** zoomLevel);
 	const tileSize = 2 ** (zoom - zoomLevel + 9); // 512 (2^9) is the standard tile size
 
@@ -79,7 +80,9 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const { width, height } = job.renderer;
 	const { zoom, center } = job.view;
 	const { sources } = job.style;
-	const source = sources['versatiles-shortbread'] as { type: string; tiles?: string[] } | undefined;
+	const source = sources['versatiles-shortbread'] as
+		| { type: string; tiles?: string[]; maxzoom?: number }
+		| undefined;
 
 	if (!source) return new Map();
 
@@ -94,7 +97,7 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 		zoomLevel,
 		tileSize,
 		tiles: tileCoordinates,
-	} = calculateTileGrid(width, height, center, zoom);
+	} = calculateTileGrid(width, height, center, zoom, source.maxzoom);
 
 	const layerFeatures: LayerFeatures = new Map();
 

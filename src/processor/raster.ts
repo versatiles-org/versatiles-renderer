@@ -4,14 +4,22 @@ import { calculateTileGrid, getTile } from './vector.js';
 export async function getRasterTiles(job: RenderJob, sourceName: string): Promise<RasterTile[]> {
 	const { width, height } = job.renderer;
 	const { zoom, center } = job.view;
-	const source = job.style.sources[sourceName] as { type: string; tiles?: string[] } | undefined;
+	const source = job.style.sources[sourceName] as
+		| { type: string; tiles?: string[]; maxzoom?: number }
+		| undefined;
 
 	if (source?.type !== 'raster' || !source.tiles) {
 		throw Error('Invalid raster source: ' + sourceName);
 	}
 
 	const sourceUrl: string = source.tiles[0];
-	const { zoomLevel, tileSize, tiles } = calculateTileGrid(width, height, center, zoom);
+	const { zoomLevel, tileSize, tiles } = calculateTileGrid(
+		width,
+		height,
+		center,
+		zoom,
+		source.maxzoom,
+	);
 
 	const rasterTiles = await Promise.all(
 		tiles.map(async ({ x, y, offsetX, offsetY }): Promise<RasterTile | null> => {
