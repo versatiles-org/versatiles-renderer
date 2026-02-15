@@ -5,6 +5,72 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-02-15
+
+### Features
+
+- add RasterStyle and RasterTile interfaces for enhanced rendering options
+- enhance getTile function to return content type along with buffer
+- implement getRasterTiles function for raster tile retrieval
+- add drawRasterTiles method to SVGRenderer for rendering raster tiles
+- add type property to regions and generate e2e results for satellite
+- update satellite style to disable overlay in SVG rendering
+- enhance getLayerFeatures to handle missing source and log errors for invalid configurations
+- add drawRasterTiles tests for SVG rendering with various raster styles and filters
+- add overlap to raster tile rendering to prevent sub-pixel gaps
+- make screenshot images in report clickable for easier access
+- add SVG export control for maplibre integration with customizable options
+- add MapLibre control tests with SVG export functionality
+- add Playwright browser installation and MapLibre E2E test steps to CI workflows
+- add development server and initial HTML for SVG export control
+- enhance SVG export preview styling for better responsiveness
+- update SVG export controls to include Download and Open in Tab buttons
+- add maxzoom parameter to calculateTileGrid and update raster source handling
+- manage map interactions during SVG export
+- update dependency graph to include MapLibre components
+- refactor tile handling by moving calculateTileGrid and getTile functions to tiles.ts
+- enhance README with detailed usage examples and additional options for renderToSVG
+- update MapLibre integration example in README with HTML structure and script tags
+- add badges for NPM version, downloads, code coverage, CI status, and license to README
+
+### Bug Fixes
+
+- handle Buffer availability for base64 encoding in getRasterTiles
+- correct type checking for vector source in getLayerFeatures function
+- update dependency graph structure and correct subgraph references in README
+- include README.md in format script for prettier
+- update dependencies in package-lock.json and remove unused packages
+- update ESLint configuration to use array format for exports
+- correct coverage configuration in vitest.config.ts to include and exclude specific files
+- update format script in package.json to apply Prettier to all files
+- remove unused StyleOptions, TextStyle, and SymbolStyle interfaces from types.ts
+- update import paths in demo.ts for consistency
+- ensure coverage includes all files in vitest.config.ts
+- update actions/checkout and actions/setup-node to version 6
+- refactor eslint configuration to use defineConfig and update ignores
+- update license from Unlicense to MIT
+- update README to format required option for SVGExportControl
+- update README to format required option for SVGExportControl
+- update license from Unlicense to MIT in package-lock.json
+
+### Code Refactoring
+
+- move style value retrieval functions inside render function for better encapsulation
+- move getTile function
+- reorganize tile-related interfaces and functions for improved structure
+- reorganize dependency graph in README for clarity
+- simplify tile array initialization and format drawRasterTiles call
+
+### Chores
+
+- **deps:** bump the action group with 2 updates
+
+### Styles
+
+- format function parameters and imports for improved readability
+- improve formatting of style switch cases in getStyle function
+- format files
+
 ## [0.1.0] - 2026-02-13
 
 ### Features
