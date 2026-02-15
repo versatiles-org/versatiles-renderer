@@ -61,4 +61,3 @@ export interface RasterTile {
 	height: number;
 	dataUri: string;
 }
-

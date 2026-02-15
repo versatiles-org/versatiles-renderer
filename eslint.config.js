@@ -1,12 +1,11 @@
+import { defineConfig, globalIgnores } from 'eslint/config';
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
-export default [
+export default defineConfig(
 	eslint.configs.recommended,
 	...tseslint.configs.recommended,
-	{
-		ignores: ['dist/**', 'coverage/**', 'lib/**'],
-	},
+	globalIgnores(['dist/**', 'coverage/**', 'lib/**', 'e2e/**', 'scripts/**', 'dev/**']),
 	{
 		files: ['src/**/*.ts'],
 		extends: [
@@ -17,7 +16,7 @@ export default [
 		languageOptions: {
 			parserOptions: {
 				projectService: true,
-				tsconfigRootDir: new URL('./', import.meta.url).pathname,
+				tsconfigRootDir: import.meta.dirname,
 			},
 		},
 		linterOptions: {
@@ -25,4 +24,4 @@ export default [
 		},
 		rules: {},
 	},
-];
+);
