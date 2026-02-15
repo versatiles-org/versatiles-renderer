@@ -5,6 +5,7 @@ export default defineConfig({
 		exclude: ['lib/**', 'node_modules/**', 'dist/**'],
 		passWithNoTests: true,
 		coverage: {
+			all: true,
 			include: ['src/**/*.ts'],
 			exclude: ['src/demo.ts'],
 		},
