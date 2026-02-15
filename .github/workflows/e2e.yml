@@ -39,7 +39,7 @@ jobs:
         run: npm run e2e
 
       - name: Upload E2E report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: e2e-report
@@ -47,7 +47,7 @@ jobs:
           retention-days: 30
 
       - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: e2e/output/
 
