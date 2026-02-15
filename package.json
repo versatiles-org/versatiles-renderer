@@ -63,7 +63,7 @@
   },
   "type": "module",
   "author": "Michael Kreil <versatiles@michael-kreil.de>",
-  "license": "Unlicense",
+  "license": "MIT",
   "engines": {
     "node": ">= 22"
   },
