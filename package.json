@@ -76,7 +76,7 @@
     }
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
+    "@eslint/js": "^10.0.1",
     "@mapbox/vector-tile": "^2.0.4",
     "@maplibre/maplibre-gl-style-spec": "^24.4.1",
     "@rollup/plugin-node-resolve": "^16.0.3",
@@ -88,7 +88,7 @@
     "@versatiles/release-tool": "^2.7.1",
     "@versatiles/style": "^5.9.3",
     "@vitest/coverage-v8": "^4.0.18",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.0",
     "geojson": "^0.5.0",
     "maplibre-gl": "^5.18.0",
     "npm-check-updates": "^19.3.2",
