@@ -20,10 +20,6 @@ export interface RendererOptions {
 	scale: number;
 }
 
-export interface StyleOptions {
-	zoom: number;
-}
-
 export interface BackgroundStyle {
 	color: Color;
 	opacity: number;
@@ -66,10 +62,3 @@ export interface RasterTile {
 	dataUri: string;
 }
 
-export interface TextStyle {
-	color: Color;
-}
-
-export interface SymbolStyle {
-	color: Color;
-}
