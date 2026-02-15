@@ -1,16 +1,11 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
-
 export default [
 	eslint.configs.recommended,
 	...tseslint.configs.recommended,
 	{
-		ignores: [
-			'dist/**',
-			'coverage/**',
-			'lib/**',
-		],
+		ignores: ['dist/**', 'coverage/**', 'lib/**'],
 	},
 	{
 		files: ['src/**/*.ts'],
@@ -28,7 +23,6 @@ export default [
 		linterOptions: {
 			reportUnusedDisableDirectives: true,
 		},
-		rules: {
-		},
+		rules: {},
 	},
 ];

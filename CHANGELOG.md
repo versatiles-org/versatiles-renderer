@@ -157,4 +157,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add funding.yml
 - minor fixes
 - Add demo script to package.json and fix upgrade script formatting
-

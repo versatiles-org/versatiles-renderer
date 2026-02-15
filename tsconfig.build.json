@@ -8,7 +8,5 @@
 		"sourceMap": true,
 		"allowImportingTsExtensions": false
 	},
-	"exclude": [
-		"src/demo.ts"
-	]
+	"exclude": ["src/demo.ts"]
 }

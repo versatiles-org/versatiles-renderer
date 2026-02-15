@@ -31,7 +31,11 @@ for (let i = 0; i < outputMap.sources.length; i++) {
 	if (!absSource.includes('node_modules')) continue;
 
 	let code;
-	try { code = readFileSync(absSource, 'utf8'); } catch { continue; }
+	try {
+		code = readFileSync(absSource, 'utf8');
+	} catch {
+		continue;
+	}
 	const match = /\/\/[#@]\s*sourceMappingURL=(\S+)\s*$/.exec(code);
 	if (!match || match[1].startsWith('data:')) continue;
 
@@ -149,7 +153,7 @@ const sortedFiles = [...bytesPerSource.entries()].sort((a, b) => b[1] - a[1]);
 console.log('\n=== Bundle Size by Package ===\n');
 for (const [pkg, bytes] of sortedPackages) {
 	const kb = (bytes / 1024).toFixed(1);
-	const pct = (bytes / totalBytes * 100).toFixed(1);
+	const pct = ((bytes / totalBytes) * 100).toFixed(1);
 	console.log(`  ${kb.padStart(8)} KB  ${pct.padStart(5)}%  ${pkg}`);
 }
 console.log(`  ${(totalBytes / 1024).toFixed(1).padStart(8)} KB  total`);
@@ -157,10 +161,12 @@ console.log(`  ${(totalBytes / 1024).toFixed(1).padStart(8)} KB  total`);
 console.log('\n=== Bundle Size by File (top 30) ===\n');
 for (const [source, bytes] of sortedFiles.slice(0, 30)) {
 	const kb = (bytes / 1024).toFixed(1);
-	const pct = (bytes / totalBytes * 100).toFixed(1);
+	const pct = ((bytes / totalBytes) * 100).toFixed(1);
 	console.log(`  ${kb.padStart(8)} KB  ${pct.padStart(5)}%  ${source}`);
 }
 if (sortedFiles.length > 30) {
 	const rest = sortedFiles.slice(30).reduce((sum, [, b]) => sum + b, 0);
-	console.log(`  ${(rest / 1024).toFixed(1).padStart(8)} KB         ... and ${sortedFiles.length - 30} more files`);
+	console.log(
+		`  ${(rest / 1024).toFixed(1).padStart(8)} KB         ... and ${sortedFiles.length - 30} more files`,
+	);
 }

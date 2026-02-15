@@ -31,10 +31,7 @@ const allConfigs = [
 			{ file: 'dist/maplibre.cjs', format: 'cjs', sourcemap: true },
 		],
 		external: ['maplibre-gl'],
-		plugins: [
-			resolve(),
-			typescript({ tsconfig: './tsconfig.build.json' }),
-		],
+		plugins: [resolve(), typescript({ tsconfig: './tsconfig.build.json' })],
 	},
 	{
 		input: 'dist/types/maplibre/index.d.ts',
@@ -46,14 +43,9 @@ const allConfigs = [
 const maplibreConfig = [
 	{
 		input: 'src/maplibre/index.ts',
-		output: [
-			{ file: 'dist/maplibre.js', format: 'es', sourcemap: true },
-		],
+		output: [{ file: 'dist/maplibre.js', format: 'es', sourcemap: true }],
 		external: ['maplibre-gl'],
-		plugins: [
-			resolve(),
-			typescript({ tsconfig: './tsconfig.build.json' }),
-		],
+		plugins: [resolve(), typescript({ tsconfig: './tsconfig.build.json' })],
 	},
 ];
 
