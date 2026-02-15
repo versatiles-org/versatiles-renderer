@@ -1,6 +1,6 @@
 import { styles } from '@versatiles/style';
-import { renderToSVG } from './index';
-import { writeFileSync } from 'fs';
+import { renderToSVG } from './index.js';
+import { writeFileSync } from 'node:fs';
 
 const style = styles.colorful({});
 
