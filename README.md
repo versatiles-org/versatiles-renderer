@@ -64,10 +64,6 @@ document.body.innerHTML = svg;
 
 The package includes an `SVGExportControl` that adds an export button to any MapLibre GL JS map.
 
-```bash
-npm install @versatiles/svg-renderer maplibre-gl
-```
-
 ```html
 <!DOCTYPE html>
 <html>
@@ -85,7 +81,7 @@ npm install @versatiles/svg-renderer maplibre-gl
 				center: [13.4, 52.5],
 				zoom: 10,
 			});
-			map.addControl(new VersatilesSVGRendererMaplibre.SVGExportControl(), 'top-right');
+			map.addControl(new VersaTilesSVG.SVGExportControl(), 'top-right');
 		</script>
 	</body>
 </html>

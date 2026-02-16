@@ -18,8 +18,8 @@
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "unpkg": "dist/index.umd.js",
-  "jsdelivr": "dist/index.umd.js",
+  "unpkg": "dist/maplibre.umd.js",
+  "jsdelivr": "dist/maplibre.umd.js",
   "exports": {
     ".": {
       "import": {
@@ -29,8 +29,7 @@
       "require": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.cjs"
-      },
-      "script": "./dist/index.umd.js"
+      }
     },
     "./maplibre": {
       "import": {
