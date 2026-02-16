@@ -44,6 +44,15 @@ export interface LineStyle {
 	width: number;
 }
 
+export interface CircleStyle {
+	color: Color;
+	radius: number;
+	blur: number;
+	translate: Point2D;
+	strokeWidth: number;
+	strokeColor: Color;
+}
+
 export interface RasterStyle {
 	opacity: number;
 	hueRotate: number;

@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { SVGRenderer } from './renderer_svg.js';
 import { Color } from '../lib/color.js';
 import { Feature, Point2D } from '../lib/geometry.js';
-import type { RasterStyle, RasterTile } from '../types.js';
+import type { CircleStyle, RasterStyle, RasterTile } from '../types.js';
 
 function makeRenderer(scale = 1): SVGRenderer {
 	return new SVGRenderer({ width: 256, height: 256, scale });
@@ -205,6 +205,86 @@ describe('SVGRenderer', () => {
 			r.drawLineStrings([[feature, style]], 1);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
+		});
+	});
+
+	describe('drawCircles', () => {
+		function makePointFeature(points: [number, number][]): Feature {
+			return new Feature({
+				type: 'Point',
+				properties: {},
+				geometry: points.map(([x, y]) => [new Point2D(x, y)]),
+			});
+		}
+
+		function defaultCircleStyle(overrides: Partial<CircleStyle> = {}): CircleStyle {
+			return {
+				color: new Color('#FF0000'),
+				radius: 5,
+				blur: 0,
+				translate: new Point2D(0, 0),
+				strokeWidth: 0,
+				strokeColor: new Color('#000000'),
+				...overrides,
+			};
+		}
+
+		test('generates circle elements with correct attributes', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawCircles([[feature, defaultCircleStyle()]], 1);
+			const svg = r.getString();
+			expect(svg).toContain('<circle');
+			expect(svg).toContain('cx=');
+			expect(svg).toContain('cy=');
+			expect(svg).toContain('r="5.000"');
+			expect(svg).toContain('fill="#FF0000"');
+			expect(svg).toContain('<g opacity="1">');
+		});
+
+		test('empty features produce no output', () => {
+			const r = makeRenderer();
+			r.drawCircles([], 1);
+			const svg = r.getString();
+			expect(svg).not.toContain('<circle');
+			expect(svg).not.toContain('<g');
+		});
+
+		test('zero opacity produces no output', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawCircles([[feature, defaultCircleStyle()]], 0);
+			const svg = r.getString();
+			expect(svg).not.toContain('<circle');
+		});
+
+		test('zero-radius circles produce no output', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawCircles([[feature, defaultCircleStyle({ radius: 0 })]], 1);
+			const svg = r.getString();
+			expect(svg).not.toContain('<circle');
+		});
+
+		test('stroke attributes appear when strokeWidth > 0', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawCircles(
+				[[feature, defaultCircleStyle({ strokeWidth: 2, strokeColor: new Color('#00FF00') })]],
+				1,
+			);
+			const svg = r.getString();
+			expect(svg).toContain('stroke="#00FF00"');
+			expect(svg).toContain('stroke-width="2.000"');
+		});
+
+		test('no stroke attributes when strokeWidth is 0', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawCircles([[feature, defaultCircleStyle({ strokeWidth: 0 })]], 1);
+			const svg = r.getString();
+			expect(svg).not.toContain('stroke=');
+			expect(svg).not.toContain('stroke-width=');
 		});
 	});
 

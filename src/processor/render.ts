@@ -133,6 +133,32 @@ async function render(job: RenderJob): Promise<void> {
 				}
 				continue;
 			case 'circle':
+				{
+					const points = layerFeatures.get(layerStyle.sourceLayer)?.points;
+					if (!points || points.length === 0) continue;
+					const filter = featureFilter(layerStyle.filter);
+					const pointFeatures = points.filter((feature) => filter.filter({ zoom }, feature));
+
+					if (pointFeatures.length === 0) continue;
+
+					renderer.drawCircles(
+						pointFeatures.map((feature) => [
+							feature,
+							{
+								color: new Color(getPaint('circle-color', feature) as MaplibreColor),
+								radius: getPaint('circle-radius', feature) as number,
+								blur: getPaint('circle-blur', feature) as number,
+								translate: new Point2D(
+									...(getPaint('circle-translate', feature) as [number, number]),
+								),
+								strokeWidth: getPaint('circle-stroke-width', feature) as number,
+								strokeColor: new Color(getPaint('circle-stroke-color', feature) as MaplibreColor),
+							},
+						]),
+						getPaint('circle-opacity', pointFeatures[0]) as number,
+					);
+				}
+				continue;
 			case 'color-relief':
 			case 'fill-extrusion':
 			case 'heatmap':

@@ -2,6 +2,7 @@ import type { Feature, Point2D } from '../lib/geometry.js';
 import { Color } from '../lib/color.js';
 import type {
 	BackgroundStyle,
+	CircleStyle,
 	FillStyle,
 	LineStyle,
 	RasterStyle,
@@ -118,6 +119,48 @@ export class SVGRenderer {
 			const chains = chainSegments(segments);
 			const d = segmentsToPath(chains);
 			this.#svg.push(`<path d="${d}" ${attrs} />`);
+		}
+
+		this.#svg.push('</g>');
+	}
+
+	public drawCircles(features: [Feature, CircleStyle][], opacity: number): void {
+		if (features.length === 0) return;
+		if (opacity <= 0) return;
+
+		this.#svg.push(`<g opacity="${String(opacity)}">`);
+
+		const groups = new Map<string, { points: [number, number][]; attrs: string }>();
+		features.forEach(([feature, style]) => {
+			if (style.radius <= 0 || style.color.alpha <= 0) return;
+
+			const translate = style.translate.isZero()
+				? ''
+				: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
+			const roundedRadius = roundValue(style.radius, this.#scale);
+			const strokeAttrs =
+				style.strokeWidth > 0
+					? ` stroke="${style.strokeColor.hex}" stroke-width="${roundValue(style.strokeWidth, this.#scale)}"`
+					: '';
+			const key = [style.color.hex, roundedRadius, strokeAttrs, translate].join('\0');
+
+			let group = groups.get(key);
+			if (!group) {
+				group = {
+					points: [],
+					attrs: `r="${roundedRadius}" fill="${style.color.hex}"${strokeAttrs}${translate}`,
+				};
+				groups.set(key, group);
+			}
+			feature.geometry.forEach((ring) => {
+				group.points.push(roundXY(ring[0], this.#scale));
+			});
+		});
+
+		for (const { points, attrs } of groups.values()) {
+			for (const [x, y] of points) {
+				this.#svg.push(`<circle cx="${formatNum(x)}" cy="${formatNum(y)}" ${attrs} />`);
+			}
 		}
 
 		this.#svg.push('</g>');
