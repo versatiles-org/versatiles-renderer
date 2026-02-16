@@ -12,6 +12,7 @@ const allConfigs = [
 		output: [
 			{ file: 'dist/index.js', format: 'es', sourcemap: true },
 			{ file: 'dist/index.cjs', format: 'cjs', sourcemap: true },
+			{ file: 'dist/index.umd.js', format: 'umd', name: 'VersatilesSVGRenderer', sourcemap: true },
 		],
 		plugins: [
 			resolve(),
@@ -29,6 +30,7 @@ const allConfigs = [
 		output: [
 			{ file: 'dist/maplibre.js', format: 'es', sourcemap: true },
 			{ file: 'dist/maplibre.cjs', format: 'cjs', sourcemap: true },
+			{ file: 'dist/maplibre.umd.js', format: 'umd', name: 'VersatilesSVGRendererMaplibre', sourcemap: true, globals: { 'maplibre-gl': 'maplibregl' } },
 		],
 		external: ['maplibre-gl'],
 		plugins: [resolve(), typescript({ tsconfig: './tsconfig.build.json' })],
