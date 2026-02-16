@@ -29,7 +29,13 @@ const allConfigs = [
 		output: [
 			{ file: 'dist/maplibre.js', format: 'es', sourcemap: true },
 			{ file: 'dist/maplibre.cjs', format: 'cjs', sourcemap: true },
-			{ file: 'dist/maplibre.umd.js', format: 'umd', name: 'VersaTilesSVG', sourcemap: true, globals: { 'maplibre-gl': 'maplibregl' } },
+			{
+				file: 'dist/maplibre.umd.js',
+				format: 'umd',
+				name: 'VersaTilesSVG',
+				sourcemap: true,
+				globals: { 'maplibre-gl': 'maplibregl' },
+			},
 		],
 		external: ['maplibre-gl'],
 		plugins: [resolve(), typescript({ tsconfig: './tsconfig.build.json' })],

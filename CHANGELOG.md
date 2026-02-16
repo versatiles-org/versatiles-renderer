@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-02-16
+
+### Features
+
+- add UMD build output for main and maplibre configurations in Rollup
+
+### Bug Fixes
+
+- update @versatiles/style dependency version to 5.9.4 in package.json and package-lock.json
+- update MapLibre integration to use UMD build for SVGExportControl
+- update UMD build output names for SVGExportControl in Rollup and README
+
 ## [0.2.0] - 2026-02-15
 
 ### Features
