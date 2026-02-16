@@ -74,8 +74,7 @@ npm install @versatiles/svg-renderer maplibre-gl
 	<head>
 		<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css" />
 		<script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
-		<script src="…/svg-renderer/dist/maplibre.cjs"></script>
-		<style></style>
+		<script src="https://unpkg.com/@versatiles/svg-renderer/dist/maplibre.umd.js"></script>
 	</head>
 	<body>
 		<div id="map"></div>
@@ -86,7 +85,7 @@ npm install @versatiles/svg-renderer maplibre-gl
 				center: [13.4, 52.5],
 				zoom: 10,
 			});
-			map.addControl(new SVGExportControl(), 'top-right');
+			map.addControl(new VersatilesSVGRendererMaplibre.SVGExportControl(), 'top-right');
 		</script>
 	</body>
 </html>
