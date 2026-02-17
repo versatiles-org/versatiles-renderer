@@ -11,32 +11,57 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const { width, height } = job.renderer;
 	const { zoom, center } = job.view;
 	const { sources } = job.style;
-	const source = sources['versatiles-shortbread'] as
-		| { type: string; tiles?: string[]; maxzoom?: number }
-		| undefined;
 
-	if (!source) return new Map();
+	const layerFeatures: LayerFeatures = new Map();
 
-	if (source.type !== 'vector' || !source.tiles) {
-		console.error('Invalid source configuration. Expected a vector source with tile URLs.');
-		console.error('Source config:', source);
-		throw Error('Invalid source');
+	for (const [sourceName, sourceSpec] of Object.entries(sources)) {
+		const source = sourceSpec as Record<string, unknown>;
+
+		switch (source.type) {
+			case 'vector':
+				await loadVectorSource(source, job, layerFeatures);
+				break;
+			case 'geojson':
+				if (source.data) {
+					loadGeoJSONSource(sourceName, source.data, width, height, zoom, center, layerFeatures);
+				}
+				break;
+		}
 	}
-	const sourceUrl: string = source.tiles[0];
+
+	for (const [name, features] of layerFeatures) {
+		layerFeatures.set(name, {
+			points: features.points,
+			linestrings: features.linestrings,
+			polygons: mergePolygons(features.polygons),
+		});
+	}
+
+	return layerFeatures;
+}
+
+async function loadVectorSource(
+	source: Record<string, unknown>,
+	job: RenderJob,
+	layerFeatures: LayerFeatures,
+): Promise<void> {
+	const tiles = source.tiles as string[] | undefined;
+	if (!tiles) return;
+
+	const { width, height } = job.renderer;
+	const { zoom, center } = job.view;
 
 	const {
 		zoomLevel,
 		tileSize,
 		tiles: tileCoordinates,
-	} = calculateTileGrid(width, height, center, zoom, source.maxzoom);
-
-	const layerFeatures: LayerFeatures = new Map();
+	} = calculateTileGrid(width, height, center, zoom, source.maxzoom as number | undefined);
 
 	await Promise.all(
 		tileCoordinates.map(async ({ x, y, offsetX, offsetY }): Promise<void> => {
 			const offset = new Point2D(offsetX, offsetY);
 
-			const tile = await getTile(sourceUrl, zoomLevel, x, y);
+			const tile = await getTile(tiles[0], zoomLevel, x, y);
 			if (!tile) return;
 
 			const vectorTile = new VectorTile(new Protobuf(tile.buffer));
@@ -88,16 +113,132 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 			}
 		}),
 	);
+}
 
-	for (const [name, features] of layerFeatures) {
-		layerFeatures.set(name, {
-			points: features.points,
-			linestrings: features.linestrings,
-			polygons: mergePolygons(features.polygons),
-		});
+type Coord = [number, number];
+
+function loadGeoJSONSource(
+	sourceName: string,
+	data: unknown,
+	width: number,
+	height: number,
+	zoom: number,
+	center: Point2D,
+	layerFeatures: LayerFeatures,
+): void {
+	const existing = layerFeatures.get(sourceName);
+	const features: Features = existing ?? { points: [], linestrings: [], polygons: [] };
+	if (!existing) layerFeatures.set(sourceName, features);
+
+	const worldSize = 512 * 2 ** zoom;
+	const centerMercator = center.getProject2Pixel();
+
+	function projectCoord(coord: Coord): Point2D {
+		const mercator = new Point2D(coord[0], coord[1]).getProject2Pixel();
+		return new Point2D(
+			(mercator.x - centerMercator.x) * worldSize + width / 2,
+			(mercator.y - centerMercator.y) * worldSize + height / 2,
+		);
 	}
 
-	return layerFeatures;
+	function addFeature(
+		type: 'LineString' | 'Point' | 'Polygon',
+		geometry: Point2D[][],
+		id: unknown,
+		properties: Record<string, unknown>,
+	): void {
+		const feature = new Feature({ type, geometry, id, properties });
+		if (!feature.doesOverlap([0, 0, width, height])) return;
+		switch (type) {
+			case 'Point':
+				features.points.push(feature);
+				break;
+			case 'LineString':
+				features.linestrings.push(feature);
+				break;
+			case 'Polygon':
+				features.polygons.push(feature);
+				break;
+		}
+	}
+
+	function processGeometry(
+		geom: Record<string, unknown>,
+		id: unknown,
+		properties: Record<string, unknown>,
+	): void {
+		const coords = geom.coordinates as unknown;
+		switch (geom.type) {
+			case 'Point':
+				addFeature('Point', [[projectCoord(coords as Coord)]], id, properties);
+				break;
+			case 'MultiPoint':
+				addFeature(
+					'Point',
+					(coords as Coord[]).map((c) => [projectCoord(c)]),
+					id,
+					properties,
+				);
+				break;
+			case 'LineString':
+				addFeature('LineString', [(coords as Coord[]).map((c) => projectCoord(c))], id, properties);
+				break;
+			case 'MultiLineString':
+				addFeature(
+					'LineString',
+					(coords as Coord[][]).map((line) => line.map((c) => projectCoord(c))),
+					id,
+					properties,
+				);
+				break;
+			case 'Polygon':
+				addFeature(
+					'Polygon',
+					(coords as Coord[][]).map((ring) => ring.map((c) => projectCoord(c))),
+					id,
+					properties,
+				);
+				break;
+			case 'MultiPolygon':
+				addFeature(
+					'Polygon',
+					(coords as Coord[][][]).flatMap((polygon) =>
+						polygon.map((ring) => ring.map((c) => projectCoord(c))),
+					),
+					id,
+					properties,
+				);
+				break;
+			case 'GeometryCollection':
+				for (const g of geom.geometries as Record<string, unknown>[]) {
+					processGeometry(g, id, properties);
+				}
+				break;
+		}
+	}
+
+	const geojson = data as Record<string, unknown>;
+	switch (geojson.type) {
+		case 'FeatureCollection':
+			for (const f of geojson.features as Record<string, unknown>[]) {
+				processGeometry(
+					f.geometry as Record<string, unknown>,
+					f.id,
+					(f.properties ?? {}) as Record<string, unknown>,
+				);
+			}
+			break;
+		case 'Feature':
+			processGeometry(
+				geojson.geometry as Record<string, unknown>,
+				geojson.id,
+				(geojson.properties ?? {}) as Record<string, unknown>,
+			);
+			break;
+		default:
+			processGeometry(geojson, undefined, {});
+			break;
+	}
 }
 
 interface Features {

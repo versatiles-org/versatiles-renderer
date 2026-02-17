@@ -63,7 +63,9 @@ async function render(job: RenderJob): Promise<void> {
 				continue;
 			case 'fill':
 				{
-					const polygons = layerFeatures.get(layerStyle.sourceLayer)?.polygons;
+					const polygons = (
+						layerFeatures.get(layerStyle.sourceLayer) ?? layerFeatures.get(layerStyle.source)
+					)?.polygons;
 					if (!polygons || polygons.length === 0) continue;
 					const filter = featureFilter(layerStyle.filter);
 					const polygonFeatures = polygons.filter((feature) => filter.filter({ zoom }, feature));
@@ -86,7 +88,9 @@ async function render(job: RenderJob): Promise<void> {
 				continue;
 			case 'line':
 				{
-					const lineStrings = layerFeatures.get(layerStyle.sourceLayer)?.linestrings;
+					const lineStrings = (
+						layerFeatures.get(layerStyle.sourceLayer) ?? layerFeatures.get(layerStyle.source)
+					)?.linestrings;
 					if (!lineStrings || lineStrings.length === 0) continue;
 					const filter = featureFilter(layerStyle.filter);
 					const lineStringFeatures = lineStrings.filter((feature) =>
@@ -134,7 +138,9 @@ async function render(job: RenderJob): Promise<void> {
 				continue;
 			case 'circle':
 				{
-					const points = layerFeatures.get(layerStyle.sourceLayer)?.points;
+					const points = (
+						layerFeatures.get(layerStyle.sourceLayer) ?? layerFeatures.get(layerStyle.source)
+					)?.points;
 					if (!points || points.length === 0) continue;
 					const filter = featureFilter(layerStyle.filter);
 					const pointFeatures = points.filter((feature) => filter.filter({ zoom }, feature));
