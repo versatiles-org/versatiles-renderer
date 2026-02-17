@@ -53,7 +53,7 @@ export function loadGeoJSONSource(
 		id: unknown,
 		properties: Record<string, unknown>,
 	): void {
-		const coords = geom.coordinates as unknown;
+		const coords = geom.coordinates;
 		switch (geom.type) {
 			case 'Point':
 				addFeature('Point', [[projectCoord(coords as Coord)]], id, properties);
