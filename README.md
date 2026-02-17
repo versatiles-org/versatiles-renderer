@@ -105,7 +105,7 @@ new SVGExportControl({
 
 | Option   | Type                 | Default      | Description                  |
 | -------- | -------------------- | ------------ | ---------------------------- |
-| `style`  | `StyleSpecification` | _(required)_ | MapLibre style specification |
+| `style`  | `StyleSpecification` | *(required)* | MapLibre style specification |
 | `width`  | `number`             | `1024`       | Output width in pixels       |
 | `height` | `number`             | `1024`       | Output height in pixels      |
 | `scale`  | `number`             | `1`          | Scale factor                 |
@@ -136,47 +136,55 @@ subgraph 0["src"]
 subgraph 3["lib"]
 4["geometry.ts"]
 7["color.ts"]
-B["style_layer.ts"]
+G["style_layer.ts"]
 end
 subgraph 5["processor"]
 6["render.ts"]
-8["raster.ts"]
-9["tiles.ts"]
-A["styles.ts"]
-C["vector.ts"]
-D["helper.ts"]
+subgraph 8["sources"]
+9["index.ts"]
+B["geojson.ts"]
+C["raster.ts"]
+D["tiles.ts"]
+E["vector.ts"]
+N["types.ts"]
 end
-subgraph E["renderer"]
-F["renderer_svg.ts"]
+A["helper.ts"]
+F["styles.ts"]
 end
-subgraph G["maplibre"]
-H["control.ts"]
-I["styles.ts"]
-J["index.ts"]
+subgraph H["renderer"]
+I["renderer_svg.ts"]
 end
-K["types.ts"]
+subgraph J["maplibre"]
+K["control.ts"]
+L["styles.ts"]
+M["index.ts"]
+end
+O["types.ts"]
 end
 1-->2
 2-->4
 2-->6
-2-->F
+2-->I
 6-->7
 6-->4
-6-->8
-6-->A
-6-->C
-8-->9
-A-->B
-C-->4
+6-->9
+6-->F
+9-->A
+9-->B
+9-->C
+9-->E
+A-->4
+B-->4
 C-->D
-C-->9
-D-->4
-F-->7
-H-->2
-H-->I
-J-->2
-J-->H
+E-->4
+E-->D
+F-->G
+I-->7
+K-->2
+K-->L
+M-->2
+M-->K
 
-class 0,3,5,E,G subgraphs;
+class 0,3,5,8,H,J subgraphs;
 classDef subgraphs fill-opacity:0.1, fill:#888, color:#888, stroke:#888;
 ```
