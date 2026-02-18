@@ -27,24 +27,45 @@ export function loadGeoJSONSource(
 		);
 	}
 
+	function makeFeature(type: string, geometry: Point2D[][], id: unknown, properties: Record<string, unknown>): Feature | null {
+		const feature = new Feature({ type, geometry, id, properties });
+		if (!feature.doesOverlap([0, 0, width, height])) return null;
+		return feature;
+	}
+
+	function extractPoints(geometry: Point2D[][]): Point2D[][] {
+		return geometry.flatMap((ring) => ring.map((p) => [p]));
+	}
+
 	function addFeature(
 		type: 'LineString' | 'Point' | 'Polygon',
 		geometry: Point2D[][],
 		id: unknown,
 		properties: Record<string, unknown>,
 	): void {
-		const feature = new Feature({ type, geometry, id, properties });
-		if (!feature.doesOverlap([0, 0, width, height])) return;
 		switch (type) {
-			case 'Point':
-				features.points.push(feature);
+			case 'Point': {
+				const f = makeFeature('Point', geometry, id, properties);
+				if (f) features.points.push(f);
 				break;
-			case 'LineString':
-				features.linestrings.push(feature);
+			}
+			case 'LineString': {
+				const f = makeFeature('LineString', geometry, id, properties);
+				if (f) {
+					features.linestrings.push(f);
+					features.points.push(new Feature({ type: 'Point', geometry: extractPoints(geometry), id, properties }));
+				}
 				break;
-			case 'Polygon':
-				features.polygons.push(feature);
+			}
+			case 'Polygon': {
+				const f = makeFeature('Polygon', geometry, id, properties);
+				if (f) {
+					features.polygons.push(f);
+					features.linestrings.push(new Feature({ type: 'LineString', geometry, id, properties }));
+					features.points.push(new Feature({ type: 'Point', geometry: extractPoints(geometry), id, properties }));
+				}
 				break;
+			}
 		}
 	}
 
