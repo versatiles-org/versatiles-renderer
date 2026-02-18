@@ -100,27 +100,32 @@ export class SVGRenderer {
 					? ''
 					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
 			const roundedWidth = roundValue(style.width, this.#scale);
+			const dasharrayStr = style.dasharray
+				? style.dasharray.map((v) => roundValue(v * style.width, this.#scale)).join(',')
+				: '';
 			const key = [
 				color.hex,
 				roundedWidth,
 				style.cap,
 				style.join,
 				String(style.miterLimit),
+				dasharrayStr,
 				translate,
 			].join('\0');
 
 			let group = groups.get(key);
 			if (!group) {
+				const attrs = [
+					'fill="none"',
+					strokeAttr(color, roundedWidth),
+					`stroke-linecap="${style.cap}"`,
+					`stroke-linejoin="${style.join}"`,
+					`stroke-miterlimit="${String(style.miterLimit)}"`,
+				];
+				if (dasharrayStr) attrs.push(`stroke-dasharray="${dasharrayStr}"`);
 				group = {
 					segments: [],
-					attrs:
-						[
-							'fill="none"',
-							strokeAttr(color, roundedWidth),
-							`stroke-linecap="${style.cap}"`,
-							`stroke-linejoin="${style.join}"`,
-							`stroke-miterlimit="${String(style.miterLimit)}"`,
-						].join(' ') + translate,
+					attrs: attrs.join(' ') + translate,
 				};
 				groups.set(key, group);
 			}
