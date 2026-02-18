@@ -5,7 +5,15 @@ import tseslint from 'typescript-eslint';
 export default defineConfig(
 	eslint.configs.recommended,
 	...tseslint.configs.recommended,
-	globalIgnores(['dist/**', 'coverage/**', 'lib/**', 'e2e/**', 'scripts/**', 'dev/**']),
+	globalIgnores([
+		'coverage/**',
+		'dev/**',
+		'dist/**',
+		'doc-typescript/**',
+		'e2e/**',
+		'lib/**',
+		'scripts/**',
+	]),
 	{
 		files: ['src/**/*.ts'],
 		extends: [
