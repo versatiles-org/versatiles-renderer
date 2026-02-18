@@ -9,3 +9,4 @@ node_modules
 tmp
 e2e/.cache/
 e2e/output/
+doc-typescript/
