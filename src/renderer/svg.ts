@@ -171,7 +171,8 @@ export class SVGRenderer {
 				groups.set(key, group);
 			}
 			feature.geometry.forEach((ring) => {
-				group.points.push(roundXY(ring[0].x, ring[0].y, this.#scale));
+				const p = ring[0];
+				if (p) group.points.push(roundXY(p.x, p.y, this.#scale));
 			});
 		});
 

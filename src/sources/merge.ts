@@ -4,7 +4,7 @@ import { Point2D, Feature } from '../geometry.js';
 
 function geojsonToFeature(id: number, polygonFeature: GeoJsonFeature<Polygon>): Feature {
 	const geometry = polygonFeature.geometry.coordinates.map((ring) => {
-		return ring.map((coord: Position) => new Point2D(coord[0], coord[1]));
+		return ring.map((coord: Position) => new Point2D(coord[0] ?? 0, coord[1] ?? 0));
 	});
 	return new Feature({
 		type: 'Polygon',
@@ -30,7 +30,7 @@ export function mergePolygonsByFeatureId(featureList: Feature[]): Feature[] {
 	const mergedFeatures: Feature[] = [];
 	for (const [id, features] of featuresById) {
 		if (features.length === 1) {
-			mergedFeatures.push(features[0]);
+			mergedFeatures.push(features[0]!);
 			continue;
 		}
 		const turfFeatures: GeoJsonFeature<Polygon>[] = [];

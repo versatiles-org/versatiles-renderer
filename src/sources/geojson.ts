@@ -72,8 +72,8 @@ export function loadGeoJSONSource(
 					let area = 0;
 					for (let i = 0; i < ring.length; i++) {
 						const j = (i + 1) % ring.length;
-						area += ring[i].x * ring[j].y;
-						area -= ring[j].x * ring[i].y;
+						area += ring[i]!.x * ring[j]!.y;
+						area -= ring[j]!.x * ring[i]!.y;
 					}
 
 					if (area < 0 !== needsCW) ring.reverse();

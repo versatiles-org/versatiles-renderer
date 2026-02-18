@@ -8,9 +8,9 @@
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"declaration": true,
-		"allowJs": true,
 		"noEmit": true,
+		"noUncheckedIndexedAccess": true,
+		"isolatedModules": true,
 		"types": ["node"]
 	},
 	"include": ["**/*.ts"],

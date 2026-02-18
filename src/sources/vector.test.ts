@@ -58,10 +58,10 @@ function setMockLayers(
 		vtLayers[name] = {
 			length: features.length,
 			feature: (i: number) => ({
-				type: features[i].type,
-				id: features[i].id,
-				properties: features[i].properties,
-				loadGeometry: () => features[i].geometry,
+				type: features[i]!.type,
+				id: features[i]!.id,
+				properties: features[i]!.properties,
+				loadGeometry: () => features[i]!.geometry,
 			}),
 		};
 	}
@@ -113,8 +113,8 @@ describe('loadVectorSource', () => {
 		expect(features).toBeDefined();
 		const f = features ?? { points: [], linestrings: [], polygons: [] };
 		expect(f.points.length).toBe(1);
-		expect(f.points[0].type).toBe('Point');
-		expect(f.points[0].properties).toEqual({ name: 'test' });
+		expect(f.points[0]!.type).toBe('Point');
+		expect(f.points[0]!.properties).toEqual({ name: 'test' });
 	});
 
 	test('loads linestring features from vector tile', async () => {
@@ -148,7 +148,7 @@ describe('loadVectorSource', () => {
 		expect(features).toBeDefined();
 		const f = features ?? { points: [], linestrings: [], polygons: [] };
 		expect(f.linestrings.length).toBe(1);
-		expect(f.linestrings[0].type).toBe('LineString');
+		expect(f.linestrings[0]!.type).toBe('LineString');
 	});
 
 	test('loads polygon features from vector tile', async () => {
@@ -184,7 +184,7 @@ describe('loadVectorSource', () => {
 		expect(features).toBeDefined();
 		const f = features ?? { points: [], linestrings: [], polygons: [] };
 		expect(f.polygons.length).toBe(1);
-		expect(f.polygons[0].type).toBe('Polygon');
+		expect(f.polygons[0]!.type).toBe('Polygon');
 	});
 
 	test('throws on unknown feature type', async () => {

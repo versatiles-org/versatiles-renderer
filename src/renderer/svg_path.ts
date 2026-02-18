@@ -14,14 +14,18 @@ export function chainSegments(segments: Segment[]): Segment[] {
 
 function normalizeSegments(segments: Segment[], coordIndex: number): void {
 	for (const seg of segments) {
-		if (seg[seg.length - 1][coordIndex] < seg[0][coordIndex]) seg.reverse();
+		const first = seg[0];
+		const last = seg[seg.length - 1];
+		if (first && last && last[coordIndex]! < first[coordIndex]!) seg.reverse();
 	}
 }
 
 function greedyChain(segments: Segment[]): Segment[] {
 	const byStart = new Map<string, Segment[]>();
 	for (const seg of segments) {
-		const key = String(seg[0][0]) + ',' + String(seg[0][1]);
+		const start = seg[0];
+		if (!start) continue;
+		const key = String(start[0]) + ',' + String(start[1]);
 		let list = byStart.get(key);
 		if (!list) {
 			list = [];
@@ -37,7 +41,7 @@ function greedyChain(segments: Segment[]): Segment[] {
 		visited.add(seg);
 		const chain: Segment = [...seg];
 		let endPoint = chain[chain.length - 1];
-		let candidates = byStart.get(String(endPoint[0]) + ',' + String(endPoint[1]));
+		let candidates = endPoint ? byStart.get(String(endPoint[0]) + ',' + String(endPoint[1])) : undefined;
 		while (candidates) {
 			let next: Segment | undefined;
 			for (const c of candidates) {
@@ -48,9 +52,9 @@ function greedyChain(segments: Segment[]): Segment[] {
 			}
 			if (!next) break;
 			visited.add(next);
-			for (let i = 1; i < next.length; i++) chain.push(next[i]);
+			for (let i = 1; i < next.length; i++) chain.push(next[i]!);
 			endPoint = chain[chain.length - 1];
-			candidates = byStart.get(String(endPoint[0]) + ',' + String(endPoint[1]));
+			candidates = endPoint ? byStart.get(String(endPoint[0]) + ',' + String(endPoint[1])) : undefined;
 		}
 		chains.push(chain);
 	}
@@ -61,12 +65,14 @@ function greedyChain(segments: Segment[]): Segment[] {
 export function segmentsToPath(chains: Segment[], close = false): string {
 	let d = '';
 	for (const chain of chains) {
-		d += 'M' + formatNum(chain[0][0]) + ',' + formatNum(chain[0][1]);
-		let px = chain[0][0];
-		let py = chain[0][1];
+		const first = chain[0];
+		if (!first) continue;
+		d += 'M' + formatNum(first[0]) + ',' + formatNum(first[1]);
+		let px = first[0];
+		let py = first[1];
 		for (let i = 1; i < chain.length; i++) {
-			const x = chain[i][0];
-			const y = chain[i][1];
+			const x = chain[i]![0];
+			const y = chain[i]![1];
 			const dx = x - px;
 			const dy = y - py;
 			if (dy === 0) {

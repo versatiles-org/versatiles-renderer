@@ -250,5 +250,6 @@ export class SVGExportControl implements IControl {
 		const blob = new Blob([this.currentSVG], { type: 'image/svg+xml' });
 		const url = URL.createObjectURL(blob);
 		window.open(url, '_blank');
+		setTimeout(() => URL.revokeObjectURL(url), 60000);
 	}
 }

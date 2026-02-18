@@ -14,7 +14,7 @@ export async function getRasterTiles(job: RenderJob, sourceName: string): Promis
 		);
 	}
 
-	const sourceUrl: string = source.tiles[0];
+	const sourceUrl = source.tiles[0]!;
 	const { zoomLevel, tileSize, tiles } = calculateTileGrid(
 		width,
 		height,

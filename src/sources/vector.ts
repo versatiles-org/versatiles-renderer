@@ -35,7 +35,7 @@ export async function loadVectorSource(
 		tileCoordinates.map(async ({ x, y, offsetX, offsetY }): Promise<void> => {
 			const offset = new Point2D(offsetX, offsetY);
 
-			const tile = await getTile(tiles[0], zoomLevel, x, y);
+			const tile = await getTile(tiles[0]!, zoomLevel, x, y);
 			if (!tile) return;
 
 			const vectorTile = new VectorTile(new Protobuf(tile.buffer));

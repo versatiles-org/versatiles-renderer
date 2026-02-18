@@ -11,7 +11,7 @@ import { dirname, resolve, relative } from 'node:path';
 import { decode, encode } from '@jridgewell/sourcemap-codec';
 import { TraceMap, originalPositionFor } from '@jridgewell/trace-mapping';
 
-const bundleFile = process.argv[2] || 'dist/index.js';
+const bundleFile = process.argv[2] ?? 'dist/index.js';
 const mapFile = bundleFile + '.map';
 
 if (!existsSync(mapFile)) {
@@ -37,7 +37,7 @@ for (let i = 0; i < outputMap.sources.length; i++) {
 		continue;
 	}
 	const match = /\/\/[#@]\s*sourceMappingURL=(\S+)\s*$/.exec(code);
-	if (!match || match[1].startsWith('data:')) continue;
+	if (!match?.[1] || match[1].startsWith('data:')) continue;
 
 	const depMapFile = resolve(dirname(absSource), match[1]);
 	if (!existsSync(depMapFile)) continue;
@@ -80,8 +80,8 @@ if (depTracers.size > 0) {
 		if (idx !== undefined) return idx;
 		idx = newSources.length;
 		const dep = depTracers.get(depIdx);
-		newSources.push(dep.resolvedSources[origSourceIdx]);
-		newSourcesContent[idx] = dep.depMap.sourcesContent?.[origSourceIdx] ?? null;
+		newSources.push(dep.resolvedSources[origSourceIdx] ?? '[unknown]');
+		newSourcesContent[idx] = (dep.depMap.sourcesContent?.[origSourceIdx] as string | undefined) ?? null;
 		sourceIndexMap.set(key, idx);
 		return idx;
 	}
@@ -92,11 +92,11 @@ if (depTracers.size > 0) {
 			const dep = depTracers.get(seg[1]);
 			if (!dep) continue;
 
-			const result = originalPositionFor(dep.tracer, { line: seg[2] + 1, column: seg[3] });
+			const result = originalPositionFor(dep.tracer, { line: (seg[2] ?? 0) + 1, column: seg[3] ?? 0 });
 			if (result.source != null) {
 				const origIdx = dep.depMap.sources.indexOf(result.source);
 				if (origIdx >= 0) {
-					seg[1] = getNewSourceIndex(seg[1], origIdx);
+					seg[1] = getNewSourceIndex(seg[1]!, origIdx);
 					seg[2] = result.line - 1;
 					seg[3] = result.column;
 				}
@@ -119,7 +119,7 @@ const bytesPerSource = new Map<string, number>();
 let totalBytes = 0;
 
 for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
-	const line = lines[lineIdx];
+	const line = lines[lineIdx]!;
 	const lineLen = line.length;
 
 	// Get all segments for this line by probing key positions
@@ -140,8 +140,8 @@ for (const [source, bytes] of bytesPerSource) {
 		pkg = '[unmapped]';
 	} else if (source.includes('node_modules/')) {
 		// Extract package name (handles scoped packages)
-		const parts = source.split('node_modules/')[1].split('/');
-		pkg = parts[0].startsWith('@') ? parts[0] + '/' + parts[1] : parts[0];
+		const parts = source.split('node_modules/')[1]!.split('/');
+		pkg = parts[0]!.startsWith('@') ? parts[0]! + '/' + parts[1]! : parts[0]!;
 	} else {
 		pkg = '[project]';
 	}

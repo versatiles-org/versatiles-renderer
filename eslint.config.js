@@ -3,8 +3,6 @@ import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
-	eslint.configs.recommended,
-	...tseslint.configs.recommended,
 	globalIgnores(['coverage/**', 'dist/**', 'doc-typescript/**']),
 	{
 		files: ['**/*.ts'],
@@ -22,7 +20,10 @@ export default defineConfig(
 		linterOptions: {
 			reportUnusedDisableDirectives: true,
 		},
-		rules: { '@typescript-eslint/no-confusing-void-expression': 'off' },
+		rules: {
+			'@typescript-eslint/no-confusing-void-expression': 'off',
+			'@typescript-eslint/no-non-null-assertion': 'off',
+		},
 	},
 	{
 		files: ['e2e/**/*.ts', 'scripts/**/*.ts'],

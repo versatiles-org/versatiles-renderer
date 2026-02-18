@@ -32,8 +32,8 @@ describe('loadGeoJSONSource', () => {
 
 			const features = getFeatures(lf);
 			expect(features.points.length).toBe(1);
-			expect(features.points[0].type).toBe('Point');
-			expect(features.points[0].properties).toEqual({ name: 'origin' });
+			expect(features.points[0]!.type).toBe('Point');
+			expect(features.points[0]!.properties).toEqual({ name: 'origin' });
 		});
 
 		test('loads a MultiPoint geometry', () => {
@@ -51,7 +51,7 @@ describe('loadGeoJSONSource', () => {
 
 			const features = getFeatures(lf);
 			expect(features.points.length).toBe(1);
-			expect(features.points[0].geometry.length).toBe(2);
+			expect(features.points[0]!.geometry.length).toBe(2);
 		});
 	});
 
@@ -71,7 +71,7 @@ describe('loadGeoJSONSource', () => {
 
 			const features = getFeatures(lf);
 			expect(features.linestrings.length).toBe(1);
-			expect(features.linestrings[0].type).toBe('LineString');
+			expect(features.linestrings[0]!.type).toBe('LineString');
 			// Points are also created from linestring vertices
 			expect(features.points.length).toBe(1);
 		});
@@ -97,7 +97,7 @@ describe('loadGeoJSONSource', () => {
 
 			const features = getFeatures(lf);
 			expect(features.linestrings.length).toBe(1);
-			expect(features.linestrings[0].geometry.length).toBe(2);
+			expect(features.linestrings[0]!.geometry.length).toBe(2);
 		});
 	});
 
@@ -122,7 +122,7 @@ describe('loadGeoJSONSource', () => {
 
 			const features = getFeatures(lf);
 			expect(features.polygons.length).toBe(1);
-			expect(features.polygons[0].type).toBe('Polygon');
+			expect(features.polygons[0]!.type).toBe('Polygon');
 			expect(features.linestrings.length).toBe(1);
 			expect(features.points.length).toBe(1);
 		});
@@ -281,7 +281,7 @@ describe('loadGeoJSONSource', () => {
 			});
 
 			const features = getFeatures(lf);
-			const point = features.points[0].geometry[0][0];
+			const point = features.points[0]!.geometry[0]![0]!;
 			expect(point.x).toBeCloseTo(WIDTH / 2);
 			expect(point.y).toBeCloseTo(HEIGHT / 2);
 		});
