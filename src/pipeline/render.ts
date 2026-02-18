@@ -46,20 +46,20 @@ async function render(job: RenderJob): Promise<void> {
 			return value;
 		}
 
-		function getPaint(key: string, feature?: Feature): unknown {
-			return getStyleValue(layerStyle.paint, key, feature);
+		function getPaint<T>(key: string, feature?: Feature): T {
+			return getStyleValue(layerStyle.paint, key, feature) as T;
 		}
 
-		function getLayout(key: string, feature?: Feature): unknown {
-			return getStyleValue(layerStyle.layout, key, feature);
+		function getLayout<T>(key: string, feature?: Feature): T {
+			return getStyleValue(layerStyle.layout, key, feature) as T;
 		}
 
 		switch (layerStyle.type) {
 			case 'background':
 				{
 					renderer.drawBackgroundFill({
-						color: getPaint('background-color') as MaplibreColor,
-						opacity: getPaint('background-opacity') as number,
+						color: getPaint<MaplibreColor>('background-color'),
+						opacity: getPaint<number>('background-opacity'),
 					});
 				}
 				continue;
@@ -76,11 +76,11 @@ async function render(job: RenderJob): Promise<void> {
 						polygonFeatures.map((feature) => [
 							feature,
 							{
-								color: getPaint('fill-color', feature) as MaplibreColor,
-								translate: getPaint('fill-translate', feature) as [number, number],
+								color: getPaint<MaplibreColor>('fill-color', feature),
+								translate: getPaint<[number, number]>('fill-translate', feature),
 							},
 						]),
-						getPaint('fill-opacity', polygonFeatures[0]) as number,
+						getPaint<number>('fill-opacity', polygonFeatures[0]),
 					);
 				}
 				continue;
@@ -99,17 +99,17 @@ async function render(job: RenderJob): Promise<void> {
 						lineStringFeatures.map((feature) => [
 							feature,
 							{
-								color: getPaint('line-color', feature) as MaplibreColor,
-								translate: getPaint('line-translate', feature) as [number, number],
-								cap: getLayout('line-cap', feature) as 'butt' | 'round' | 'square',
-								dasharray: getPaint('line-dasharray', feature) as number[] | undefined,
-								join: getLayout('line-join', feature) as 'bevel' | 'miter' | 'round',
-								miterLimit: getLayout('line-miter-limit', feature) as number,
-								offset: getPaint('line-offset', feature) as number,
-								width: getPaint('line-width', feature) as number,
+								color: getPaint<MaplibreColor>('line-color', feature),
+								translate: getPaint<[number, number]>('line-translate', feature),
+								cap: getLayout<'butt' | 'round' | 'square'>('line-cap', feature),
+								dasharray: getPaint<number[] | undefined>('line-dasharray', feature),
+								join: getLayout<'bevel' | 'miter' | 'round'>('line-join', feature),
+								miterLimit: getLayout<number>('line-miter-limit', feature),
+								offset: getPaint<number>('line-offset', feature),
+								width: getPaint<number>('line-width', feature),
 							},
 						]),
-						getPaint('line-opacity', lineStringFeatures[0]) as number,
+						getPaint<number>('line-opacity', lineStringFeatures[0]),
 					);
 				}
 				continue;
@@ -117,13 +117,13 @@ async function render(job: RenderJob): Promise<void> {
 				{
 					const tiles = await getRasterTiles(job, layerStyle.source);
 					renderer.drawRasterTiles(tiles, {
-						opacity: getPaint('raster-opacity') as number,
-						hueRotate: getPaint('raster-hue-rotate') as number,
-						brightnessMin: getPaint('raster-brightness-min') as number,
-						brightnessMax: getPaint('raster-brightness-max') as number,
-						saturation: getPaint('raster-saturation') as number,
-						contrast: getPaint('raster-contrast') as number,
-						resampling: getPaint('raster-resampling') as 'linear' | 'nearest',
+						opacity: getPaint<number>('raster-opacity'),
+						hueRotate: getPaint<number>('raster-hue-rotate'),
+						brightnessMin: getPaint<number>('raster-brightness-min'),
+						brightnessMax: getPaint<number>('raster-brightness-max'),
+						saturation: getPaint<number>('raster-saturation'),
+						contrast: getPaint<number>('raster-contrast'),
+						resampling: getPaint<'linear' | 'nearest'>('raster-resampling'),
 					});
 				}
 				continue;
@@ -140,14 +140,14 @@ async function render(job: RenderJob): Promise<void> {
 						pointFeatures.map((feature) => [
 							feature,
 							{
-								color: getPaint('circle-color', feature) as MaplibreColor,
-								radius: getPaint('circle-radius', feature) as number,
-								translate: getPaint('circle-translate', feature) as [number, number],
-								strokeWidth: getPaint('circle-stroke-width', feature) as number,
-								strokeColor: getPaint('circle-stroke-color', feature) as MaplibreColor,
+								color: getPaint<MaplibreColor>('circle-color', feature),
+								radius: getPaint<number>('circle-radius', feature),
+								translate: getPaint<[number, number]>('circle-translate', feature),
+								strokeWidth: getPaint<number>('circle-stroke-width', feature),
+								strokeColor: getPaint<MaplibreColor>('circle-stroke-color', feature),
 							},
 						]),
-						getPaint('circle-opacity', pointFeatures[0]) as number,
+						getPaint<number>('circle-opacity', pointFeatures[0]),
 					);
 				}
 				continue;
