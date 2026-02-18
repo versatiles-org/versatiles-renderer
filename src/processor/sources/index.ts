@@ -1,5 +1,5 @@
 import type { RenderJob } from '../../renderer/renderer_svg.js';
-import { mergePolygons } from '../helper.js';
+import { mergePolygons } from './helper.js';
 import { loadVectorSource } from './vector.js';
 import { loadGeoJSONSource } from './geojson.js';
 import type { LayerFeatures } from './types.js';

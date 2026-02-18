@@ -142,24 +142,25 @@ subgraph 5["processor"]
 6["render.ts"]
 subgraph 8["sources"]
 9["index.ts"]
-B["geojson.ts"]
+A["geojson.ts"]
+B["helper.ts"]
 C["raster.ts"]
 D["tiles.ts"]
 E["vector.ts"]
-N["types.ts"]
+O["types.ts"]
 end
-A["helper.ts"]
 F["styles.ts"]
 end
 subgraph H["renderer"]
 I["renderer_svg.ts"]
+J["svg_path.ts"]
+P["types.ts"]
 end
-subgraph J["maplibre"]
-K["control.ts"]
-L["styles.ts"]
-M["index.ts"]
+subgraph K["maplibre"]
+L["control.ts"]
+M["styles.ts"]
+N["index.ts"]
 end
-O["types.ts"]
 end
 1-->2
 2-->4
@@ -180,11 +181,12 @@ E-->4
 E-->D
 F-->G
 I-->7
-K-->2
-K-->L
-M-->2
-M-->K
+I-->J
+L-->2
+L-->M
+N-->2
+N-->L
 
-class 0,3,5,8,H,J subgraphs;
+class 0,3,5,8,H,K subgraphs;
 classDef subgraphs fill-opacity:0.1, fill:#888, color:#888, stroke:#888;
 ```

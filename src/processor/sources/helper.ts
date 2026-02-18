@@ -1,6 +1,6 @@
 import { union } from '@turf/union';
 import type { Polygon, Feature as GeoJsonFeature, Position, MultiPolygon } from 'geojson';
-import { Point2D, Feature } from '../lib/geometry.js';
+import { Point2D, Feature } from '../../lib/geometry.js';
 
 function geojsonToFeature(id: number, polygonFeature: GeoJsonFeature<Polygon>): Feature {
 	const geometry = polygonFeature.geometry.coordinates.map((ring) => {

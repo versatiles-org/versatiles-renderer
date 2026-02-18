@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { mergePolygons } from './helper.js';
-import { Feature, Point2D } from '../lib/geometry.js';
+import { Feature, Point2D } from '../../lib/geometry.js';
 
 function makePolygon(id: number, rings: [number, number][][]): Feature {
 	return new Feature({
