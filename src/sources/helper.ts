@@ -14,7 +14,7 @@ function geojsonToFeature(id: number, polygonFeature: GeoJsonFeature<Polygon>): 
 	});
 }
 
-export function mergePolygons(featureList: Feature[]): Feature[] {
+export function mergePolygonsByFeatureId(featureList: Feature[]): Feature[] {
 	const featuresById = new Map<number, Feature[]>();
 	let nextId = -1;
 	for (const feature of featureList) {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { mergePolygons } from './helper.js';
+import { mergePolygonsByFeatureId } from './helper.js';
 import { Feature, Point2D } from './geometry.js';
 
 function makePolygon(id: number, rings: [number, number][][]): Feature {
@@ -11,7 +11,7 @@ function makePolygon(id: number, rings: [number, number][][]): Feature {
 	});
 }
 
-describe('mergePolygons', () => {
+describe('mergePolygonsByFeatureId', () => {
 	test('single feature passes through unchanged', () => {
 		const f = makePolygon(1, [
 			[
@@ -22,7 +22,7 @@ describe('mergePolygons', () => {
 				[0, 0],
 			],
 		]);
-		const result = mergePolygons([f]);
+		const result = mergePolygonsByFeatureId([f]);
 		expect(result).toHaveLength(1);
 		expect(result[0]).toBe(f);
 	});
@@ -46,7 +46,7 @@ describe('mergePolygons', () => {
 				[10, 10],
 			],
 		]);
-		const result = mergePolygons([f1, f2]);
+		const result = mergePolygonsByFeatureId([f1, f2]);
 		expect(result).toHaveLength(2);
 		expect(result[0]).toBe(f1);
 		expect(result[1]).toBe(f2);
@@ -71,7 +71,7 @@ describe('mergePolygons', () => {
 				[5, 5],
 			],
 		]);
-		const result = mergePolygons([f1, f2]);
+		const result = mergePolygonsByFeatureId([f1, f2]);
 		// The two overlapping polygons should be merged into one (or possibly split into parts)
 		// but there should be fewer than 2 original features returned with the same id
 		expect(result.length).toBeGreaterThanOrEqual(1);
@@ -100,7 +100,7 @@ describe('mergePolygons', () => {
 				[10, 10],
 			],
 		]);
-		const result = mergePolygons([f1, f2]);
+		const result = mergePolygonsByFeatureId([f1, f2]);
 		// Non-overlapping polygons with same id: turf union produces MultiPolygon -> 2 separate Feature results
 		expect(result).toHaveLength(2);
 		for (const r of result) {

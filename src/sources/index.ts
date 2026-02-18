@@ -1,6 +1,6 @@
 import type { GeoJSON } from 'geojson';
 import type { RenderJob } from '../renderer/renderer_svg.js';
-import { mergePolygons } from './helper.js';
+import { mergePolygonsByFeatureId } from './helper.js';
 import { loadVectorSource } from './vector.js';
 import { loadGeoJSONSource } from './geojson.js';
 import type { LayerFeatures } from './types.js';
@@ -46,7 +46,7 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 		layerFeatures.set(name, {
 			points: features.points,
 			linestrings: features.linestrings,
-			polygons: mergePolygons(features.polygons),
+			polygons: mergePolygonsByFeatureId(features.polygons),
 		});
 	}
 
