@@ -33,11 +33,14 @@ export function calculateTileGrid(
 	const tileMaxX = Math.floor(tileCenterCoordinate.x + tileCols / 2);
 	const tileMaxY = Math.floor(tileCenterCoordinate.y + tileRows / 2);
 
+	const tilesPerZoom = 2 ** zoomLevel;
 	const tiles: TileInfo[] = [];
 	for (let x = tileMinX; x <= tileMaxX; x++) {
+		const wrappedX = ((x % tilesPerZoom) + tilesPerZoom) % tilesPerZoom;
 		for (let y = tileMinY; y <= tileMaxY; y++) {
+			if (y < 0 || y >= tilesPerZoom) continue;
 			tiles.push({
-				x,
+				x: wrappedX,
 				y,
 				offsetX: width / 2 + (x - tileCenterCoordinate.x) * tileSize,
 				offsetY: height / 2 + (y - tileCenterCoordinate.y) * tileSize,
