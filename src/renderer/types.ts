@@ -26,7 +26,6 @@ export interface RenderJob {
 export interface RendererOptions {
 	width: number;
 	height: number;
-	scale: number;
 }
 
 export interface BackgroundStyle {

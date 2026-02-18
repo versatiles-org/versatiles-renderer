@@ -130,16 +130,13 @@ console.log('  PASS: Panel opened');
 console.log('Test 3: Checking inputs...');
 const widthInput = page.locator('.input-width');
 const heightInput = page.locator('.input-height');
-const scaleInput = page.locator('.input-scale');
 await widthInput.waitFor({ state: 'visible', timeout: 2000 });
 
 const widthVal = await widthInput.inputValue();
 const heightVal = await heightInput.inputValue();
-const scaleVal = await scaleInput.inputValue();
 
 if (widthVal !== '400') throw new Error(`Expected width 400, got ${widthVal}`);
 if (heightVal !== '300') throw new Error(`Expected height 300, got ${heightVal}`);
-if (scaleVal !== '1') throw new Error(`Expected scale 1, got ${scaleVal}`);
 console.log('  PASS: Inputs have correct default values');
 
 // Test 4: Preview renders SVG

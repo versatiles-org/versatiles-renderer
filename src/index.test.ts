@@ -34,7 +34,6 @@ describe('renderToSVG', () => {
 			style: minimalStyle,
 			width: 800,
 			height: 600,
-			scale: 2,
 			lon: 13.4,
 			lat: 52.5,
 			zoom: 10,
@@ -58,12 +57,6 @@ describe('renderToSVG', () => {
 	test('throws on non-positive height', async () => {
 		await expect(renderToSVG({ style: minimalStyle, height: 0 })).rejects.toThrow(
 			'height must be positive',
-		);
-	});
-
-	test('throws on non-positive scale', async () => {
-		await expect(renderToSVG({ style: minimalStyle, scale: 0 })).rejects.toThrow(
-			'scale must be positive',
 		);
 	});
 });

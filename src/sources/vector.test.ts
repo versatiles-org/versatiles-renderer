@@ -36,7 +36,7 @@ const { loadVectorSource } = await import('./vector.js');
 
 function makeJob(width = 512, height = 512, zoom = 0): RenderJob {
 	return {
-		renderer: new SVGRenderer({ width, height, scale: 1 }),
+		renderer: new SVGRenderer({ width, height }),
 		style: { version: 8 as const, sources: {}, layers: [] },
 		view: { center: [0, 0] as [number, number], zoom },
 	};

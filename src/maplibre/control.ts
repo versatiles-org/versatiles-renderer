@@ -5,7 +5,6 @@ import { renderToSVG } from '../index.js';
 export interface SVGExportControlOptions {
 	defaultWidth?: number;
 	defaultHeight?: number;
-	defaultScale?: number;
 }
 
 function querySelector(parent: Element, selector: string): HTMLElement {
@@ -62,7 +61,6 @@ export class SVGExportControl implements IControl {
 		this.options = {
 			defaultWidth: options?.defaultWidth ?? 1024,
 			defaultHeight: options?.defaultHeight ?? 1024,
-			defaultScale: options?.defaultScale ?? 1,
 		};
 	}
 
@@ -116,7 +114,6 @@ export class SVGExportControl implements IControl {
 			<div class="panel-inputs">
 				<label>Width<input type="number" class="input-width" value="${String(this.options.defaultWidth)}" min="1" max="8192"></label>
 				<label>Height<input type="number" class="input-height" value="${String(this.options.defaultHeight)}" min="1" max="8192"></label>
-				<label>Scale<input type="number" class="input-scale" value="${String(this.options.defaultScale)}" min="0.1" max="10" step="0.1"></label>
 			</div>
 			<div class="preview-container">
 				<span class="preview-loading">Rendering preview\u2026</span>
@@ -225,9 +222,8 @@ export class SVGExportControl implements IControl {
 
 		const width = Number((querySelector(panel, '.input-width') as HTMLInputElement).value);
 		const height = Number((querySelector(panel, '.input-height') as HTMLInputElement).value);
-		const scale = Number((querySelector(panel, '.input-scale') as HTMLInputElement).value);
 
-		if (!width || !height || !scale || width < 1 || height < 1 || scale < 0.1) {
+		if (!width || !height || width < 1 || height < 1) {
 			previewContainer.innerHTML = '<span class="preview-loading">Invalid input values</span>';
 			return;
 		}
@@ -240,7 +236,6 @@ export class SVGExportControl implements IControl {
 			const svg = await renderToSVG({
 				width,
 				height,
-				scale,
 				style,
 				lon: center.lng,
 				lat: center.lat,

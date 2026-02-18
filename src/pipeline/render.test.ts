@@ -18,7 +18,7 @@ function makeStyle(layers: StyleSpecification['layers']): StyleSpecification {
 
 function makeJob(style: StyleSpecification, zoom = 10) {
 	return {
-		renderer: new SVGRenderer({ width: 256, height: 256, scale: 1 }),
+		renderer: new SVGRenderer({ width: 256, height: 256 }),
 		style,
 		view: { center: [0, 0] as [number, number], zoom },
 	};

@@ -11,8 +11,8 @@ function mc(hex: string, alpha = 1): Color {
 	return new Color(r, g, b, alpha);
 }
 
-function makeRenderer(scale = 1): SVGRenderer {
-	return new SVGRenderer({ width: 256, height: 256, scale });
+function makeRenderer(): SVGRenderer {
+	return new SVGRenderer({ width: 256, height: 256 });
 }
 
 function makePolygonFeature(points: [number, number][][]): Feature {

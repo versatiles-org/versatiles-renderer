@@ -54,14 +54,12 @@ describe('SVGExportControl', () => {
 			const container = map.getContainer();
 			expect(container.querySelector<HTMLInputElement>('.input-width')!.value).toBe('1024');
 			expect(container.querySelector<HTMLInputElement>('.input-height')!.value).toBe('1024');
-			expect(container.querySelector<HTMLInputElement>('.input-scale')!.value).toBe('1');
 		});
 
 		test('accepts custom options', () => {
 			const control = new SVGExportControl({
 				defaultWidth: 800,
 				defaultHeight: 600,
-				defaultScale: 2,
 			});
 			const map = createMockMap();
 			const el = control.onAdd(map as never);
@@ -71,7 +69,6 @@ describe('SVGExportControl', () => {
 			const container = map.getContainer();
 			expect(container.querySelector<HTMLInputElement>('.input-width')!.value).toBe('800');
 			expect(container.querySelector<HTMLInputElement>('.input-height')!.value).toBe('600');
-			expect(container.querySelector<HTMLInputElement>('.input-scale')!.value).toBe('2');
 		});
 	});
 
@@ -152,7 +149,6 @@ describe('SVGExportControl', () => {
 			expect(container.querySelector('.panel-close')).toBeTruthy();
 			expect(container.querySelector('.input-width')).toBeTruthy();
 			expect(container.querySelector('.input-height')).toBeTruthy();
-			expect(container.querySelector('.input-scale')).toBeTruthy();
 			expect(container.querySelector('.preview-container')).toBeTruthy();
 			expect(container.querySelector('.btn-download')).toBeTruthy();
 			expect(container.querySelector('.btn-open')).toBeTruthy();
@@ -168,7 +164,6 @@ describe('SVGExportControl', () => {
 			const container = map.getContainer();
 			expect(container.querySelector<HTMLInputElement>('.input-width')!.value).toBe('1024');
 			expect(container.querySelector<HTMLInputElement>('.input-height')!.value).toBe('1024');
-			expect(container.querySelector<HTMLInputElement>('.input-scale')!.value).toBe('1');
 		});
 
 		test('buttons are initially disabled', () => {
@@ -274,7 +269,6 @@ describe('SVGExportControl', () => {
 			expect(call).toMatchObject({
 				width: 1024,
 				height: 1024,
-				scale: 1,
 				lon: 13.4,
 				lat: 52.5,
 				zoom: 10,
@@ -351,7 +345,6 @@ describe('SVGExportControl', () => {
 			const control = new SVGExportControl({
 				defaultWidth: 0,
 				defaultHeight: 1024,
-				defaultScale: 1,
 			});
 			const map = createMockMap();
 			const el = control.onAdd(map as never);

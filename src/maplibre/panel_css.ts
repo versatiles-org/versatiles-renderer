@@ -64,7 +64,7 @@ export const PANEL_CSS = `
 
 .svg-export-panel .panel-inputs {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-columns: 1fr 1fr;
 	gap: 8px;
 	margin-bottom: 12px;
 }

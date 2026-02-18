@@ -32,15 +32,12 @@ export class SVGRenderer {
 
 	readonly #svg: string[];
 
-	readonly #scale: number;
-
 	#backgroundColor: Color;
 
 	public constructor(opt: RendererOptions) {
 		this.width = opt.width;
 		this.height = opt.height;
 		this.#svg = [];
-		this.#scale = opt.scale;
 		this.#backgroundColor = Color.transparent;
 	}
 
@@ -62,7 +59,7 @@ export class SVGRenderer {
 			const translate =
 				style.translate[0] === 0 && style.translate[1] === 0
 					? ''
-					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
+					: ` transform="translate(${formatPoint(style.translate)})"`;
 			const opacityAttr = style.opacity < 1 ? ` opacity="${style.opacity.toFixed(3)}"` : '';
 			const key = color.hex + translate + opacityAttr;
 
@@ -72,7 +69,7 @@ export class SVGRenderer {
 				groups.set(key, group);
 			}
 			feature.geometry.forEach((ring) => {
-				group.segments.push(ring.map((p) => roundXY(p.x, p.y, this.#scale)));
+				group.segments.push(ring.map((p) => roundXY(p.x, p.y)));
 			});
 		});
 
@@ -94,10 +91,10 @@ export class SVGRenderer {
 			const translate =
 				style.translate[0] === 0 && style.translate[1] === 0
 					? ''
-					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
-			const roundedWidth = formatScaled(style.width, this.#scale);
+					: ` transform="translate(${formatPoint(style.translate)})"`;
+			const roundedWidth = formatScaled(style.width);
 			const dasharrayStr = style.dasharray
-				? style.dasharray.map((v) => formatScaled(v * style.width, this.#scale)).join(',')
+				? style.dasharray.map((v) => formatScaled(v * style.width)).join(',')
 				: '';
 			const opacityAttr = style.opacity < 1 ? ` opacity="${style.opacity.toFixed(3)}"` : '';
 			const key = [
@@ -129,7 +126,7 @@ export class SVGRenderer {
 			}
 
 			feature.geometry.forEach((line) => {
-				group.segments.push(line.map((p) => roundXY(p.x, p.y, this.#scale)));
+				group.segments.push(line.map((p) => roundXY(p.x, p.y)));
 			});
 		});
 
@@ -152,13 +149,11 @@ export class SVGRenderer {
 			const translate =
 				style.translate[0] === 0 && style.translate[1] === 0
 					? ''
-					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
-			const roundedRadius = formatScaled(style.radius, this.#scale);
+					: ` transform="translate(${formatPoint(style.translate)})"`;
+			const roundedRadius = formatScaled(style.radius);
 			const strokeColor = new Color(style.strokeColor);
 			const strokeAttrs =
-				style.strokeWidth > 0
-					? ` ${strokeAttr(strokeColor, formatScaled(style.strokeWidth, this.#scale))}`
-					: '';
+				style.strokeWidth > 0 ? ` ${strokeAttr(strokeColor, formatScaled(style.strokeWidth))}` : '';
 			const opacityAttr = style.opacity < 1 ? ` opacity="${style.opacity.toFixed(3)}"` : '';
 			const key = [color.hex, roundedRadius, strokeAttrs, opacityAttr, translate].join('\0');
 
@@ -172,7 +167,7 @@ export class SVGRenderer {
 			}
 			feature.geometry.forEach((ring) => {
 				const p = ring[0];
-				if (p) group.points.push(roundXY(p.x, p.y, this.#scale));
+				if (p) group.points.push(roundXY(p.x, p.y));
 			});
 		});
 
@@ -204,8 +199,7 @@ export class SVGRenderer {
 		const pixelated = style.resampling === 'nearest';
 		for (const tile of tiles) {
 			const overlap = Math.min(tile.width, tile.height) / 10000; // slight overlap to prevent sub-pixel gaps between tiles
-			const s = this.#scale;
-			let attrs = `x="${formatScaled(tile.x - overlap, s)}" y="${formatScaled(tile.y - overlap, s)}" width="${formatScaled(tile.width + overlap * 2, s)}" height="${formatScaled(tile.height + overlap * 2, s)}" href="${tile.dataUri}"`;
+			let attrs = `x="${formatScaled(tile.x - overlap)}" y="${formatScaled(tile.y - overlap)}" width="${formatScaled(tile.width + overlap * 2)}" height="${formatScaled(tile.height + overlap * 2)}" href="${tile.dataUri}"`;
 			if (pixelated) attrs += ' style="image-rendering:pixelated"';
 			this.#svg.push(`<image ${attrs} />`);
 		}
@@ -243,15 +237,15 @@ function strokeAttr(color: Color, width: string): string {
 	return attr;
 }
 
-function formatScaled(v: number, scale: number): string {
-	return formatNum(Math.round(v * scale * 10));
+function formatScaled(v: number): string {
+	return formatNum(Math.round(v * 10));
 }
 
-function roundXY(x: number, y: number, scale: number): [number, number] {
-	return [Math.round(x * scale * 10), Math.round(y * scale * 10)];
+function roundXY(x: number, y: number): [number, number] {
+	return [Math.round(x * 10), Math.round(y * 10)];
 }
 
-function formatPoint(p: [number, number], scale: number): string {
-	const [x, y] = roundXY(p[0], p[1], scale);
+function formatPoint(p: [number, number]): string {
+	const [x, y] = roundXY(p[0], p[1]);
 	return formatNum(x) + ',' + formatNum(y);
 }
