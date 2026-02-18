@@ -80,6 +80,21 @@ export class Color {
 		}
 	}
 
+	public get rgb(): string {
+		return `#${d2h(this.values[0])}${d2h(this.values[1])}${d2h(this.values[2])}`;
+
+		function d2h(num: number): string {
+			if (num < 0) num = 0;
+			if (num > 255) num = 255;
+			const str = Math.round(num).toString(16).toUpperCase();
+			return str.length < 2 ? '0' + str : str;
+		}
+	}
+
+	public get opacity(): number {
+		return this.values[3] / 255;
+	}
+
 	public get alpha(): number {
 		return this.values[3];
 	}

@@ -49,6 +49,35 @@ describe('Color', () => {
 		});
 	});
 
+	describe('rgb getter', () => {
+		test('returns #RRGGBB without alpha', () => {
+			const c = new Color(255, 128, 0);
+			expect(c.rgb).toBe('#FF8000');
+		});
+
+		test('returns #RRGGBB ignoring alpha', () => {
+			const c = new Color(255, 128, 0, 128);
+			expect(c.rgb).toBe('#FF8000');
+		});
+	});
+
+	describe('opacity getter', () => {
+		test('returns 1 for opaque colors', () => {
+			const c = new Color(255, 128, 0);
+			expect(c.opacity).toBe(1);
+		});
+
+		test('returns 0 for fully transparent colors', () => {
+			const c = new Color(0, 0, 0, 0);
+			expect(c.opacity).toBe(0);
+		});
+
+		test('returns fractional value for translucent colors', () => {
+			const c = new Color(0, 0, 0, 128);
+			expect(c.opacity).toBeCloseTo(0.502, 3);
+		});
+	});
+
 	describe('alpha getter/setter', () => {
 		test('returns alpha value', () => {
 			const c = new Color(0, 0, 0, 100);
