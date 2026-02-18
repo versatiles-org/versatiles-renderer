@@ -4,12 +4,12 @@ import {
 	type Color as MaplibreColor,
 } from '@maplibre/maplibre-gl-style-spec';
 import { getLayerFeatures, getRasterTiles } from '../sources/index.js';
-import { getLayerStyles } from './styles.js';
+import { getLayerStyles } from './style_layer.js';
 import type { PossiblyEvaluatedPropertyValue, StyleLayer } from './style_layer.js';
-import type { RenderJob } from '../renderer/renderer_svg.js';
-import type { Features, LayerFeatures } from '../sources/types.js';
+import type { RenderJob } from '../renderer/svg.js';
+import type { Features, LayerFeatures } from '../types.js';
 
-export async function renderVectorTiles(job: RenderJob): Promise<string> {
+export async function renderMap(job: RenderJob): Promise<string> {
 	await render(job);
 	return job.renderer.getString();
 }

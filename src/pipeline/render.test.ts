@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
-import { SVGRenderer } from '../renderer/renderer_svg.js';
-import { renderVectorTiles } from './render.js';
+import { SVGRenderer } from '../renderer/svg.js';
+import { renderMap } from './render.js';
 
 vi.mock('../sources/index.js', () => ({
 	getLayerFeatures: vi.fn().mockResolvedValue(new Map()),
@@ -20,9 +20,9 @@ function makeJob(style: StyleSpecification, zoom = 10) {
 	};
 }
 
-describe('renderVectorTiles', () => {
+describe('renderMap', () => {
 	test('returns valid SVG for empty style', async () => {
-		const result = await renderVectorTiles(makeJob(makeStyle([])));
+		const result = await renderMap(makeJob(makeStyle([])));
 		expect(result).toContain('<svg');
 		expect(result).toContain('</svg>');
 	});
@@ -38,7 +38,7 @@ describe('renderVectorTiles', () => {
 				},
 			},
 		]);
-		const result = await renderVectorTiles(makeJob(style));
+		const result = await renderMap(makeJob(style));
 		expect(result).toContain('<svg');
 		expect(result).toContain('fill=');
 	});
@@ -52,7 +52,7 @@ describe('renderVectorTiles', () => {
 				paint: { 'background-color': '#ff0000' },
 			},
 		]);
-		const result = await renderVectorTiles(makeJob(style));
+		const result = await renderMap(makeJob(style));
 		// Should not contain fill for a hidden background
 		expect(result).not.toContain('fill=');
 	});
@@ -66,7 +66,7 @@ describe('renderVectorTiles', () => {
 				paint: { 'background-color': '#ff0000' },
 			},
 		]);
-		const result = await renderVectorTiles(makeJob(style, 10));
+		const result = await renderMap(makeJob(style, 10));
 		expect(result).not.toContain('fill=');
 	});
 
@@ -79,7 +79,7 @@ describe('renderVectorTiles', () => {
 				'source-layer': 'labels',
 			} as StyleSpecification['layers'][number],
 		]);
-		const result = await renderVectorTiles(makeJob(style));
+		const result = await renderMap(makeJob(style));
 		expect(result).toContain('<svg');
 	});
 
@@ -96,7 +96,7 @@ describe('renderVectorTiles', () => {
 				paint: { 'background-color': '#00ff00', 'background-opacity': 1 },
 			},
 		]);
-		const result = await renderVectorTiles(makeJob(style));
+		const result = await renderMap(makeJob(style));
 		expect(result).toContain('<svg');
 		// The second background should override the first
 		expect(result).toContain('fill=');

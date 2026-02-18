@@ -1,6 +1,6 @@
 import type { GeoJSON, Geometry } from 'geojson';
-import { Point2D, Feature } from './geometry.js';
-import type { Features, LayerFeatures } from './types.js';
+import { Point2D, Feature } from '../geometry.js';
+import type { Features, LayerFeatures } from '../types.js';
 
 type Coord = [number, number];
 

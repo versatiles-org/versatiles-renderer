@@ -1,5 +1,5 @@
 import type { Map, IControl } from 'maplibre-gl';
-import { PANEL_CSS } from './styles.js';
+import { PANEL_CSS } from './panel_css.js';
 import { renderToSVG } from '../index.js';
 
 export interface SVGExportControlOptions {

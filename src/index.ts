@@ -1,5 +1,5 @@
-import { SVGRenderer } from './renderer/renderer_svg.js';
-import { renderVectorTiles } from './processor/render.js';
+import { SVGRenderer } from './renderer/svg.js';
+import { renderMap } from './pipeline/render.js';
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 
 export async function renderToSVG(options: {
@@ -19,7 +19,7 @@ export async function renderToSVG(options: {
 	if (height <= 0) throw new Error('height must be positive');
 	if (scale <= 0) throw new Error('scale must be positive');
 
-	return await renderVectorTiles({
+	return await renderMap({
 		renderer: new SVGRenderer({ width, height, scale }),
 		style: options.style,
 		view: {

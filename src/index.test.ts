@@ -1,10 +1,10 @@
 import { describe, expect, test, vi } from 'vitest';
 
-vi.mock('./processor/render.js', () => ({
-	renderVectorTiles: vi.fn().mockResolvedValue('<svg></svg>'),
+vi.mock('./pipeline/render.js', () => ({
+	renderMap: vi.fn().mockResolvedValue('<svg></svg>'),
 }));
 
-const { renderVectorTiles } = await import('./processor/render.js');
+const { renderMap } = await import('./pipeline/render.js');
 const { renderToSVG } = await import('./index.js');
 
 describe('renderToSVG', () => {
@@ -19,9 +19,9 @@ describe('renderToSVG', () => {
 		expect(result).toBe('<svg></svg>');
 	});
 
-	test('passes default options to renderVectorTiles', async () => {
+	test('passes default options to renderMap', async () => {
 		await renderToSVG({ style: minimalStyle });
-		expect(renderVectorTiles).toHaveBeenCalledWith(
+		expect(renderMap).toHaveBeenCalledWith(
 			expect.objectContaining({
 				style: minimalStyle,
 				view: { center: [0, 0], zoom: 2 },
@@ -39,7 +39,7 @@ describe('renderToSVG', () => {
 			lat: 52.5,
 			zoom: 10,
 		});
-		expect(renderVectorTiles).toHaveBeenCalledWith(
+		expect(renderMap).toHaveBeenCalledWith(
 			expect.objectContaining({
 				view: { center: [13.4, 52.5], zoom: 10 },
 			}),

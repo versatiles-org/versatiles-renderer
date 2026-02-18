@@ -1,5 +1,5 @@
 import type { Color as MaplibreColor, StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
-import type { SVGRenderer } from './renderer_svg.js';
+import type { SVGRenderer } from './svg.js';
 
 export interface View {
 	center: [number, number];

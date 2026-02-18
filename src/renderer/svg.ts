@@ -1,4 +1,4 @@
-import type { Feature } from '../sources/geometry.js';
+import type { Feature } from '../geometry.js';
 import { Color } from './color.js';
 import type { Segment } from './svg_path.js';
 import { chainSegments, formatNum, segmentsToPath } from './svg_path.js';

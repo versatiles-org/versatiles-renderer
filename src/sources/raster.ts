@@ -1,4 +1,4 @@
-import type { RenderJob, RasterTile } from '../renderer/renderer_svg.js';
+import type { RenderJob, RasterTile } from '../renderer/svg.js';
 import { calculateTileGrid, getTile } from './tiles.js';
 
 export async function getRasterTiles(job: RenderJob, sourceName: string): Promise<RasterTile[]> {

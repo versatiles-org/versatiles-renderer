@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { renderVectorTiles } from '../src/processor/render.js';
-import { SVGRenderer } from '../src/renderer/renderer_svg.js';
+import { renderMap } from '../src/pipeline/render.js';
+import { SVGRenderer } from '../src/renderer/svg.js';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
-import type { RenderJob } from '../src/renderer/renderer_svg.js';
+import type { RenderJob } from '../src/renderer/svg.js';
 import { installFetchCache, uninstallFetchCache } from './fetch-cache.js';
 
 beforeAll(() => {
@@ -35,7 +35,7 @@ function geojsonSource(data: unknown): StyleSpecification['sources'][string] {
 
 describe('e2e: geojson source with circle layer', () => {
 	test('renders circles from GeoJSON points', async () => {
-		const svg = await renderVectorTiles(
+		const svg = await renderMap(
 			makeJob({
 				version: 8,
 				sources: {
@@ -67,7 +67,7 @@ describe('e2e: geojson source with circle layer', () => {
 	});
 
 	test('renders circles with stroke', async () => {
-		const svg = await renderVectorTiles(
+		const svg = await renderMap(
 			makeJob({
 				version: 8,
 				sources: {
@@ -105,7 +105,7 @@ describe('e2e: geojson source with circle layer', () => {
 	});
 
 	test('renders multiple points', async () => {
-		const svg = await renderVectorTiles(
+		const svg = await renderMap(
 			makeJob({
 				version: 8,
 				sources: {
@@ -142,7 +142,7 @@ describe('e2e: geojson source with circle layer', () => {
 	});
 
 	test('renders MultiPoint geometry', async () => {
-		const svg = await renderVectorTiles(
+		const svg = await renderMap(
 			makeJob({
 				version: 8,
 				sources: {
@@ -175,7 +175,7 @@ describe('e2e: geojson source with circle layer', () => {
 	});
 
 	test('hidden circle layer produces no circles', async () => {
-		const svg = await renderVectorTiles(
+		const svg = await renderMap(
 			makeJob({
 				version: 8,
 				sources: {
@@ -208,7 +208,7 @@ describe('e2e: geojson source with circle layer', () => {
 
 describe('e2e: geojson source with fill layer', () => {
 	test('renders polygons from GeoJSON', async () => {
-		const svg = await renderVectorTiles(
+		const svg = await renderMap(
 			makeJob({
 				version: 8,
 				sources: {
@@ -247,7 +247,7 @@ describe('e2e: geojson source with fill layer', () => {
 
 describe('e2e: geojson source with line layer', () => {
 	test('renders lines from GeoJSON', async () => {
-		const svg = await renderVectorTiles(
+		const svg = await renderMap(
 			makeJob({
 				version: 8,
 				sources: {
@@ -281,7 +281,7 @@ describe('e2e: geojson source with line layer', () => {
 
 describe('e2e: geojson source with multiple layers', () => {
 	test('renders circles and fills from same source', async () => {
-		const svg = await renderVectorTiles(
+		const svg = await renderMap(
 			makeJob({
 				version: 8,
 				sources: {
@@ -338,7 +338,7 @@ describe('e2e: geojson source with multiple layers', () => {
 
 describe('e2e: vector tile source', () => {
 	test('renders polygons from vector tiles', async () => {
-		const svg = await renderVectorTiles(
+		const svg = await renderMap(
 			makeJob(
 				{
 					version: 8,
@@ -374,7 +374,7 @@ describe('e2e: vector tile source', () => {
 
 describe('e2e: empty source', () => {
 	test('geojson source with no features produces no output', async () => {
-		const svg = await renderVectorTiles(
+		const svg = await renderMap(
 			makeJob({
 				version: 8,
 				sources: {

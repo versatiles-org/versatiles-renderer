@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
-import { SVGRenderer } from './renderer_svg.js';
+import { SVGRenderer } from './svg.js';
 import { Color } from '@maplibre/maplibre-gl-style-spec';
-import { Feature, Point2D } from '../sources/geometry.js';
-import type { CircleStyle, RasterStyle, RasterTile } from './renderer_svg.js';
+import { Feature, Point2D } from '../geometry.js';
+import type { CircleStyle, RasterStyle, RasterTile } from './svg.js';
 
 function mc(hex: string, alpha = 1): Color {
 	const r = (parseInt(hex.slice(1, 3), 16) / 255) * alpha;

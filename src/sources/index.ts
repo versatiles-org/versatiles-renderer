@@ -1,11 +1,11 @@
 import type { GeoJSON } from 'geojson';
-import type { RenderJob } from '../renderer/renderer_svg.js';
-import { mergePolygonsByFeatureId } from './helper.js';
+import type { RenderJob } from '../renderer/svg.js';
+import { mergePolygonsByFeatureId } from './merge.js';
 import { loadVectorSource } from './vector.js';
 import { loadGeoJSONSource } from './geojson.js';
-import type { LayerFeatures } from './types.js';
+import type { LayerFeatures } from '../types.js';
 
-export type { Features, LayerFeatures } from './types.js';
+export type { Features, LayerFeatures } from '../types.js';
 export { getRasterTiles } from './raster.js';
 
 export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
