@@ -54,7 +54,7 @@ export class SVGRenderer {
 
 			let group = groups.get(key);
 			if (!group) {
-				group = { segments: [], attrs: `fill="${style.color.hex}"${translate}` };
+				group = { segments: [], attrs: `${fillAttr(style.color)}${translate}` };
 				groups.set(key, group);
 			}
 			feature.geometry.forEach((ring) => {
@@ -100,8 +100,7 @@ export class SVGRenderer {
 					attrs:
 						[
 							'fill="none"',
-							`stroke="${style.color.hex}"`,
-							`stroke-width="${roundedWidth}"`,
+							strokeAttr(style.color, roundedWidth),
 							`stroke-linecap="${style.cap}"`,
 							`stroke-linejoin="${style.join}"`,
 							`stroke-miterlimit="${String(style.miterLimit)}"`,
@@ -140,7 +139,7 @@ export class SVGRenderer {
 			const roundedRadius = roundValue(style.radius, this.#scale);
 			const strokeAttrs =
 				style.strokeWidth > 0
-					? ` stroke="${style.strokeColor.hex}" stroke-width="${roundValue(style.strokeWidth, this.#scale)}"`
+					? ` ${strokeAttr(style.strokeColor, roundValue(style.strokeWidth, this.#scale))}`
 					: '';
 			const key = [style.color.hex, roundedRadius, strokeAttrs, translate].join('\0');
 
@@ -148,7 +147,7 @@ export class SVGRenderer {
 			if (!group) {
 				group = {
 					points: [],
-					attrs: `r="${roundedRadius}" fill="${style.color.hex}"${strokeAttrs}${translate}`,
+					attrs: `r="${roundedRadius}" ${fillAttr(style.color)}${strokeAttrs}${translate}`,
 				};
 				groups.set(key, group);
 			}
@@ -198,11 +197,30 @@ export class SVGRenderer {
 
 	public getString(): string {
 		return [
-			`<svg viewBox="0 0 ${String(this.width)} ${String(this.height)}" width="${String(this.width)}" height="${String(this.height)}" xmlns="http://www.w3.org/2000/svg" style="background-color:${this.#backgroundColor.hex}">`,
+			`<svg viewBox="0 0 ${String(this.width)} ${String(this.height)}" width="${String(this.width)}" height="${String(this.height)}" xmlns="http://www.w3.org/2000/svg" style="${bgColorStyle(this.#backgroundColor)}">`,
 			...this.#svg,
 			'</svg>',
 		].join('\n');
 	}
+}
+
+function fillAttr(color: Color): string {
+	let attr = `fill="${color.rgb}"`;
+	if (color.alpha < 255) attr += ` fill-opacity="${color.opacity.toFixed(3)}"`;
+	return attr;
+}
+
+function strokeAttr(color: Color, width: string): string {
+	let attr = `stroke="${color.rgb}" stroke-width="${width}"`;
+	if (color.alpha < 255) attr += ` stroke-opacity="${color.opacity.toFixed(3)}"`;
+	return attr;
+}
+
+function bgColorStyle(color: Color): string {
+	if (color.alpha === 0) return 'background-color:transparent';
+	if (color.alpha === 255) return `background-color:${color.rgb}`;
+	const [r, g, b] = color.values;
+	return `background-color:rgba(${String(r)},${String(g)},${String(b)},${color.opacity.toFixed(3)})`;
 }
 
 function roundValue(v: number, scale: number): string {

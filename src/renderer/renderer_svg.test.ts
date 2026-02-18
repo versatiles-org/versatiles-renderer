@@ -40,7 +40,7 @@ describe('SVGRenderer', () => {
 		test('default background is transparent', () => {
 			const r = makeRenderer();
 			const svg = r.getString();
-			expect(svg).toContain('background-color:#00000000');
+			expect(svg).toContain('background-color:transparent');
 		});
 	});
 
@@ -56,9 +56,14 @@ describe('SVGRenderer', () => {
 			const r = makeRenderer();
 			r.drawBackgroundFill({ color: new Color('#FF0000'), opacity: 0.5 });
 			const svg = r.getString();
+			expect(svg).toContain('background-color:rgba(255,0,0,0.502)');
+		});
+
+		test('opaque background uses hex', () => {
+			const r = makeRenderer();
+			r.drawBackgroundFill({ color: new Color('#FF0000'), opacity: 1 });
+			const svg = r.getString();
 			expect(svg).toContain('background-color:#FF0000');
-			// alpha should be ~128 (255 * 0.5)
-			expect(svg).toMatch(/background-color:#FF0000[0-9A-F]{2}/);
 		});
 	});
 
