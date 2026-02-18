@@ -32,6 +32,7 @@
       }
     },
     "./maplibre": {
+      "script": "./dist/maplibre.umd.js",
       "import": {
         "types": "./dist/maplibre.d.ts",
         "default": "./dist/maplibre.js"
@@ -39,8 +40,7 @@
       "require": {
         "types": "./dist/maplibre.d.ts",
         "default": "./dist/maplibre.cjs"
-      },
-      "script": "./dist/maplibre.umd.js"
+      }
     }
   },
   "files": [
