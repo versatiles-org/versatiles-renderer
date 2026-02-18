@@ -5,6 +5,75 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-02-18
+
+### Features
+
+- add copyright notice to SVG export panel and style it
+- enhance SVG export panel with attribution notice and styling
+- update TypeScript configurations, enhance ESLint rules, and improve bundle analysis script
+
+### Bug Fixes
+
+- update .prettierignore to include README.md and ensure package.json is properly formatted
+
+### Code Refactoring
+
+- migrate RenderJob and related types to renderer_svg module, remove obsolete types.ts
+- reorganize types and move segment-related functions to svg_path module
+- move helper to processor/sources
+- move processor/source one level up
+- replace Point2D with tuple for center coordinates in rendering and testing modules
+- replace Point2D with tuple for translate coordinates in renderer and types
+- move style_layer module to processor directory and update imports
+- move geometry module to sources directory and update imports
+- update color handling to use MaplibreColor across renderer and styles
+- implement Color class with various constructors and methods for color manipulation
+- move d2h function outside of Color class for better accessibility
+- extract getFeatures function for improved feature retrieval
+- update loadGeoJSONSource to use GeoJSON type for improved type safety
+- update loadVectorSource to use VectorSourceSpec for improved type safety
+- replace magic numbers with VTFeatureType constants for improved readability
+- simplify evaluate calls in StyleLayer for improved clarity
+- enhance error logging in getTile function for improved debugging
+- streamline parameter handling in renderToSVG for improved readability
+- improve error messages in getRasterTiles and Color constructor
+- improve tile wrapping logic in calculateTileGrid for better tile management
+- optimize bbox calculation in Feature class for improved performance
+- change values property to be mutable in Color class
+- rename mergePolygons to mergePolygonsByFeatureId for clarity
+- rename folder renderer to pipeline
+- rename renderer_svg to svg
+- move geometry
+- move types
+- rename to merge.ts
+- rename styles to panel_css
+- merge styles into style_layer
+- rename renderVectorTiles to renderMap and update imports
+- rename processor subgraph to pipeline and update related references
+- move Features and LayerFeatures types to geometry.ts and update imports
+- update TypeScript configurations and improve type safety across multiple files
+- add sideEffects flag to package.json and simplify color tests
+- update notice element to use textContent for safer HTML handling
+- improve error handling in SVG preview by using textContent for safer DOM manipulation
+- update polygon handling in loadGeoJSONSource for improved feature extraction
+- enhance stroke attributes handling in SVGRenderer for improved styling options
+- remove unused style properties from LineStyle and CircleStyle interfaces for cleaner code
+- update loadGeoJSONSource calls to use options object for improved readability
+- optimize loadVectorSource calls by using Promise.all for concurrent loading
+- enhance type safety in getPaint and getLayout functions for improved code clarity
+- replace roundValue with formatScaled for consistent scaling in SVG rendering
+- add filterFn to StyleLayer for enhanced filtering capabilities
+- improve code readability by formatting multi-line expressions in analyze-bundle.ts
+- streamline SVG rendering by removing opacity parameter and enhancing style handling
+- simplify SVG attributes by removing unnecessary decimal places in circle radius and stroke width
+
+### Tests
+
+- add unit tests for geojson, raster, and tile processing
+- improve error handling in geojson and raster tests
+- add unit tests for SVG rendering and vector source loading
+
 ## [0.4.0] - 2026-02-18
 
 ### Features
