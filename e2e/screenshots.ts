@@ -19,7 +19,7 @@ interface Region {
 	lon: number;
 	lat: number;
 	zoom: number;
-	type: 'vector' | 'satellite';
+	type: 'vector' | 'satellite' | 'geojson';
 }
 
 const regions: Region[] = [
@@ -31,6 +31,8 @@ const regions: Region[] = [
 	{ name: 'sao-paulo', lon: -46.635, lat: -23.548, zoom: 14, type: 'vector' },
 
 	{ name: 'berlin', lon: 13.376, lat: 52.518, zoom: 15, type: 'satellite' },
+
+	{ name: 'berlin', lon: 13.388, lat: 52.517, zoom: 14, type: 'geojson' },
 ];
 
 const outputDir = resolve(import.meta.dirname, 'output');
@@ -52,6 +54,101 @@ async function getStyle(type: Region['type']): Promise<StyleSpecification> {
 				break;
 			case 'satellite':
 				style = await styles.satellite({ overlay: false });
+				break;
+			case 'geojson':
+				style = styles.colorful({ hideLabels: true });
+				style.sources['geojson-overlay'] = {
+					type: 'geojson',
+					data: {
+						type: 'FeatureCollection',
+						features: [
+							{
+								type: 'Feature',
+								properties: {},
+								geometry: {
+									type: 'Polygon',
+									coordinates: [
+										[
+											[13.383, 52.52],
+											[13.393, 52.52],
+											[13.393, 52.514],
+											[13.383, 52.514],
+											[13.383, 52.52],
+										],
+									],
+								},
+							},
+							{
+								type: 'Feature',
+								properties: {},
+								geometry: {
+									type: 'LineString',
+									coordinates: [
+										[13.38, 52.522],
+										[13.385, 52.519],
+										[13.39, 52.521],
+										[13.395, 52.518],
+									],
+								},
+							},
+							{
+								type: 'Feature',
+								properties: {},
+								geometry: {
+									type: 'Point',
+									coordinates: [13.388, 52.517],
+								},
+							},
+							{
+								type: 'Feature',
+								properties: {},
+								geometry: {
+									type: 'Point',
+									coordinates: [13.385, 52.519],
+								},
+							},
+							{
+								type: 'Feature',
+								properties: {},
+								geometry: {
+									type: 'Point',
+									coordinates: [13.391, 52.515],
+								},
+							},
+						],
+					},
+				};
+				style.layers.push(
+					{
+						id: 'geojson-fill',
+						type: 'fill',
+						source: 'geojson-overlay',
+						paint: {
+							'fill-color': '#ff0000',
+							'fill-opacity': 0.3,
+						},
+					},
+					{
+						id: 'geojson-line',
+						type: 'line',
+						source: 'geojson-overlay',
+						paint: {
+							'line-color': '#0000ff',
+							'line-width': 4,
+						},
+					},
+					{
+						id: 'geojson-circle',
+						type: 'circle',
+						source: 'geojson-overlay',
+						paint: {
+							'circle-radius': 8,
+							'circle-color': '#00cc00',
+							'circle-stroke-width': 2,
+							'circle-stroke-color': '#ffffff',
+						},
+					},
+				);
 				break;
 		}
 		styleCache.set(type, style);
