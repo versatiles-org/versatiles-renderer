@@ -1,4 +1,3 @@
-import type { Point2D } from '../lib/geometry.js';
 import type { Color } from '../lib/color.js';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { SVGRenderer } from './renderer_svg.js';
@@ -27,7 +26,7 @@ export interface BackgroundStyle {
 
 export interface FillStyle {
 	color: Color;
-	translate: Point2D;
+	translate: [number, number];
 }
 
 export interface LineStyle {
@@ -40,7 +39,7 @@ export interface LineStyle {
 	miterLimit: number;
 	offset: number;
 	roundLimit: number;
-	translate: Point2D;
+	translate: [number, number];
 	width: number;
 }
 
@@ -48,7 +47,7 @@ export interface CircleStyle {
 	color: Color;
 	radius: number;
 	blur: number;
-	translate: Point2D;
+	translate: [number, number];
 	strokeWidth: number;
 	strokeColor: Color;
 }

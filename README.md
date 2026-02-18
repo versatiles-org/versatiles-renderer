@@ -133,18 +133,18 @@ flowchart TB
 subgraph 0["src"]
 1["demo.ts"]
 2["index.ts"]
-subgraph 3["lib"]
-4["geometry.ts"]
-7["color.ts"]
-G["style_layer.ts"]
-end
-subgraph 5["processor"]
-6["render.ts"]
+subgraph 3["processor"]
+4["render.ts"]
 F["styles.ts"]
 end
-subgraph 8["sources"]
-9["index.ts"]
-A["geojson.ts"]
+subgraph 5["lib"]
+6["color.ts"]
+A["geometry.ts"]
+G["style_layer.ts"]
+end
+subgraph 7["sources"]
+8["index.ts"]
+9["geojson.ts"]
 B["helper.ts"]
 C["raster.ts"]
 D["tiles.ts"]
@@ -164,29 +164,28 @@ end
 end
 1-->2
 2-->4
-2-->6
 2-->I
-6-->7
-6-->4
-6-->9
-6-->F
+4-->6
+4-->8
+4-->F
+8-->9
+8-->B
+8-->C
+8-->E
 9-->A
-9-->B
-9-->C
-9-->E
-A-->4
-B-->4
+B-->A
 C-->D
-E-->4
+D-->A
+E-->A
 E-->D
 F-->G
-I-->7
+I-->6
 I-->J
 L-->2
 L-->M
 N-->2
 N-->L
 
-class 0,3,5,8,H,K subgraphs;
+class 0,3,5,7,H,K subgraphs;
 classDef subgraphs fill-opacity:0.1, fill:#888, color:#888, stroke:#888;
 ```

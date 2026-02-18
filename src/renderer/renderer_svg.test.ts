@@ -82,7 +82,7 @@ describe('SVGRenderer', () => {
 					[0, 10],
 				],
 			]);
-			const style = { color: new Color('#336699'), translate: new Point2D(0, 0) };
+			const style = { color: new Color('#336699'), translate: [0, 0] as [number, number] };
 			r.drawPolygons([[feature, style]], 1);
 			const svg = r.getString();
 			expect(svg).toContain('<path d=');
@@ -107,7 +107,7 @@ describe('SVGRenderer', () => {
 					[10, 10],
 				],
 			]);
-			const style = { color: new Color('#336699'), translate: new Point2D(0, 0) };
+			const style = { color: new Color('#336699'), translate: [0, 0] as [number, number] };
 			r.drawPolygons([[feature, style]], 0);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
@@ -122,7 +122,7 @@ describe('SVGRenderer', () => {
 					[10, 10],
 				],
 			]);
-			const style = { color: Color.transparent, translate: new Point2D(0, 0) };
+			const style = { color: Color.transparent, translate: [0, 0] as [number, number] };
 			r.drawPolygons([[feature, style]], 1);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
@@ -147,7 +147,7 @@ describe('SVGRenderer', () => {
 				miterLimit: 2,
 				offset: 0,
 				roundLimit: 1,
-				translate: new Point2D(0, 0),
+				translate: [0, 0] as [number, number],
 				width: 2,
 			};
 			r.drawLineStrings([[feature, style]], 1);
@@ -183,7 +183,7 @@ describe('SVGRenderer', () => {
 				miterLimit: 2,
 				offset: 0,
 				roundLimit: 1,
-				translate: new Point2D(0, 0),
+				translate: [0, 0] as [number, number],
 				width: 1,
 			};
 			r.drawLineStrings([[feature, style]], 0);
@@ -208,7 +208,7 @@ describe('SVGRenderer', () => {
 				miterLimit: 2,
 				offset: 0,
 				roundLimit: 1,
-				translate: new Point2D(0, 0),
+				translate: [0, 0] as [number, number],
 				width: 0,
 			};
 			r.drawLineStrings([[feature, style]], 1);
@@ -231,7 +231,7 @@ describe('SVGRenderer', () => {
 				color: new Color('#FF0000'),
 				radius: 5,
 				blur: 0,
-				translate: new Point2D(0, 0),
+				translate: [0, 0] as [number, number],
 				strokeWidth: 0,
 				strokeColor: new Color('#000000'),
 				...overrides,

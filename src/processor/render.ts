@@ -8,7 +8,6 @@ import { getLayerFeatures, getRasterTiles } from '../sources/index.js';
 import { getLayerStyles } from './styles.js';
 import type { PossiblyEvaluatedPropertyValue } from '../lib/style_layer.js';
 import type { RenderJob } from '../renderer/renderer_svg.js';
-import { Point2D } from '../lib/geometry.js';
 
 export async function renderVectorTiles(job: RenderJob): Promise<string> {
 	await render(job);
@@ -76,9 +75,7 @@ async function render(job: RenderJob): Promise<void> {
 							feature,
 							{
 								color: new Color(getPaint('fill-color', feature) as MaplibreColor),
-								translate: new Point2D(
-									...(getPaint('fill-translate', feature) as [number, number]),
-								),
+								translate: getPaint('fill-translate', feature) as [number, number],
 							},
 						]),
 						getPaint('fill-opacity', polygonFeatures[0]) as number,
@@ -103,9 +100,7 @@ async function render(job: RenderJob): Promise<void> {
 							feature,
 							{
 								color: new Color(getPaint('line-color', feature) as MaplibreColor),
-								translate: new Point2D(
-									...(getPaint('line-translate', feature) as [number, number]),
-								),
+								translate: getPaint('line-translate', feature) as [number, number],
 								blur: getPaint('line-blur', feature) as number,
 								cap: getLayout('line-cap', feature) as 'butt' | 'round' | 'square',
 								dasharray: getPaint('line-dasharray', feature) as number[] | undefined,
@@ -153,9 +148,7 @@ async function render(job: RenderJob): Promise<void> {
 								color: new Color(getPaint('circle-color', feature) as MaplibreColor),
 								radius: getPaint('circle-radius', feature) as number,
 								blur: getPaint('circle-blur', feature) as number,
-								translate: new Point2D(
-									...(getPaint('circle-translate', feature) as [number, number]),
-								),
+								translate: getPaint('circle-translate', feature) as [number, number],
 								strokeWidth: getPaint('circle-stroke-width', feature) as number,
 								strokeColor: new Color(getPaint('circle-stroke-color', feature) as MaplibreColor),
 							},

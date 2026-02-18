@@ -1,4 +1,4 @@
-import type { Feature, Point2D } from '../lib/geometry.js';
+import type { Feature } from '../lib/geometry.js';
 import { Color } from '../lib/color.js';
 import type { Segment } from './svg_path.js';
 import { chainSegments, formatNum, segmentsToPath } from './svg_path.js';
@@ -59,9 +59,10 @@ export class SVGRenderer {
 		features.forEach(([feature, style]) => {
 			if (style.color.alpha <= 0) return;
 
-			const translate = style.translate.isZero()
-				? ''
-				: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
+			const translate =
+				style.translate[0] === 0 && style.translate[1] === 0
+					? ''
+					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
 			const key = style.color.hex + translate;
 
 			let group = groups.get(key);
@@ -70,7 +71,7 @@ export class SVGRenderer {
 				groups.set(key, group);
 			}
 			feature.geometry.forEach((ring) => {
-				group.segments.push(ring.map((p) => roundXY(p, this.#scale)));
+				group.segments.push(ring.map((p) => roundXY(p.x, p.y, this.#scale)));
 			});
 		});
 
@@ -92,9 +93,10 @@ export class SVGRenderer {
 		features.forEach(([feature, style]) => {
 			if (style.width <= 0 || style.color.alpha <= 0) return;
 
-			const translate = style.translate.isZero()
-				? ''
-				: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
+			const translate =
+				style.translate[0] === 0 && style.translate[1] === 0
+					? ''
+					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
 			const roundedWidth = roundValue(style.width, this.#scale);
 			const key = [
 				style.color.hex,
@@ -122,7 +124,7 @@ export class SVGRenderer {
 			}
 
 			feature.geometry.forEach((line) => {
-				group.segments.push(line.map((p) => roundXY(p, this.#scale)));
+				group.segments.push(line.map((p) => roundXY(p.x, p.y, this.#scale)));
 			});
 		});
 
@@ -145,9 +147,10 @@ export class SVGRenderer {
 		features.forEach(([feature, style]) => {
 			if (style.radius <= 0 || style.color.alpha <= 0) return;
 
-			const translate = style.translate.isZero()
-				? ''
-				: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
+			const translate =
+				style.translate[0] === 0 && style.translate[1] === 0
+					? ''
+					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
 			const roundedRadius = roundValue(style.radius, this.#scale);
 			const strokeAttrs =
 				style.strokeWidth > 0
@@ -164,7 +167,7 @@ export class SVGRenderer {
 				groups.set(key, group);
 			}
 			feature.geometry.forEach((ring) => {
-				group.points.push(roundXY(ring[0], this.#scale));
+				group.points.push(roundXY(ring[0].x, ring[0].y, this.#scale));
 			});
 		});
 
@@ -241,11 +244,11 @@ function roundValue(v: number, scale: number): string {
 	return (v * scale).toFixed(3);
 }
 
-function roundXY(p: Point2D, scale: number): [number, number] {
-	return [Math.round(p.x * scale * 10), Math.round(p.y * scale * 10)];
+function roundXY(x: number, y: number, scale: number): [number, number] {
+	return [Math.round(x * scale * 10), Math.round(y * scale * 10)];
 }
 
-function formatPoint(p: Point2D, scale: number): string {
-	const [x, y] = roundXY(p, scale);
+function formatPoint(p: [number, number], scale: number): string {
+	const [x, y] = roundXY(p[0], p[1], scale);
 	return formatNum(x) + ',' + formatNum(y);
 }
