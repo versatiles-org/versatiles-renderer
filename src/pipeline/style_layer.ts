@@ -1,5 +1,6 @@
 import {
 	normalizePropertyExpression,
+	featureFilter,
 	latest,
 	type LayerSpecification,
 	type FilterSpecification,
@@ -69,6 +70,7 @@ export class StyleLayer {
 	readonly minzoom: number | undefined;
 	readonly maxzoom: number | undefined;
 	readonly filter: FilterSpecification | undefined;
+	readonly filterFn: ReturnType<typeof featureFilter> | undefined;
 	paint: EvaluatedProperties;
 	layout: EvaluatedProperties;
 
@@ -90,6 +92,7 @@ export class StyleLayer {
 			this.source = (spec as Record<string, unknown>).source as string;
 			this.sourceLayer = (spec as Record<string, unknown>)['source-layer'] as string;
 			this.filter = (spec as Record<string, unknown>).filter as FilterSpecification | undefined;
+			this.filterFn = featureFilter(this.filter);
 		}
 
 		this.visibility = (spec.layout?.visibility ?? 'visible') as string;
