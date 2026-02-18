@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { SVGRenderer } from './renderer_svg.js';
 import { Color } from '../lib/color.js';
 import { Feature, Point2D } from '../lib/geometry.js';
-import type { CircleStyle, RasterStyle, RasterTile } from '../types.js';
+import type { CircleStyle, RasterStyle, RasterTile } from './renderer_svg.js';
 
 function makeRenderer(scale = 1): SVGRenderer {
 	return new SVGRenderer({ width: 256, height: 256, scale });

@@ -7,7 +7,7 @@ import { Color } from '../lib/color.js';
 import { getLayerFeatures, getRasterTiles } from './sources/index.js';
 import { getLayerStyles } from './styles.js';
 import type { PossiblyEvaluatedPropertyValue } from '../lib/style_layer.js';
-import type { RenderJob } from '../types.js';
+import type { RenderJob } from '../renderer/renderer_svg.js';
 import { Point2D } from '../lib/geometry.js';
 
 export async function renderVectorTiles(job: RenderJob): Promise<string> {
