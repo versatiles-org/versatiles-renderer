@@ -6,6 +6,7 @@ import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
 
 const TILE_EXTENT = 4096;
+const VTFeatureType = { Unknown: 0, Point: 1, LineString: 2, Polygon: 3 } as const;
 
 interface VectorSourceSpec {
 	type: 'vector';
@@ -58,17 +59,17 @@ export async function loadVectorSource(
 					let type: 'LineString' | 'Point' | 'Polygon';
 					let list: Feature[];
 					switch (featureSrc.type) {
-						case 0: //Unknown
+						case VTFeatureType.Unknown:
 							throw Error('Unknown feature type in vector tile');
-						case 1: //Point
+						case VTFeatureType.Point:
 							type = 'Point';
 							list = features.points;
 							break;
-						case 2: //LineString
+						case VTFeatureType.LineString:
 							type = 'LineString';
 							list = features.linestrings;
 							break;
-						case 3: //Polygon
+						case VTFeatureType.Polygon:
 							type = 'Polygon';
 							list = features.polygons;
 							break;
