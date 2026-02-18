@@ -7,12 +7,18 @@ import Protobuf from 'pbf';
 
 const TILE_EXTENT = 4096;
 
+interface VectorSourceSpec {
+	type: 'vector';
+	tiles?: string[];
+	maxzoom?: number;
+}
+
 export async function loadVectorSource(
-	source: Record<string, unknown>,
+	source: VectorSourceSpec,
 	job: RenderJob,
 	layerFeatures: LayerFeatures,
 ): Promise<void> {
-	const tiles = source.tiles as string[] | undefined;
+	const tiles = source.tiles;
 	if (!tiles) return;
 
 	const { width, height } = job.renderer;
@@ -22,7 +28,7 @@ export async function loadVectorSource(
 		zoomLevel,
 		tileSize,
 		tiles: tileCoordinates,
-	} = calculateTileGrid(width, height, center, zoom, source.maxzoom as number | undefined);
+	} = calculateTileGrid(width, height, center, zoom, source.maxzoom);
 
 	await Promise.all(
 		tileCoordinates.map(async ({ x, y, offsetX, offsetY }): Promise<void> => {

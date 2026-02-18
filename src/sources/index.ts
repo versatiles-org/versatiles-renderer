@@ -20,7 +20,11 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 
 		switch (source.type) {
 			case 'vector':
-				await loadVectorSource(source, job, layerFeatures);
+				await loadVectorSource(
+					source as unknown as { type: 'vector'; tiles?: string[]; maxzoom?: number },
+					job,
+					layerFeatures,
+				);
 				break;
 			case 'geojson':
 				if (source.data) {
