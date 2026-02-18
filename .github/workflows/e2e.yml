@@ -1,4 +1,4 @@
-name: E2E Visual Comparison
+name: GitHub Pages
 
 on:
   workflow_run:
@@ -35,18 +35,49 @@ jobs:
       - name: Run E2E tests
         run: npm run test:e2e
 
+      - name: Generate TypeScript docs
+        run: npm run doc:typescript
+
+      - name: Assemble pages directory
+        run: |
+          mkdir -p pages/e2e pages/demo pages/doc-typescript
+          cp -r e2e/output/* pages/e2e/
+          cp -r doc-typescript/* pages/doc-typescript/
+          cp e2e/demo.html pages/demo/index.html
+          cp dist/maplibre.umd.js pages/demo/
+
+          cat > pages/index.html << 'LANDING'
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8" />
+              <title>VersaTiles SVG Renderer</title>
+              <style>
+                body { font-family: system-ui, sans-serif; max-width: 600px; margin: 4rem auto; padding: 0 1rem; }
+                a { display: block; margin: 1rem 0; font-size: 1.2rem; }
+              </style>
+            </head>
+            <body>
+              <h1>VersaTiles SVG Renderer</h1>
+              <a href="e2e/report.html">E2E Visual Comparison Report</a>
+              <a href="doc-typescript/index.html">TypeScript API Documentation</a>
+              <a href="demo/index.html">MapLibre Plugin Demo</a>
+            </body>
+          </html>
+          LANDING
+
       - name: Upload E2E report artifact
         uses: actions/upload-artifact@v6
         if: always()
         with:
           name: e2e-report
-          path: e2e/output/
+          path: pages/
           retention-days: 30
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: e2e/output/
+          path: pages/
 
   deploy:
     name: Deploy report to GitHub Pages
