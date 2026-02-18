@@ -44,7 +44,7 @@ export class SVGRenderer {
 	}
 
 	public drawBackgroundFill(style: BackgroundStyle): void {
-		const color = style.color.clone();
+		const color = new Color(style.color);
 		color.alpha *= style.opacity;
 		this.#backgroundColor = color;
 	}
@@ -57,17 +57,18 @@ export class SVGRenderer {
 
 		const groups = new Map<string, { segments: Segment[]; attrs: string }>();
 		features.forEach(([feature, style]) => {
-			if (style.color.alpha <= 0) return;
+			const color = new Color(style.color);
+			if (color.alpha <= 0) return;
 
 			const translate =
 				style.translate[0] === 0 && style.translate[1] === 0
 					? ''
 					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
-			const key = style.color.hex + translate;
+			const key = color.hex + translate;
 
 			let group = groups.get(key);
 			if (!group) {
-				group = { segments: [], attrs: `${fillAttr(style.color)}${translate}` };
+				group = { segments: [], attrs: `${fillAttr(color)}${translate}` };
 				groups.set(key, group);
 			}
 			feature.geometry.forEach((ring) => {
@@ -91,7 +92,8 @@ export class SVGRenderer {
 
 		const groups = new Map<string, { segments: Segment[]; attrs: string }>();
 		features.forEach(([feature, style]) => {
-			if (style.width <= 0 || style.color.alpha <= 0) return;
+			const color = new Color(style.color);
+			if (style.width <= 0 || color.alpha <= 0) return;
 
 			const translate =
 				style.translate[0] === 0 && style.translate[1] === 0
@@ -99,7 +101,7 @@ export class SVGRenderer {
 					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
 			const roundedWidth = roundValue(style.width, this.#scale);
 			const key = [
-				style.color.hex,
+				color.hex,
 				roundedWidth,
 				style.cap,
 				style.join,
@@ -114,7 +116,7 @@ export class SVGRenderer {
 					attrs:
 						[
 							'fill="none"',
-							strokeAttr(style.color, roundedWidth),
+							strokeAttr(color, roundedWidth),
 							`stroke-linecap="${style.cap}"`,
 							`stroke-linejoin="${style.join}"`,
 							`stroke-miterlimit="${String(style.miterLimit)}"`,
@@ -145,24 +147,26 @@ export class SVGRenderer {
 
 		const groups = new Map<string, { points: [number, number][]; attrs: string }>();
 		features.forEach(([feature, style]) => {
-			if (style.radius <= 0 || style.color.alpha <= 0) return;
+			const color = new Color(style.color);
+			if (style.radius <= 0 || color.alpha <= 0) return;
 
 			const translate =
 				style.translate[0] === 0 && style.translate[1] === 0
 					? ''
 					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
 			const roundedRadius = roundValue(style.radius, this.#scale);
+			const strokeColor = new Color(style.strokeColor);
 			const strokeAttrs =
 				style.strokeWidth > 0
-					? ` ${strokeAttr(style.strokeColor, roundValue(style.strokeWidth, this.#scale))}`
+					? ` ${strokeAttr(strokeColor, roundValue(style.strokeWidth, this.#scale))}`
 					: '';
-			const key = [style.color.hex, roundedRadius, strokeAttrs, translate].join('\0');
+			const key = [color.hex, roundedRadius, strokeAttrs, translate].join('\0');
 
 			let group = groups.get(key);
 			if (!group) {
 				group = {
 					points: [],
-					attrs: `r="${roundedRadius}" ${fillAttr(style.color)}${strokeAttrs}${translate}`,
+					attrs: `r="${roundedRadius}" ${fillAttr(color)}${strokeAttrs}${translate}`,
 				};
 				groups.set(key, group);
 			}

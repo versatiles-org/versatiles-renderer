@@ -135,26 +135,26 @@ subgraph 0["src"]
 2["index.ts"]
 subgraph 3["processor"]
 4["render.ts"]
-F["styles.ts"]
-G["style_layer.ts"]
+D["styles.ts"]
+E["style_layer.ts"]
 end
-subgraph 5["lib"]
-6["color.ts"]
-end
-subgraph 7["sources"]
-8["index.ts"]
-9["geojson.ts"]
-A["geometry.ts"]
-B["helper.ts"]
-C["raster.ts"]
-D["tiles.ts"]
-E["vector.ts"]
+subgraph 5["sources"]
+6["index.ts"]
+7["geojson.ts"]
+8["geometry.ts"]
+9["helper.ts"]
+A["raster.ts"]
+B["tiles.ts"]
+C["vector.ts"]
 P["types.ts"]
 end
-subgraph H["renderer"]
-I["renderer_svg.ts"]
+subgraph F["renderer"]
+G["renderer_svg.ts"]
 J["svg_path.ts"]
 O["types.ts"]
+end
+subgraph H["lib"]
+I["color.ts"]
 end
 subgraph K["maplibre"]
 L["control.ts"]
@@ -164,28 +164,27 @@ end
 end
 1-->2
 2-->4
-2-->I
+2-->G
 4-->6
-4-->8
-4-->F
-8-->9
-8-->B
-8-->C
-8-->E
-9-->A
-B-->A
-C-->D
-D-->A
-E-->A
-E-->D
-F-->G
-I-->6
-I-->J
+4-->D
+6-->7
+6-->9
+6-->A
+6-->C
+7-->8
+9-->8
+A-->B
+B-->8
+C-->8
+C-->B
+D-->E
+G-->I
+G-->J
 L-->2
 L-->M
 N-->2
 N-->L
 
-class 0,3,5,7,H,K subgraphs;
+class 0,3,5,F,H,K subgraphs;
 classDef subgraphs fill-opacity:0.1, fill:#888, color:#888, stroke:#888;
 ```

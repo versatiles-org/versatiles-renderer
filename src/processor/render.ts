@@ -3,7 +3,6 @@ import {
 	type Feature,
 	type Color as MaplibreColor,
 } from '@maplibre/maplibre-gl-style-spec';
-import { Color } from '../lib/color.js';
 import { getLayerFeatures, getRasterTiles } from '../sources/index.js';
 import { getLayerStyles } from './styles.js';
 import type { PossiblyEvaluatedPropertyValue } from './style_layer.js';
@@ -54,7 +53,7 @@ async function render(job: RenderJob): Promise<void> {
 			case 'background':
 				{
 					renderer.drawBackgroundFill({
-						color: new Color(getPaint('background-color') as MaplibreColor),
+						color: getPaint('background-color') as MaplibreColor,
 						opacity: getPaint('background-opacity') as number,
 					});
 				}
@@ -74,7 +73,7 @@ async function render(job: RenderJob): Promise<void> {
 						polygonFeatures.map((feature) => [
 							feature,
 							{
-								color: new Color(getPaint('fill-color', feature) as MaplibreColor),
+								color: getPaint('fill-color', feature) as MaplibreColor,
 								translate: getPaint('fill-translate', feature) as [number, number],
 							},
 						]),
@@ -99,7 +98,7 @@ async function render(job: RenderJob): Promise<void> {
 						lineStringFeatures.map((feature) => [
 							feature,
 							{
-								color: new Color(getPaint('line-color', feature) as MaplibreColor),
+								color: getPaint('line-color', feature) as MaplibreColor,
 								translate: getPaint('line-translate', feature) as [number, number],
 								blur: getPaint('line-blur', feature) as number,
 								cap: getLayout('line-cap', feature) as 'butt' | 'round' | 'square',
@@ -145,12 +144,12 @@ async function render(job: RenderJob): Promise<void> {
 						pointFeatures.map((feature) => [
 							feature,
 							{
-								color: new Color(getPaint('circle-color', feature) as MaplibreColor),
+								color: getPaint('circle-color', feature) as MaplibreColor,
 								radius: getPaint('circle-radius', feature) as number,
 								blur: getPaint('circle-blur', feature) as number,
 								translate: getPaint('circle-translate', feature) as [number, number],
 								strokeWidth: getPaint('circle-stroke-width', feature) as number,
-								strokeColor: new Color(getPaint('circle-stroke-color', feature) as MaplibreColor),
+								strokeColor: getPaint('circle-stroke-color', feature) as MaplibreColor,
 							},
 						]),
 						getPaint('circle-opacity', pointFeatures[0]) as number,

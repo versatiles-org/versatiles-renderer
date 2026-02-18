@@ -1,8 +1,15 @@
 import { describe, expect, test } from 'vitest';
 import { SVGRenderer } from './renderer_svg.js';
-import { Color } from '../lib/color.js';
+import { Color } from '@maplibre/maplibre-gl-style-spec';
 import { Feature, Point2D } from '../sources/geometry.js';
 import type { CircleStyle, RasterStyle, RasterTile } from './renderer_svg.js';
+
+function mc(hex: string, alpha = 1): Color {
+	const r = (parseInt(hex.slice(1, 3), 16) / 255) * alpha;
+	const g = (parseInt(hex.slice(3, 5), 16) / 255) * alpha;
+	const b = (parseInt(hex.slice(5, 7), 16) / 255) * alpha;
+	return new Color(r, g, b, alpha);
+}
 
 function makeRenderer(scale = 1): SVGRenderer {
 	return new SVGRenderer({ width: 256, height: 256, scale });
@@ -56,14 +63,14 @@ describe('SVGRenderer', () => {
 	describe('drawBackgroundFill', () => {
 		test('sets background color as oversized rect', () => {
 			const r = makeRenderer();
-			r.drawBackgroundFill({ color: new Color('#FF0000'), opacity: 1 });
+			r.drawBackgroundFill({ color: mc('#FF0000'), opacity: 1 });
 			const svg = r.getString();
 			expect(svg).toContain('<rect x="-1" y="-1" width="258" height="258" fill="#FF0000" />');
 		});
 
 		test('applies opacity to alpha', () => {
 			const r = makeRenderer();
-			r.drawBackgroundFill({ color: new Color('#FF0000'), opacity: 0.5 });
+			r.drawBackgroundFill({ color: mc('#FF0000'), opacity: 0.5 });
 			const svg = r.getString();
 			expect(svg).toContain(
 				'<rect x="-1" y="-1" width="258" height="258" fill="#FF0000" fill-opacity="0.502" />',
@@ -82,7 +89,7 @@ describe('SVGRenderer', () => {
 					[0, 10],
 				],
 			]);
-			const style = { color: new Color('#336699'), translate: [0, 0] as [number, number] };
+			const style = { color: mc('#336699'), translate: [0, 0] as [number, number] };
 			r.drawPolygons([[feature, style]], 1);
 			const svg = r.getString();
 			expect(svg).toContain('<path d=');
@@ -107,7 +114,7 @@ describe('SVGRenderer', () => {
 					[10, 10],
 				],
 			]);
-			const style = { color: new Color('#336699'), translate: [0, 0] as [number, number] };
+			const style = { color: mc('#336699'), translate: [0, 0] as [number, number] };
 			r.drawPolygons([[feature, style]], 0);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
@@ -122,7 +129,7 @@ describe('SVGRenderer', () => {
 					[10, 10],
 				],
 			]);
-			const style = { color: Color.transparent, translate: [0, 0] as [number, number] };
+			const style = { color: new Color(0, 0, 0, 0), translate: [0, 0] as [number, number] };
 			r.drawPolygons([[feature, style]], 1);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
@@ -141,7 +148,7 @@ describe('SVGRenderer', () => {
 			const style = {
 				blur: 0,
 				cap: 'round' as const,
-				color: new Color('#FF0000'),
+				color: mc('#FF0000'),
 				gapWidth: 0,
 				join: 'round' as const,
 				miterLimit: 2,
@@ -177,7 +184,7 @@ describe('SVGRenderer', () => {
 			const style = {
 				blur: 0,
 				cap: 'butt' as const,
-				color: new Color('#FF0000'),
+				color: mc('#FF0000'),
 				gapWidth: 0,
 				join: 'miter' as const,
 				miterLimit: 2,
@@ -202,7 +209,7 @@ describe('SVGRenderer', () => {
 			const style = {
 				blur: 0,
 				cap: 'butt' as const,
-				color: new Color('#FF0000'),
+				color: mc('#FF0000'),
 				gapWidth: 0,
 				join: 'miter' as const,
 				miterLimit: 2,
@@ -228,12 +235,12 @@ describe('SVGRenderer', () => {
 
 		function defaultCircleStyle(overrides: Partial<CircleStyle> = {}): CircleStyle {
 			return {
-				color: new Color('#FF0000'),
+				color: mc('#FF0000'),
 				radius: 5,
 				blur: 0,
 				translate: [0, 0] as [number, number],
 				strokeWidth: 0,
-				strokeColor: new Color('#000000'),
+				strokeColor: mc('#000000'),
 				...overrides,
 			};
 		}
@@ -279,7 +286,7 @@ describe('SVGRenderer', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
 			r.drawCircles(
-				[[feature, defaultCircleStyle({ strokeWidth: 2, strokeColor: new Color('#00FF00') })]],
+				[[feature, defaultCircleStyle({ strokeWidth: 2, strokeColor: mc('#00FF00') })]],
 				1,
 			);
 			const svg = r.getString();

@@ -1,5 +1,4 @@
-import type { Color } from '../lib/color.js';
-import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
+import type { Color as MaplibreColor, StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { SVGRenderer } from './renderer_svg.js';
 
 export interface View {
@@ -20,19 +19,19 @@ export interface RendererOptions {
 }
 
 export interface BackgroundStyle {
-	color: Color;
+	color: MaplibreColor;
 	opacity: number;
 }
 
 export interface FillStyle {
-	color: Color;
+	color: MaplibreColor;
 	translate: [number, number];
 }
 
 export interface LineStyle {
 	blur: number;
 	cap: 'butt' | 'round' | 'square';
-	color: Color;
+	color: MaplibreColor;
 	dasharray?: number[];
 	gapWidth: number;
 	join: 'bevel' | 'miter' | 'round';
@@ -44,12 +43,12 @@ export interface LineStyle {
 }
 
 export interface CircleStyle {
-	color: Color;
+	color: MaplibreColor;
 	radius: number;
 	blur: number;
 	translate: [number, number];
 	strokeWidth: number;
-	strokeColor: Color;
+	strokeColor: MaplibreColor;
 }
 
 export interface RasterStyle {
