@@ -36,15 +36,13 @@ export function mergePolygons(featureList: Feature[]): Feature[] {
 		const turfFeatures: GeoJsonFeature<Polygon>[] = [];
 		features.forEach((f) => {
 			const rings = f.geometry.map((ring) => ring.map((p) => [p.x, p.y]));
-			rings.forEach((ring) => {
-				turfFeatures.push({
-					type: 'Feature' as const,
-					geometry: {
-						type: 'Polygon' as const,
-						coordinates: [ring],
-					},
-					properties: f.properties,
-				});
+			turfFeatures.push({
+				type: 'Feature' as const,
+				geometry: {
+					type: 'Polygon' as const,
+					coordinates: rings,
+				},
+				properties: f.properties,
 			});
 		});
 		const merged = union({
