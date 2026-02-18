@@ -28,7 +28,7 @@ export function loadGeoJSONSource(
 	}
 
 	function makeFeature(
-		type: string,
+		type: 'LineString' | 'Point' | 'Polygon',
 		geometry: Point2D[][],
 		id: unknown,
 		properties: Record<string, unknown>,
@@ -65,6 +65,19 @@ export function loadGeoJSONSource(
 				break;
 			}
 			case 'Polygon': {
+				geometry.forEach((ring, ringIndex) => {
+					const needsCW = ringIndex === 0;
+
+					let area = 0;
+					for (let i = 0; i < ring.length; i++) {
+						const j = (i + 1) % ring.length;
+						area += ring[i].x * ring[j].y;
+						area -= ring[j].x * ring[i].y;
+					}
+					let isClockwise = area < 0;
+
+					if (isClockwise !== needsCW) ring.reverse();
+				});
 				const f = makeFeature('Polygon', geometry, id, properties);
 				if (f) {
 					features.polygons.push(f);
