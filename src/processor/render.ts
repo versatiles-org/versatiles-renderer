@@ -4,7 +4,7 @@ import {
 	type Color as MaplibreColor,
 } from '@maplibre/maplibre-gl-style-spec';
 import { Color } from '../lib/color.js';
-import { getLayerFeatures, getRasterTiles } from './sources/index.js';
+import { getLayerFeatures, getRasterTiles } from '../sources/index.js';
 import { getLayerStyles } from './styles.js';
 import type { PossiblyEvaluatedPropertyValue } from '../lib/style_layer.js';
 import type { RenderJob } from '../renderer/renderer_svg.js';

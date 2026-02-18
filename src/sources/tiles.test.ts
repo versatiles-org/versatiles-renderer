@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
-import { Point2D } from '../../lib/geometry.js';
+import { Point2D } from '../lib/geometry.js';
 import { calculateTileGrid, getTile } from './tiles.js';
 
 describe('calculateTileGrid', () => {

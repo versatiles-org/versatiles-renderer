@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { Point2D } from '../../lib/geometry.js';
+import { Point2D } from '../lib/geometry.js';
 import type { LayerFeatures } from './types.js';
 import { loadGeoJSONSource } from './geojson.js';
 

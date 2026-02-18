@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { Point2D } from '../../lib/geometry.js';
-import type { SVGRenderer } from '../../renderer/renderer_svg.js';
+import { Point2D } from '../lib/geometry.js';
+import type { SVGRenderer } from '../renderer/renderer_svg.js';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
-import type { RenderJob } from '../../renderer/renderer_svg.js';
+import type { RenderJob } from '../renderer/renderer_svg.js';
 
 vi.mock('./vector.js', () => ({
 	loadVectorSource: vi.fn(),

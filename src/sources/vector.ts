@@ -1,5 +1,5 @@
-import { Point2D, Feature } from '../../lib/geometry.js';
-import type { RenderJob } from '../../renderer/renderer_svg.js';
+import { Point2D, Feature } from '../lib/geometry.js';
+import type { RenderJob } from '../renderer/renderer_svg.js';
 import { calculateTileGrid, getTile } from './tiles.js';
 import type { LayerFeatures } from './types.js';
 import { VectorTile } from '@mapbox/vector-tile';

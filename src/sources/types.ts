@@ -1,4 +1,4 @@
-import type { Feature } from '../../lib/geometry.js';
+import type { Feature } from '../lib/geometry.js';
 
 export interface Features {
 	points: Feature[];

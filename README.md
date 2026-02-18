@@ -140,6 +140,8 @@ G["style_layer.ts"]
 end
 subgraph 5["processor"]
 6["render.ts"]
+F["styles.ts"]
+end
 subgraph 8["sources"]
 9["index.ts"]
 A["geojson.ts"]
@@ -147,14 +149,12 @@ B["helper.ts"]
 C["raster.ts"]
 D["tiles.ts"]
 E["vector.ts"]
-O["types.ts"]
-end
-F["styles.ts"]
+P["types.ts"]
 end
 subgraph H["renderer"]
 I["renderer_svg.ts"]
 J["svg_path.ts"]
-P["types.ts"]
+O["types.ts"]
 end
 subgraph K["maplibre"]
 L["control.ts"]
