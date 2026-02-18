@@ -94,7 +94,7 @@ export class SVGExportControl implements IControl {
 		`;
 
 		const noticeEl = querySelector(this.panel, '.panel-attribution');
-		const sources = this.map.getStyle().sources ?? {};
+		const sources = this.map.getStyle().sources;
 		const attributions = [
 			...new Set(
 				Object.values(sources)

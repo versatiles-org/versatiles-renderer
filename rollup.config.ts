@@ -1,4 +1,4 @@
-import { defineConfig } from 'rollup';
+import { defineConfig, type RollupOptions } from 'rollup';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import dts from 'rollup-plugin-dts';
@@ -6,7 +6,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 
 const maplibreOnly = process.env.BUILD_TARGET === 'maplibre';
 
-const allConfigs = [
+const allConfigs: RollupOptions[] = [
 	{
 		input: 'src/index.ts',
 		output: [
@@ -47,7 +47,7 @@ const allConfigs = [
 	},
 ];
 
-const maplibreConfig = [
+const maplibreConfig: RollupOptions[] = [
 	{
 		input: 'src/maplibre/index.ts',
 		output: [{ file: 'dist/maplibre.js', format: 'es', sourcemap: true }],

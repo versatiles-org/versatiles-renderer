@@ -5,8 +5,8 @@
 		"declaration": true,
 		"declarationDir": "dist/types",
 		"noEmit": false,
-		"sourceMap": true,
-		"allowImportingTsExtensions": false
+		"sourceMap": true
 	},
+	"include": ["src/**/*.ts"],
 	"exclude": ["src/demo.ts"]
 }

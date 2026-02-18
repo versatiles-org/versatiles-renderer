@@ -5,17 +5,9 @@ import tseslint from 'typescript-eslint';
 export default defineConfig(
 	eslint.configs.recommended,
 	...tseslint.configs.recommended,
-	globalIgnores([
-		'coverage/**',
-		'dev/**',
-		'dist/**',
-		'doc-typescript/**',
-		'e2e/**',
-		'lib/**',
-		'scripts/**',
-	]),
+	globalIgnores(['coverage/**', 'dist/**', 'doc-typescript/**']),
 	{
-		files: ['src/**/*.ts'],
+		files: ['**/*.ts'],
 		extends: [
 			eslint.configs.recommended,
 			...tseslint.configs.strictTypeChecked,
@@ -23,13 +15,25 @@ export default defineConfig(
 		],
 		languageOptions: {
 			parserOptions: {
-				projectService: true,
+				project: ['./tsconfig.json', './e2e/tsconfig.json'],
 				tsconfigRootDir: import.meta.dirname,
 			},
 		},
 		linterOptions: {
 			reportUnusedDisableDirectives: true,
 		},
-		rules: {},
+		rules: { '@typescript-eslint/no-confusing-void-expression': 'off' },
+	},
+	{
+		files: ['e2e/**/*.ts', 'scripts/**/*.ts'],
+		rules: {
+			'@typescript-eslint/no-explicit-any': 'off',
+			'@typescript-eslint/restrict-template-expressions': 'off',
+			'@typescript-eslint/no-unsafe-member-access': 'off',
+			'@typescript-eslint/no-unsafe-assignment': 'off',
+			'@typescript-eslint/no-unsafe-return': 'off',
+			'@typescript-eslint/no-unsafe-call': 'off',
+			'@typescript-eslint/no-unsafe-argument': 'off',
+		},
 	},
 );

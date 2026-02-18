@@ -10,9 +10,9 @@
 		"forceConsistentCasingInFileNames": true,
 		"declaration": true,
 		"allowJs": true,
-		"allowImportingTsExtensions": true,
 		"noEmit": true,
 		"types": ["node"]
 	},
-	"include": ["src/**/*.ts"]
+	"include": ["**/*.ts"],
+	"exclude": ["node_modules", "dist", "coverage", "doc-typescript", "e2e"]
 }

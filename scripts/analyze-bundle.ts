@@ -6,7 +6,7 @@
  * per-source byte attribution.
  */
 
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve, relative } from 'node:path';
 import { decode, encode } from '@jridgewell/sourcemap-codec';
 import { TraceMap, originalPositionFor } from '@jridgewell/trace-mapping';
@@ -52,7 +52,7 @@ for (let i = 0; i < outputMap.sources.length; i++) {
 		}
 
 		const depMapDir = dirname(depMapFile);
-		const resolvedSources = depMap.sources.map((s) => {
+		const resolvedSources = depMap.sources.map((s: string) => {
 			const fromMap = resolve(depMapDir, s);
 			if (existsSync(fromMap)) return relative(outputDir, fromMap);
 			const stripped = s.replace(/^(\.\.\/?)+/, '');
@@ -74,8 +74,8 @@ if (depTracers.size > 0) {
 	const newSourcesContent = outputMap.sourcesContent ? [...outputMap.sourcesContent] : [];
 	const sourceIndexMap = new Map();
 
-	function getNewSourceIndex(depIdx, origSourceIdx) {
-		const key = depIdx + ':' + origSourceIdx;
+	function getNewSourceIndex(depIdx: number, origSourceIdx: number) {
+		const key = `${depIdx}:${origSourceIdx}`;
 		let idx = sourceIndexMap.get(key);
 		if (idx !== undefined) return idx;
 		idx = newSources.length;
@@ -87,10 +87,11 @@ if (depTracers.size > 0) {
 	}
 
 	for (const line of decoded) {
-		for (const seg of line) {
+		for (const seg of line as number[][]) {
 			if (seg.length < 4) continue;
 			const dep = depTracers.get(seg[1]);
 			if (!dep) continue;
+
 			const result = originalPositionFor(dep.tracer, { line: seg[2] + 1, column: seg[3] });
 			if (result.source != null) {
 				const origIdx = dep.depMap.sources.indexOf(result.source);
@@ -114,7 +115,7 @@ const tracer = new TraceMap(outputMap);
 const js = readFileSync(bundleFile, 'utf8');
 const lines = js.split('\n');
 
-const bytesPerSource = new Map();
+const bytesPerSource = new Map<string, number>();
 let totalBytes = 0;
 
 for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
@@ -124,15 +125,15 @@ for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
 	// Get all segments for this line by probing key positions
 	// Simple approach: attribute each line to its first mapping
 	const pos = originalPositionFor(tracer, { line: lineIdx + 1, column: 0 });
-	const src = pos.source || '[unmapped]';
-	bytesPerSource.set(src, (bytesPerSource.get(src) || 0) + lineLen + 1);
+	const src = pos.source ?? '[unmapped]';
+	bytesPerSource.set(src, (bytesPerSource.get(src) ?? 0) + lineLen + 1);
 	totalBytes += lineLen + 1;
 }
 
 // ─── Step 3: Display results ───
 
 // Group by package/directory
-const byPackage = new Map();
+const byPackage = new Map<string, number>();
 for (const [source, bytes] of bytesPerSource) {
 	let pkg;
 	if (source === '[unmapped]') {
@@ -144,7 +145,7 @@ for (const [source, bytes] of bytesPerSource) {
 	} else {
 		pkg = '[project]';
 	}
-	byPackage.set(pkg, (byPackage.get(pkg) || 0) + bytes);
+	byPackage.set(pkg, (byPackage.get(pkg) ?? 0) + bytes);
 }
 
 const sortedPackages = [...byPackage.entries()].sort((a, b) => b[1] - a[1]);

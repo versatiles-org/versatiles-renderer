@@ -41,7 +41,7 @@ watch(resolve(ROOT, 'src'), { recursive: true }, (_event, filename) => {
 	if (!filename?.endsWith('.ts')) return;
 	if (debounce) clearTimeout(debounce);
 	debounce = setTimeout(() => {
-		console.log(`\nFile changed: ${String(filename)}`);
+		console.log(`\nFile changed: ${filename}`);
 		buildMaplibre();
 	}, 300);
 });
