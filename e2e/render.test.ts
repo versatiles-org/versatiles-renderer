@@ -63,7 +63,7 @@ describe('e2e: geojson source with circle layer', () => {
 
 		expect(svg).toContain('<circle');
 		expect(svg).toContain('fill="#FF0000"');
-		expect(svg).toContain('r="10.000"');
+		expect(svg).toContain('r="10"');
 	});
 
 	test('renders circles with stroke', async () => {
@@ -101,7 +101,7 @@ describe('e2e: geojson source with circle layer', () => {
 		expect(svg).toContain('<circle');
 		expect(svg).toContain('fill="#0000FF"');
 		expect(svg).toContain('stroke="#FFFFFF"');
-		expect(svg).toContain('stroke-width="2.000"');
+		expect(svg).toContain('stroke-width="2"');
 	});
 
 	test('renders multiple points', async () => {
