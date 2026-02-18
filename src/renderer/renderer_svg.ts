@@ -196,11 +196,14 @@ export class SVGRenderer {
 	}
 
 	public getString(): string {
-		return [
-			`<svg viewBox="0 0 ${String(this.width)} ${String(this.height)}" width="${String(this.width)}" height="${String(this.height)}" xmlns="http://www.w3.org/2000/svg" style="${bgColorStyle(this.#backgroundColor)}">`,
-			...this.#svg,
-			'</svg>',
-		].join('\n');
+		const w = String(this.width);
+		const h = String(this.height);
+		const parts = [`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`];
+		if (this.#backgroundColor.alpha > 0) {
+			parts.push(`<rect width="${w}" height="${h}" ${fillAttr(this.#backgroundColor)} />`);
+		}
+		parts.push(...this.#svg, '</svg>');
+		return parts.join('\n');
 	}
 }
 
@@ -214,13 +217,6 @@ function strokeAttr(color: Color, width: string): string {
 	let attr = `stroke="${color.rgb}" stroke-width="${width}"`;
 	if (color.alpha < 255) attr += ` stroke-opacity="${color.opacity.toFixed(3)}"`;
 	return attr;
-}
-
-function bgColorStyle(color: Color): string {
-	if (color.alpha === 0) return 'background-color:transparent';
-	if (color.alpha === 255) return `background-color:${color.rgb}`;
-	const [r, g, b] = color.values;
-	return `background-color:rgba(${String(r)},${String(g)},${String(b)},${color.opacity.toFixed(3)})`;
 }
 
 function roundValue(v: number, scale: number): string {

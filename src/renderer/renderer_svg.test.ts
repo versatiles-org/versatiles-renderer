@@ -37,33 +37,26 @@ describe('SVGRenderer', () => {
 			expect(svg).toContain('</svg>');
 		});
 
-		test('default background is transparent', () => {
+		test('default background has no rect', () => {
 			const r = makeRenderer();
 			const svg = r.getString();
-			expect(svg).toContain('background-color:transparent');
+			expect(svg).not.toContain('<rect');
 		});
 	});
 
 	describe('drawBackgroundFill', () => {
-		test('sets background color', () => {
+		test('sets background color as rect', () => {
 			const r = makeRenderer();
 			r.drawBackgroundFill({ color: new Color('#FF0000'), opacity: 1 });
 			const svg = r.getString();
-			expect(svg).toContain('background-color:#FF0000');
+			expect(svg).toContain('<rect width="256" height="256" fill="#FF0000" />');
 		});
 
 		test('applies opacity to alpha', () => {
 			const r = makeRenderer();
 			r.drawBackgroundFill({ color: new Color('#FF0000'), opacity: 0.5 });
 			const svg = r.getString();
-			expect(svg).toContain('background-color:rgba(255,0,0,0.502)');
-		});
-
-		test('opaque background uses hex', () => {
-			const r = makeRenderer();
-			r.drawBackgroundFill({ color: new Color('#FF0000'), opacity: 1 });
-			const svg = r.getString();
-			expect(svg).toContain('background-color:#FF0000');
+			expect(svg).toContain('<rect width="256" height="256" fill="#FF0000" fill-opacity="0.502" />');
 		});
 	});
 
