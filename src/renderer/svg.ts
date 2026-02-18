@@ -99,9 +99,9 @@ export class SVGRenderer {
 				style.translate[0] === 0 && style.translate[1] === 0
 					? ''
 					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
-			const roundedWidth = roundValue(style.width, this.#scale);
+			const roundedWidth = formatScaled(style.width, this.#scale);
 			const dasharrayStr = style.dasharray
-				? style.dasharray.map((v) => roundValue(v * style.width, this.#scale)).join(',')
+				? style.dasharray.map((v) => formatScaled(v * style.width, this.#scale)).join(',')
 				: '';
 			const key = [
 				color.hex,
@@ -159,11 +159,11 @@ export class SVGRenderer {
 				style.translate[0] === 0 && style.translate[1] === 0
 					? ''
 					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
-			const roundedRadius = roundValue(style.radius, this.#scale);
+			const roundedRadius = formatScaled(style.radius, this.#scale);
 			const strokeColor = new Color(style.strokeColor);
 			const strokeAttrs =
 				style.strokeWidth > 0
-					? ` ${strokeAttr(strokeColor, roundValue(style.strokeWidth, this.#scale))}`
+					? ` ${strokeAttr(strokeColor, formatScaled(style.strokeWidth, this.#scale))}`
 					: '';
 			const key = [color.hex, roundedRadius, strokeAttrs, translate].join('\0');
 
@@ -212,7 +212,7 @@ export class SVGRenderer {
 		for (const tile of tiles) {
 			const overlap = Math.min(tile.width, tile.height) / 10000; // slight overlap to prevent sub-pixel gaps between tiles
 			const s = this.#scale;
-			let attrs = `x="${roundValue(tile.x - overlap, s)}" y="${roundValue(tile.y - overlap, s)}" width="${roundValue(tile.width + overlap * 2, s)}" height="${roundValue(tile.height + overlap * 2, s)}" href="${tile.dataUri}"`;
+			let attrs = `x="${formatScaled(tile.x - overlap, s)}" y="${formatScaled(tile.y - overlap, s)}" width="${formatScaled(tile.width + overlap * 2, s)}" height="${formatScaled(tile.height + overlap * 2, s)}" href="${tile.dataUri}"`;
 			if (pixelated) attrs += ' style="image-rendering:pixelated"';
 			this.#svg.push(`<image ${attrs} />`);
 		}
@@ -250,8 +250,8 @@ function strokeAttr(color: Color, width: string): string {
 	return attr;
 }
 
-function roundValue(v: number, scale: number): string {
-	return (v * scale).toFixed(3);
+function formatScaled(v: number, scale: number): string {
+	return formatNum(Math.round(v * scale * 10));
 }
 
 function roundXY(x: number, y: number, scale: number): [number, number] {
