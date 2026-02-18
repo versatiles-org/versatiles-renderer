@@ -111,6 +111,14 @@ export const PANEL_CSS = `
 	font-size: 13px;
 }
 
+.svg-export-panel .panel-notice {
+	font-size: 11px;
+	color: #888;
+	line-height: 1.4;
+	margin-bottom: 12px;
+	max-width: 320px;
+}
+
 .svg-export-panel .panel-actions {
 	display: flex;
 	gap: 8px;

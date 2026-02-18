@@ -82,6 +82,9 @@ export class SVGExportControl implements IControl {
 			<div class="preview-container">
 				<span class="preview-loading">Rendering preview\u2026</span>
 			</div>
+			<div class="panel-notice">
+				The exported map data may be subject to copyright. Please check the license terms of your tile provider and include proper attribution when publishing.
+			</div>
 			<div class="panel-actions">
 				<button class="btn-download" disabled>Download</button>
 				<button class="btn-open" disabled>Open in Tab</button>
