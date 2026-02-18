@@ -5,12 +5,17 @@ import {
 } from '@maplibre/maplibre-gl-style-spec';
 import { getLayerFeatures, getRasterTiles } from '../sources/index.js';
 import { getLayerStyles } from './styles.js';
-import type { PossiblyEvaluatedPropertyValue } from './style_layer.js';
+import type { PossiblyEvaluatedPropertyValue, StyleLayer } from './style_layer.js';
 import type { RenderJob } from '../renderer/renderer_svg.js';
+import type { Features, LayerFeatures } from '../sources/types.js';
 
 export async function renderVectorTiles(job: RenderJob): Promise<string> {
 	await render(job);
 	return job.renderer.getString();
+}
+
+function getFeatures(layerFeatures: LayerFeatures, layerStyle: StyleLayer): Features | undefined {
+	return layerFeatures.get(layerStyle.sourceLayer) ?? layerFeatures.get(layerStyle.source);
 }
 
 async function render(job: RenderJob): Promise<void> {
@@ -60,9 +65,7 @@ async function render(job: RenderJob): Promise<void> {
 				continue;
 			case 'fill':
 				{
-					const polygons = (
-						layerFeatures.get(layerStyle.sourceLayer) ?? layerFeatures.get(layerStyle.source)
-					)?.polygons;
+					const polygons = getFeatures(layerFeatures, layerStyle)?.polygons;
 					if (!polygons || polygons.length === 0) continue;
 					const filter = featureFilter(layerStyle.filter);
 					const polygonFeatures = polygons.filter((feature) => filter.filter({ zoom }, feature));
@@ -83,9 +86,7 @@ async function render(job: RenderJob): Promise<void> {
 				continue;
 			case 'line':
 				{
-					const lineStrings = (
-						layerFeatures.get(layerStyle.sourceLayer) ?? layerFeatures.get(layerStyle.source)
-					)?.linestrings;
+					const lineStrings = getFeatures(layerFeatures, layerStyle)?.linestrings;
 					if (!lineStrings || lineStrings.length === 0) continue;
 					const filter = featureFilter(layerStyle.filter);
 					const lineStringFeatures = lineStrings.filter((feature) =>
@@ -131,9 +132,7 @@ async function render(job: RenderJob): Promise<void> {
 				continue;
 			case 'circle':
 				{
-					const points = (
-						layerFeatures.get(layerStyle.sourceLayer) ?? layerFeatures.get(layerStyle.source)
-					)?.points;
+					const points = getFeatures(layerFeatures, layerStyle)?.points;
 					if (!points || points.length === 0) continue;
 					const filter = featureFilter(layerStyle.filter);
 					const pointFeatures = points.filter((feature) => filter.filter({ zoom }, feature));
