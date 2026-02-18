@@ -85,10 +85,11 @@ async function getStyle(type: Region['type']): Promise<StyleSpecification> {
 							{
 								type: 'LineString',
 								coordinates: [
-									[13.391, 52.522],
-									[13.393, 52.519],
-									[13.391, 52.516],
-									[13.393, 52.513],
+									[13.391, 52.515],
+									[13.392, 52.519],
+									[13.393, 52.516],
+									[13.394, 52.519],
+									[13.395, 52.515],
 								],
 							},
 							...(
