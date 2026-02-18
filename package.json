@@ -1,6 +1,6 @@
 {
   "name": "@versatiles/svg-renderer",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Renders vector maps as SVG.",
   "keywords": [
     "svg",

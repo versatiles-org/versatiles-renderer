@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-02-18
+
+### Features
+
+- implement drawCircles method and CircleStyle interface for SVGRenderer
+- add geojson as source
+- add end-to-end tests for geojson rendering with circle, fill, and line layers
+- implement fetch caching mechanism for improved performance in tests
+- implement caching for network requests in fetch-cache and enhance e2e tests
+- add geojson support to regions and enhance style configuration
+- refactor feature creation in loadGeoJSONSource for improved clarity and reusability
+- optimize polygon merging by consolidating feature creation in mergePolygons
+- enforce polygon winding order in makeFeature for consistent geometry processing
+- add rgb and opacity getters to Color class for improved color handling
+- enhance SVG background handling with dynamic color attributes
+- enhance SVG output with clipPath and improved background rect dimensions
+- update e2e workflow for GitHub Pages deployment and add demo HTML
+
+### Bug Fixes
+
+- update type assertion for coordinates in loadGeoJSONSource function
+- update SVG screenshot file extension from .svg to .png
+- lint warnings
+- add script entry for maplibre in package.json exports
+- comment out vulnerability check in CI workflow
+- update CI workflow to omit dev dependencies in vulnerability check
+- update .gitignore and package.json for documentation scripts
+- format globalIgnores array in eslint configuration for better readability
+
+### Code Refactoring
+
+- source handling
+- update CI and E2E workflows, move regions and run scripts
+- update SVG rendering to use rect for background fill and simplify getString method
+
+### Tests
+
+- add end-to-end tests for rendering GeoJSON sources with circle, fill, and line layers
+- improve geojson feature creation
+- update coordinates for LineString in getStyle function
+
+### Chores
+
+- update devDependencies to latest versions
+- update @versatiles/release-tool to version 2.7.2
+
 ## [0.3.0] - 2026-02-16
 
 ### Features
