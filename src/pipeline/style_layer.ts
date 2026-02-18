@@ -153,3 +153,10 @@ export class StyleLayer {
 export function createStyleLayer(spec: LayerSpecification): StyleLayer {
 	return new StyleLayer(spec);
 }
+
+export function getLayerStyles(layers: LayerSpecification[]): StyleLayer[] {
+	return layers.map((layerSpecification) => {
+		const styleLayer = createStyleLayer(layerSpecification);
+		return styleLayer;
+	});
+}
