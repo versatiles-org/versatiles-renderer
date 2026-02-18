@@ -17,6 +17,14 @@ type Patterns = Record<
 type Geometry = Point2D[][];
 type Bbox = [number, number, number, number];
 
+export interface Features {
+	points: Feature[];
+	linestrings: Feature[];
+	polygons: Feature[];
+}
+
+export type LayerFeatures = Map<string, Features>;
+
 export class Point2D implements MapLibrePoint2D {
 	public x: number;
 

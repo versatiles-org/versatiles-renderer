@@ -1,6 +1,6 @@
 import type { GeoJSON } from 'geojson';
 import { describe, expect, test } from 'vitest';
-import type { LayerFeatures } from '../types.js';
+import type { LayerFeatures } from '../geometry.js';
 import { loadGeoJSONSource } from './geojson.js';
 
 // Center on 0,0 at zoom 0 — keeps projection math simple

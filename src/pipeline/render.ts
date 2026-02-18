@@ -7,7 +7,7 @@ import { getLayerFeatures, getRasterTiles } from '../sources/index.js';
 import { getLayerStyles } from './style_layer.js';
 import type { PossiblyEvaluatedPropertyValue, StyleLayer } from './style_layer.js';
 import type { RenderJob } from '../renderer/svg.js';
-import type { Features, LayerFeatures } from '../types.js';
+import type { Features, LayerFeatures } from '../geometry.js';
 
 export async function renderMap(job: RenderJob): Promise<string> {
 	await render(job);

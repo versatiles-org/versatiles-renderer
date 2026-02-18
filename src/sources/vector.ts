@@ -1,7 +1,7 @@
 import { Point2D, Feature } from '../geometry.js';
 import type { RenderJob } from '../renderer/svg.js';
 import { calculateTileGrid, getTile } from './tiles.js';
-import type { LayerFeatures } from '../types.js';
+import type { LayerFeatures } from '../geometry.js';
 import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
 
