@@ -103,11 +103,11 @@ export class SVGExportControl implements IControl {
 			),
 		];
 		if (attributions.length > 0) {
-			noticeEl.innerHTML =
+			noticeEl.textContent =
 				"When publishing the exported map, don't forget to add an attribution like: " +
 				attributions.join(', ');
 		} else {
-			noticeEl.innerHTML =
+			noticeEl.textContent =
 				'When publishing the exported map, please check the license terms of the data and include proper attribution.';
 		}
 
