@@ -28,17 +28,17 @@ function mockFetchPng(): void {
 describe('getRasterTiles', () => {
 	test('throws on missing source', async () => {
 		const job = makeJob({});
-		await expect(getRasterTiles(job, 'missing')).rejects.toThrow('Invalid raster source: missing');
+		await expect(getRasterTiles(job, 'missing')).rejects.toThrow('Invalid raster source "missing"');
 	});
 
 	test('throws on non-raster source', async () => {
 		const job = makeJob({ src: { type: 'vector', tiles: ['https://a/{z}/{x}/{y}.pbf'] } });
-		await expect(getRasterTiles(job, 'src')).rejects.toThrow('Invalid raster source: src');
+		await expect(getRasterTiles(job, 'src')).rejects.toThrow('Invalid raster source "src"');
 	});
 
 	test('throws on raster source without tiles', async () => {
 		const job = makeJob({ src: { type: 'raster' } });
-		await expect(getRasterTiles(job, 'src')).rejects.toThrow('Invalid raster source: src');
+		await expect(getRasterTiles(job, 'src')).rejects.toThrow('Invalid raster source "src"');
 	});
 
 	test('fetches tiles and returns data URIs', async () => {

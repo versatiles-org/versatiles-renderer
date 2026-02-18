@@ -58,7 +58,11 @@ export class Color {
 				return;
 			default:
 		}
-		throw Error('Unsupported Color arguments: ' + JSON.stringify(args));
+		throw Error(
+			'Unsupported Color arguments: ' +
+				JSON.stringify(args) +
+				'. Expected a MaplibreColor, hex string (#RRGGBB or #RRGGBBAA), or 3-4 numeric components.',
+		);
 
 		function h2d(text: string): number {
 			return parseInt(text, 16);

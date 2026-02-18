@@ -9,7 +9,9 @@ export async function getRasterTiles(job: RenderJob, sourceName: string): Promis
 		| undefined;
 
 	if (source?.type !== 'raster' || !source.tiles) {
-		throw Error('Invalid raster source: ' + sourceName);
+		throw Error(
+			`Invalid raster source "${sourceName}": expected type "raster" with a "tiles" array`,
+		);
 	}
 
 	const sourceUrl: string = source.tiles[0];
