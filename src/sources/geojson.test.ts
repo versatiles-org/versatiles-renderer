@@ -11,7 +11,15 @@ const ZOOM = 0;
 
 function load(data: GeoJSON): LayerFeatures {
 	const layerFeatures: LayerFeatures = new Map();
-	loadGeoJSONSource('test', data, WIDTH, HEIGHT, ZOOM, CENTER, layerFeatures);
+	loadGeoJSONSource({
+		sourceName: 'test',
+		data,
+		width: WIDTH,
+		height: HEIGHT,
+		zoom: ZOOM,
+		center: CENTER,
+		layerFeatures,
+	});
 	return layerFeatures;
 }
 
@@ -247,25 +255,25 @@ describe('loadGeoJSONSource', () => {
 		test('appends to existing features for the same source name', () => {
 			const layerFeatures: LayerFeatures = new Map();
 
-			loadGeoJSONSource(
-				'test',
-				{ type: 'Point', coordinates: [0, 0] },
-				WIDTH,
-				HEIGHT,
-				ZOOM,
-				CENTER,
+			loadGeoJSONSource({
+				sourceName: 'test',
+				data: { type: 'Point', coordinates: [0, 0] },
+				width: WIDTH,
+				height: HEIGHT,
+				zoom: ZOOM,
+				center: CENTER,
 				layerFeatures,
-			);
+			});
 
-			loadGeoJSONSource(
-				'test',
-				{ type: 'Point', coordinates: [5, 5] },
-				WIDTH,
-				HEIGHT,
-				ZOOM,
-				CENTER,
+			loadGeoJSONSource({
+				sourceName: 'test',
+				data: { type: 'Point', coordinates: [5, 5] },
+				width: WIDTH,
+				height: HEIGHT,
+				zoom: ZOOM,
+				center: CENTER,
 				layerFeatures,
-			);
+			});
 
 			const features = getFeatures(layerFeatures);
 			expect(features.points.length).toBe(2);

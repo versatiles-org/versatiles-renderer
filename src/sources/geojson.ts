@@ -4,15 +4,18 @@ import type { Features, LayerFeatures } from '../geometry.js';
 
 type Coord = [number, number];
 
-export function loadGeoJSONSource(
-	sourceName: string,
-	data: GeoJSON,
-	width: number,
-	height: number,
-	zoom: number,
-	center: [number, number],
-	layerFeatures: LayerFeatures,
-): void {
+export interface GeoJSONLoadOptions {
+	sourceName: string;
+	data: GeoJSON;
+	width: number;
+	height: number;
+	zoom: number;
+	center: [number, number];
+	layerFeatures: LayerFeatures;
+}
+
+export function loadGeoJSONSource(options: GeoJSONLoadOptions): void {
+	const { sourceName, data, width, height, zoom, center, layerFeatures } = options;
 	const existing = layerFeatures.get(sourceName);
 	const features: Features = existing ?? { points: [], linestrings: [], polygons: [] };
 	if (!existing) layerFeatures.set(sourceName, features);

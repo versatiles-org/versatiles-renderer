@@ -27,15 +27,15 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 				break;
 			case 'geojson':
 				if (source.data) {
-					loadGeoJSONSource(
+					loadGeoJSONSource({
 						sourceName,
-						source.data as GeoJSON,
+						data: source.data as GeoJSON,
 						width,
 						height,
 						zoom,
 						center,
 						layerFeatures,
-					);
+					});
 				}
 				break;
 		}
