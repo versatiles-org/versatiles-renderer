@@ -4,7 +4,7 @@ import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { SVGRenderer } from './renderer_svg.js';
 
 export interface View {
-	center: Point2D;
+	center: [number, number];
 	zoom: number;
 }
 

@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { getRasterTiles } from './raster.js';
 import type { RenderJob } from '../renderer/renderer_svg.js';
-import { Point2D } from '../lib/geometry.js';
 import type { SVGRenderer } from '../renderer/renderer_svg.js';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 
@@ -12,7 +11,7 @@ afterEach(() => {
 function makeJob(sources: Record<string, unknown>): RenderJob {
 	return {
 		renderer: { width: 512, height: 512 } as SVGRenderer,
-		view: { zoom: 0, center: new Point2D(0, 0) },
+		view: { zoom: 0, center: [0, 0] },
 		style: { sources, version: 8, layers: [] } as unknown as StyleSpecification,
 	};
 }
@@ -74,7 +73,7 @@ describe('getRasterTiles', () => {
 
 		const job: RenderJob = {
 			renderer: { width: 512, height: 512 } as SVGRenderer,
-			view: { zoom: 10, center: new Point2D(13.4, 52.5) },
+			view: { zoom: 10, center: [13.4, 52.5] },
 			style: {
 				sources: { raster: { type: 'raster', tiles: ['https://a/{z}/{x}/{y}.png'], maxzoom: 3 } },
 				version: 8,

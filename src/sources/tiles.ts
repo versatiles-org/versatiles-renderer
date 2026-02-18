@@ -16,12 +16,14 @@ export interface TileGrid {
 export function calculateTileGrid(
 	width: number,
 	height: number,
-	center: Point2D,
+	center: [number, number],
 	zoom: number,
 	maxzoom?: number,
 ): TileGrid {
 	const zoomLevel = Math.min(Math.floor(zoom), maxzoom ?? Infinity);
-	const tileCenterCoordinate = center.getProject2Pixel().scale(2 ** zoomLevel);
+	const tileCenterCoordinate = new Point2D(center[0], center[1])
+		.getProject2Pixel()
+		.scale(2 ** zoomLevel);
 	const tileSize = 2 ** (zoom - zoomLevel + 9); // 512 (2^9) is the standard tile size
 
 	const tileCols = width / tileSize;

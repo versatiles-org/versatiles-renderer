@@ -1,10 +1,9 @@
 import { describe, expect, test } from 'vitest';
-import { Point2D } from '../lib/geometry.js';
 import type { LayerFeatures } from './types.js';
 import { loadGeoJSONSource } from './geojson.js';
 
 // Center on 0,0 at zoom 0 — keeps projection math simple
-const CENTER = new Point2D(0, 0);
+const CENTER: [number, number] = [0, 0];
 const WIDTH = 512;
 const HEIGHT = 512;
 const ZOOM = 0;

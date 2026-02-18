@@ -9,7 +9,7 @@ export function loadGeoJSONSource(
 	width: number,
 	height: number,
 	zoom: number,
-	center: Point2D,
+	center: [number, number],
 	layerFeatures: LayerFeatures,
 ): void {
 	const existing = layerFeatures.get(sourceName);
@@ -17,7 +17,7 @@ export function loadGeoJSONSource(
 	if (!existing) layerFeatures.set(sourceName, features);
 
 	const worldSize = 512 * 2 ** zoom;
-	const centerMercator = center.getProject2Pixel();
+	const centerMercator = new Point2D(center[0], center[1]).getProject2Pixel();
 
 	function projectCoord(coord: Coord): Point2D {
 		const mercator = new Point2D(coord[0], coord[1]).getProject2Pixel();

@@ -1,9 +1,8 @@
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { renderVectorTiles } from '../src/processor/render.js';
 import { SVGRenderer } from '../src/renderer/renderer_svg.js';
-import { Point2D } from '../src/lib/geometry.js';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
-import type { RenderJob } from '../src/types.js';
+import type { RenderJob } from '../src/renderer/renderer_svg.js';
 import { installFetchCache, uninstallFetchCache } from './fetch-cache.js';
 
 beforeAll(() => {
@@ -23,7 +22,7 @@ function makeJob(
 ): RenderJob {
 	return {
 		style,
-		view: { center: new Point2D(center[0], center[1]), zoom },
+		view: { center, zoom },
 		renderer: new SVGRenderer({ width: 256, height: 256, scale: 1 }),
 	};
 }

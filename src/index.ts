@@ -1,7 +1,6 @@
 import { SVGRenderer } from './renderer/renderer_svg.js';
 import { renderVectorTiles } from './processor/render.js';
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
-import { Point2D } from './lib/geometry.js';
 
 export async function renderToSVG(options: {
 	width?: number;
@@ -20,7 +19,7 @@ export async function renderToSVG(options: {
 		}),
 		style: options.style,
 		view: {
-			center: new Point2D(options.lon ?? 0, options.lat ?? 0),
+			center: [options.lon ?? 0, options.lat ?? 0],
 			zoom: options.zoom ?? 2,
 		},
 	});

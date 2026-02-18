@@ -1,51 +1,50 @@
 import { describe, expect, test, vi } from 'vitest';
-import { Point2D } from '../lib/geometry.js';
 import { calculateTileGrid, getTile } from './tiles.js';
 
 describe('calculateTileGrid', () => {
 	test('returns correct zoom level for integer zoom', () => {
-		const grid = calculateTileGrid(512, 512, new Point2D(0, 0), 2);
+		const grid = calculateTileGrid(512, 512, [0, 0], 2);
 		expect(grid.zoomLevel).toBe(2);
 	});
 
 	test('floors zoom level for fractional zoom', () => {
-		const grid = calculateTileGrid(512, 512, new Point2D(0, 0), 2.7);
+		const grid = calculateTileGrid(512, 512, [0, 0], 2.7);
 		expect(grid.zoomLevel).toBe(2);
 	});
 
 	test('clamps zoom level to maxzoom', () => {
-		const grid = calculateTileGrid(512, 512, new Point2D(0, 0), 5, 3);
+		const grid = calculateTileGrid(512, 512, [0, 0], 5, 3);
 		expect(grid.zoomLevel).toBe(3);
 	});
 
 	test('does not clamp when zoom is below maxzoom', () => {
-		const grid = calculateTileGrid(512, 512, new Point2D(0, 0), 2, 5);
+		const grid = calculateTileGrid(512, 512, [0, 0], 2, 5);
 		expect(grid.zoomLevel).toBe(2);
 	});
 
 	test('tile size is 512 at integer zoom', () => {
-		const grid = calculateTileGrid(512, 512, new Point2D(0, 0), 2);
+		const grid = calculateTileGrid(512, 512, [0, 0], 2);
 		expect(grid.tileSize).toBe(512);
 	});
 
 	test('tile size scales for fractional zoom', () => {
-		const grid = calculateTileGrid(512, 512, new Point2D(0, 0), 2.5);
+		const grid = calculateTileGrid(512, 512, [0, 0], 2.5);
 		expect(grid.tileSize).toBeCloseTo(512 * 2 ** 0.5);
 	});
 
 	test('returns at least one tile', () => {
-		const grid = calculateTileGrid(512, 512, new Point2D(13.4, 52.5), 10);
+		const grid = calculateTileGrid(512, 512, [13.4, 52.5], 10);
 		expect(grid.tiles.length).toBeGreaterThanOrEqual(1);
 	});
 
 	test('returns more tiles for larger viewport', () => {
-		const small = calculateTileGrid(256, 256, new Point2D(0, 0), 2);
-		const large = calculateTileGrid(2048, 2048, new Point2D(0, 0), 2);
+		const small = calculateTileGrid(256, 256, [0, 0], 2);
+		const large = calculateTileGrid(2048, 2048, [0, 0], 2);
 		expect(large.tiles.length).toBeGreaterThan(small.tiles.length);
 	});
 
 	test('tiles have integer x and y coordinates', () => {
-		const grid = calculateTileGrid(800, 600, new Point2D(13.4, 52.5), 5);
+		const grid = calculateTileGrid(800, 600, [13.4, 52.5], 5);
 		for (const tile of grid.tiles) {
 			expect(Number.isInteger(tile.x)).toBe(true);
 			expect(Number.isInteger(tile.y)).toBe(true);
@@ -53,7 +52,7 @@ describe('calculateTileGrid', () => {
 	});
 
 	test('tile offsets are numeric', () => {
-		const grid = calculateTileGrid(800, 600, new Point2D(13.4, 52.5), 5);
+		const grid = calculateTileGrid(800, 600, [13.4, 52.5], 5);
 		for (const tile of grid.tiles) {
 			expect(typeof tile.offsetX).toBe('number');
 			expect(typeof tile.offsetY).toBe('number');

@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { Point2D } from '../lib/geometry.js';
 import type { SVGRenderer } from '../renderer/renderer_svg.js';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { RenderJob } from '../renderer/renderer_svg.js';
@@ -23,7 +22,7 @@ afterEach(() => {
 function makeJob(sources: Record<string, unknown>): RenderJob {
 	return {
 		renderer: { width: 512, height: 512 } as SVGRenderer,
-		view: { zoom: 2, center: new Point2D(0, 0) },
+		view: { zoom: 2, center: [0, 0] },
 		style: { sources, version: 8, layers: [] } as unknown as StyleSpecification,
 	};
 }
@@ -56,7 +55,7 @@ describe('getLayerFeatures', () => {
 			512,
 			512,
 			2,
-			expect.any(Point2D),
+			[0, 0],
 			expect.any(Map),
 		);
 	});
