@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { chromium } from 'playwright';
+import { ensureCacheDir, readCache, writeCache } from './fetch-cache.js';
 
 const MAPLIBRE_VERSION = '5.5.0';
 
@@ -15,6 +16,29 @@ const browser = await chromium.launch({
 const page = await browser.newPage({
 	viewport: { width: 800, height: 600 },
 	deviceScaleFactor: 1,
+});
+
+// Cache external network requests (unpkg.com)
+ensureCacheDir();
+await page.route('https://unpkg.com/**', async (route) => {
+	const url = route.request().url();
+	const cached = readCache(url);
+	if (cached) {
+		await route.fulfill({
+			status: cached.status,
+			contentType: cached.contentType,
+			body: Buffer.from(cached.body, 'base64'),
+		});
+		return;
+	}
+	const response = await route.fetch();
+	const body = await response.body();
+	writeCache(url, {
+		status: response.status(),
+		contentType: response.headers()['content-type'] ?? 'application/octet-stream',
+		body: body.toString('base64'),
+	});
+	await route.fulfill({ response, body });
 });
 
 // Serve the plugin bundle via route interception

@@ -6,7 +6,8 @@ import { PNG } from 'pngjs';
 import { styles } from '@versatiles/style';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import { renderToSVG } from '../src/index.js';
-import { installFetchCache } from './fetch-cache.js';
+import type { Page } from 'playwright';
+import { ensureCacheDir, installFetchCache, readCache, writeCache } from './fetch-cache.js';
 
 installFetchCache();
 
@@ -67,6 +68,31 @@ const browser = await chromium.launch({
 	args: ['--use-gl=angle', '--use-angle=swiftshader'],
 });
 
+// Cache browser network requests (unpkg.com, tile servers)
+ensureCacheDir();
+async function installPageCache(page: Page): Promise<void> {
+	await page.route('https://**', async (route) => {
+		const url = route.request().url();
+		const cached = readCache(url);
+		if (cached) {
+			await route.fulfill({
+				status: cached.status,
+				contentType: cached.contentType,
+				body: Buffer.from(cached.body, 'base64'),
+			});
+			return;
+		}
+		const response = await route.fetch();
+		const body = await response.body();
+		writeCache(url, {
+			status: response.status(),
+			contentType: response.headers()['content-type'] ?? 'application/octet-stream',
+			body: body.toString('base64'),
+		});
+		await route.fulfill({ response, body });
+	});
+}
+
 // Generate SVG screenshots
 console.log('\n--- SVG Screenshots ---');
 const svgSizes = new Map<string, number>();
@@ -107,6 +133,7 @@ for (const region of regions) {
 		viewport: { width: WIDTH, height: HEIGHT },
 		deviceScaleFactor: 1,
 	});
+	await installPageCache(page);
 
 	await page.setContent(`<!DOCTYPE html>
 <html><head>

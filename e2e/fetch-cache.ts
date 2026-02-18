@@ -4,21 +4,41 @@ import { resolve } from 'node:path';
 
 const CACHE_DIR = resolve(import.meta.dirname, '.cache');
 
-interface CachedResponse {
+export interface CachedResponse {
 	status: number;
 	contentType: string;
 	body: string; // base64
 }
 
+function getCachePath(url: string): string {
+	const hash = createHash('sha256').update(url).digest('hex').slice(0, 16);
+	return resolve(CACHE_DIR, hash + '.json');
+}
+
+export function ensureCacheDir(): void {
+	mkdirSync(CACHE_DIR, { recursive: true });
+}
+
+export function readCache(url: string): CachedResponse | null {
+	const cachePath = getCachePath(url);
+	if (!existsSync(cachePath)) return null;
+	return JSON.parse(readFileSync(cachePath, 'utf-8')) as CachedResponse;
+}
+
+export function writeCache(url: string, entry: CachedResponse): void {
+	writeFileSync(getCachePath(url), JSON.stringify(entry));
+}
+
+// --- Node.js fetch patching ---
+
 const originalFetch = globalThis.fetch;
 
 function cachedFetch(input: string | URL | Request, init?: RequestInit): Promise<Response> {
-	const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
-	const hash = createHash('sha256').update(url).digest('hex').slice(0, 16);
-	const cachePath = resolve(CACHE_DIR, hash + '.json');
+	const url =
+		typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
-	if (existsSync(cachePath)) {
-		const cached = JSON.parse(readFileSync(cachePath, 'utf-8')) as CachedResponse;
+	const cached = readCache(url);
+	if (cached) {
 		const body = Buffer.from(cached.body, 'base64');
 		return Promise.resolve(
 			new Response(body, {
@@ -31,21 +51,21 @@ function cachedFetch(input: string | URL | Request, init?: RequestInit): Promise
 	return originalFetch(input, init).then(async (response) => {
 		const buffer = await response.arrayBuffer();
 		const contentType = response.headers.get('content-type') ?? 'application/octet-stream';
-		const cached: CachedResponse = {
+		const entry: CachedResponse = {
 			status: response.status,
 			contentType,
 			body: Buffer.from(buffer).toString('base64'),
 		};
-		writeFileSync(cachePath, JSON.stringify(cached));
+		writeCache(url, entry);
 		return new Response(buffer, {
-			status: cached.status,
+			status: entry.status,
 			headers: { 'content-type': contentType },
 		});
 	});
 }
 
 export function installFetchCache(): void {
-	mkdirSync(CACHE_DIR, { recursive: true });
+	ensureCacheDir();
 	globalThis.fetch = cachedFetch as typeof fetch;
 }
 

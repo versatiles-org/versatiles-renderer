@@ -61,7 +61,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e:maplibre": "tsx e2e/maplibre-control.ts",
     "test:e2e:screenshots": "tsx e2e/screenshots.ts",
-    "test:e2e": "npm run test:e2e:maplibre && npm run test:e2e:screenshots",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts && npm run test:e2e:maplibre && npm run test:e2e:screenshots",
     "test": "vitest run",
     "upgrade": "npm-check-updates -u -t minor; rm -f package-lock.json; rm -rf node_modules; npm i"
   },
