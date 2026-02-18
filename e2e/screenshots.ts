@@ -316,7 +316,7 @@ const rows = results
 			diff: ${r.diffPercent.toFixed(2)}%
 		</span>
 	</td>
-	<td><a href="svg/${r.id}.svg"><img src="svg/${r.id}.svg" width="${WIDTH / 2}" height="${HEIGHT / 2}"></a></td>
+	<td><a href="svg/${r.id}.svg"><img src="svg/${r.id}.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></a></td>
 	<td><a href="maplibre/${r.id}.png"><img src="maplibre/${r.id}.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></a></td>
 	<td><a href="diff/${r.id}.png"><img src="diff/${r.id}.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></a></td>
 </tr>`;
