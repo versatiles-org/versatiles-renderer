@@ -136,11 +136,11 @@ subgraph 0["src"]
 subgraph 3["processor"]
 4["render.ts"]
 F["styles.ts"]
+G["style_layer.ts"]
 end
 subgraph 5["lib"]
 6["color.ts"]
 A["geometry.ts"]
-G["style_layer.ts"]
 end
 subgraph 7["sources"]
 8["index.ts"]
