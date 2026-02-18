@@ -71,24 +71,10 @@ export class Color {
 
 	public get hex(): string {
 		return `#${d2h(this.values[0])}${d2h(this.values[1])}${d2h(this.values[2])}${this.values[3] === 255 ? '' : d2h(this.values[3])}`;
-
-		function d2h(num: number): string {
-			if (num < 0) num = 0;
-			if (num > 255) num = 255;
-			const str = Math.round(num).toString(16).toUpperCase();
-			return str.length < 2 ? '0' + str : str;
-		}
 	}
 
 	public get rgb(): string {
 		return `#${d2h(this.values[0])}${d2h(this.values[1])}${d2h(this.values[2])}`;
-
-		function d2h(num: number): string {
-			if (num < 0) num = 0;
-			if (num > 255) num = 255;
-			const str = Math.round(num).toString(16).toUpperCase();
-			return str.length < 2 ? '0' + str : str;
-		}
 	}
 
 	public get opacity(): number {
@@ -106,4 +92,11 @@ export class Color {
 	public clone(): Color {
 		return new Color(...this.values);
 	}
+}
+
+function d2h(num: number): string {
+	if (num < 0) num = 0;
+	if (num > 255) num = 255;
+	const str = Math.round(num).toString(16).toUpperCase();
+	return str.length < 2 ? '0' + str : str;
 }
