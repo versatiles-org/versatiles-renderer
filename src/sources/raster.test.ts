@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { getRasterTiles } from './raster.js';
-import type { RenderJob } from '../renderer/svg.js';
-import type { SVGRenderer } from '../renderer/svg.js';
+import type { RenderJob, Renderer } from '../renderer/svg.js';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 
 afterEach(() => {
@@ -10,7 +9,7 @@ afterEach(() => {
 
 function makeJob(sources: Record<string, unknown>): RenderJob {
 	return {
-		renderer: { width: 512, height: 512 } as SVGRenderer,
+		renderer: { width: 512, height: 512 } as Renderer,
 		view: { zoom: 0, center: [0, 0] },
 		style: { sources, version: 8, layers: [] } as unknown as StyleSpecification,
 	};
@@ -72,7 +71,7 @@ describe('getRasterTiles', () => {
 		mockFetchPng();
 
 		const job: RenderJob = {
-			renderer: { width: 512, height: 512 } as SVGRenderer,
+			renderer: { width: 512, height: 512 } as Renderer,
 			view: { zoom: 10, center: [13.4, 52.5] },
 			style: {
 				sources: { raster: { type: 'raster', tiles: ['https://a/{z}/{x}/{y}.png'], maxzoom: 3 } },

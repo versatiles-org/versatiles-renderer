@@ -41,7 +41,9 @@ function greedyChain(segments: Segment[]): Segment[] {
 		visited.add(seg);
 		const chain: Segment = [...seg];
 		let endPoint = chain[chain.length - 1];
-		let candidates = endPoint ? byStart.get(String(endPoint[0]) + ',' + String(endPoint[1])) : undefined;
+		let candidates = endPoint
+			? byStart.get(String(endPoint[0]) + ',' + String(endPoint[1]))
+			: undefined;
 		while (candidates) {
 			let next: Segment | undefined;
 			for (const c of candidates) {
@@ -54,7 +56,9 @@ function greedyChain(segments: Segment[]): Segment[] {
 			visited.add(next);
 			for (let i = 1; i < next.length; i++) chain.push(next[i]!);
 			endPoint = chain[chain.length - 1];
-			candidates = endPoint ? byStart.get(String(endPoint[0]) + ',' + String(endPoint[1])) : undefined;
+			candidates = endPoint
+				? byStart.get(String(endPoint[0]) + ',' + String(endPoint[1]))
+				: undefined;
 		}
 		chains.push(chain);
 	}

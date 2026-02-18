@@ -1,15 +1,26 @@
 import type { Color as MaplibreColor, StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
-import type { SVGRenderer } from './svg.js';
+import type { Feature } from '../geometry.js';
 
 export interface View {
 	center: [number, number];
 	zoom: number;
 }
 
+export interface Renderer {
+	readonly width: number;
+	readonly height: number;
+	drawBackgroundFill(style: BackgroundStyle): void;
+	drawPolygons(features: [Feature, FillStyle][]): void;
+	drawLineStrings(features: [Feature, LineStyle][]): void;
+	drawCircles(features: [Feature, CircleStyle][]): void;
+	drawRasterTiles(tiles: RasterTile[], style: RasterStyle): void;
+	getString(): string;
+}
+
 export interface RenderJob {
 	style: StyleSpecification;
 	view: View;
-	renderer: SVGRenderer;
+	renderer: Renderer;
 }
 
 export interface RendererOptions {
@@ -25,6 +36,7 @@ export interface BackgroundStyle {
 
 export interface FillStyle {
 	color: MaplibreColor;
+	opacity: number;
 	translate: [number, number];
 }
 
@@ -35,12 +47,14 @@ export interface LineStyle {
 	join: 'bevel' | 'miter' | 'round';
 	miterLimit: number;
 	offset: number;
+	opacity: number;
 	translate: [number, number];
 	width: number;
 }
 
 export interface CircleStyle {
 	color: MaplibreColor;
+	opacity: number;
 	radius: number;
 	translate: [number, number];
 	strokeWidth: number;

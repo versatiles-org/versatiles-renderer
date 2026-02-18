@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import type { SVGRenderer } from '../renderer/svg.js';
+import type { Renderer, RenderJob } from '../renderer/svg.js';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
-import type { RenderJob } from '../renderer/svg.js';
 
 vi.mock('./vector.js', () => ({
 	loadVectorSource: vi.fn(),
@@ -21,7 +20,7 @@ afterEach(() => {
 
 function makeJob(sources: Record<string, unknown>): RenderJob {
 	return {
-		renderer: { width: 512, height: 512 } as SVGRenderer,
+		renderer: { width: 512, height: 512 } as Renderer,
 		view: { zoom: 2, center: [0, 0] },
 		style: { sources, version: 8, layers: [] } as unknown as StyleSpecification,
 	};
@@ -49,15 +48,16 @@ describe('getLayerFeatures', () => {
 		const job = makeJob({ geo: { type: 'geojson', data: geojsonData } });
 		await getLayerFeatures(job);
 
-		expect(loadGeoJSONSource).toHaveBeenCalledWith(
-			'geo',
-			geojsonData,
-			512,
-			512,
-			2,
-			[0, 0],
-			expect.any(Map),
-		);
+		expect(loadGeoJSONSource).toHaveBeenCalledWith({
+			sourceName: 'geo',
+			data: geojsonData,
+			width: 512,
+			height: 512,
+			zoom: 2,
+			center: [0, 0],
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			layerFeatures: expect.any(Map),
+		});
 	});
 
 	test('skips geojson sources without data', async () => {

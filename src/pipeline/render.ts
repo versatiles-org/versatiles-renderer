@@ -1,8 +1,4 @@
-import {
-	featureFilter,
-	type Feature,
-	type Color as MaplibreColor,
-} from '@maplibre/maplibre-gl-style-spec';
+import { type Feature, type Color as MaplibreColor } from '@maplibre/maplibre-gl-style-spec';
 import { getLayerFeatures, getRasterTiles } from '../sources/index.js';
 import { getLayerStyles } from './style_layer.js';
 import type { PossiblyEvaluatedPropertyValue, StyleLayer } from './style_layer.js';
@@ -46,20 +42,20 @@ async function render(job: RenderJob): Promise<void> {
 			return value;
 		}
 
-		function getPaint<T>(key: string, feature?: Feature): T {
-			return getStyleValue(layerStyle.paint, key, feature) as T;
+		function getPaint(key: string, feature?: Feature): unknown {
+			return getStyleValue(layerStyle.paint, key, feature);
 		}
 
-		function getLayout<T>(key: string, feature?: Feature): T {
-			return getStyleValue(layerStyle.layout, key, feature) as T;
+		function getLayout(key: string, feature?: Feature): unknown {
+			return getStyleValue(layerStyle.layout, key, feature);
 		}
 
 		switch (layerStyle.type) {
 			case 'background':
 				{
 					renderer.drawBackgroundFill({
-						color: getPaint<MaplibreColor>('background-color'),
-						opacity: getPaint<number>('background-opacity'),
+						color: getPaint('background-color') as MaplibreColor,
+						opacity: getPaint('background-opacity') as number,
 					});
 				}
 				continue;
@@ -67,8 +63,9 @@ async function render(job: RenderJob): Promise<void> {
 				{
 					const polygons = getFeatures(layerFeatures, layerStyle)?.polygons;
 					if (!polygons || polygons.length === 0) continue;
-					const filter = featureFilter(layerStyle.filter);
-					const polygonFeatures = polygons.filter((feature) => filter.filter({ zoom }, feature));
+					const polygonFeatures = layerStyle.filterFn
+						? polygons.filter((feature) => layerStyle.filterFn!.filter({ zoom }, feature))
+						: polygons;
 
 					if (polygonFeatures.length === 0) continue;
 
@@ -76,11 +73,11 @@ async function render(job: RenderJob): Promise<void> {
 						polygonFeatures.map((feature) => [
 							feature,
 							{
-								color: getPaint<MaplibreColor>('fill-color', feature),
-								translate: getPaint<[number, number]>('fill-translate', feature),
+								color: getPaint('fill-color', feature) as MaplibreColor,
+								opacity: getPaint('fill-opacity', feature) as number,
+								translate: getPaint('fill-translate', feature) as [number, number],
 							},
 						]),
-						getPaint<number>('fill-opacity', polygonFeatures[0]),
 					);
 				}
 				continue;
@@ -88,10 +85,9 @@ async function render(job: RenderJob): Promise<void> {
 				{
 					const lineStrings = getFeatures(layerFeatures, layerStyle)?.linestrings;
 					if (!lineStrings || lineStrings.length === 0) continue;
-					const filter = featureFilter(layerStyle.filter);
-					const lineStringFeatures = lineStrings.filter((feature) =>
-						filter.filter({ zoom }, feature),
-					);
+					const lineStringFeatures = layerStyle.filterFn
+						? lineStrings.filter((feature) => layerStyle.filterFn!.filter({ zoom }, feature))
+						: lineStrings;
 
 					if (lineStringFeatures.length === 0) continue;
 
@@ -99,17 +95,17 @@ async function render(job: RenderJob): Promise<void> {
 						lineStringFeatures.map((feature) => [
 							feature,
 							{
-								color: getPaint<MaplibreColor>('line-color', feature),
-								translate: getPaint<[number, number]>('line-translate', feature),
-								cap: getLayout<'butt' | 'round' | 'square'>('line-cap', feature),
-								dasharray: getPaint<number[] | undefined>('line-dasharray', feature),
-								join: getLayout<'bevel' | 'miter' | 'round'>('line-join', feature),
-								miterLimit: getLayout<number>('line-miter-limit', feature),
-								offset: getPaint<number>('line-offset', feature),
-								width: getPaint<number>('line-width', feature),
+								color: getPaint('line-color', feature) as MaplibreColor,
+								translate: getPaint('line-translate', feature) as [number, number],
+								cap: getLayout('line-cap', feature) as 'butt' | 'round' | 'square',
+								dasharray: getPaint('line-dasharray', feature) as number[] | undefined,
+								join: getLayout('line-join', feature) as 'bevel' | 'miter' | 'round',
+								miterLimit: getLayout('line-miter-limit', feature) as number,
+								offset: getPaint('line-offset', feature) as number,
+								opacity: getPaint('line-opacity', feature) as number,
+								width: getPaint('line-width', feature) as number,
 							},
 						]),
-						getPaint<number>('line-opacity', lineStringFeatures[0]),
 					);
 				}
 				continue;
@@ -117,13 +113,13 @@ async function render(job: RenderJob): Promise<void> {
 				{
 					const tiles = await getRasterTiles(job, layerStyle.source);
 					renderer.drawRasterTiles(tiles, {
-						opacity: getPaint<number>('raster-opacity'),
-						hueRotate: getPaint<number>('raster-hue-rotate'),
-						brightnessMin: getPaint<number>('raster-brightness-min'),
-						brightnessMax: getPaint<number>('raster-brightness-max'),
-						saturation: getPaint<number>('raster-saturation'),
-						contrast: getPaint<number>('raster-contrast'),
-						resampling: getPaint<'linear' | 'nearest'>('raster-resampling'),
+						opacity: getPaint('raster-opacity') as number,
+						hueRotate: getPaint('raster-hue-rotate') as number,
+						brightnessMin: getPaint('raster-brightness-min') as number,
+						brightnessMax: getPaint('raster-brightness-max') as number,
+						saturation: getPaint('raster-saturation') as number,
+						contrast: getPaint('raster-contrast') as number,
+						resampling: getPaint('raster-resampling') as 'linear' | 'nearest',
 					});
 				}
 				continue;
@@ -131,8 +127,9 @@ async function render(job: RenderJob): Promise<void> {
 				{
 					const points = getFeatures(layerFeatures, layerStyle)?.points;
 					if (!points || points.length === 0) continue;
-					const filter = featureFilter(layerStyle.filter);
-					const pointFeatures = points.filter((feature) => filter.filter({ zoom }, feature));
+					const pointFeatures = layerStyle.filterFn
+						? points.filter((feature) => layerStyle.filterFn!.filter({ zoom }, feature))
+						: points;
 
 					if (pointFeatures.length === 0) continue;
 
@@ -140,14 +137,14 @@ async function render(job: RenderJob): Promise<void> {
 						pointFeatures.map((feature) => [
 							feature,
 							{
-								color: getPaint<MaplibreColor>('circle-color', feature),
-								radius: getPaint<number>('circle-radius', feature),
-								translate: getPaint<[number, number]>('circle-translate', feature),
-								strokeWidth: getPaint<number>('circle-stroke-width', feature),
-								strokeColor: getPaint<MaplibreColor>('circle-stroke-color', feature),
+								color: getPaint('circle-color', feature) as MaplibreColor,
+								opacity: getPaint('circle-opacity', feature) as number,
+								radius: getPaint('circle-radius', feature) as number,
+								translate: getPaint('circle-translate', feature) as [number, number],
+								strokeWidth: getPaint('circle-stroke-width', feature) as number,
+								strokeColor: getPaint('circle-stroke-color', feature) as MaplibreColor,
 							},
 						]),
-						getPaint<number>('circle-opacity', pointFeatures[0]),
 					);
 				}
 				continue;

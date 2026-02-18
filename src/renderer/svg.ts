@@ -19,6 +19,7 @@ export type {
 	LineStyle,
 	RasterStyle,
 	RasterTile,
+	Renderer,
 	RenderJob,
 	RendererOptions,
 	View,
@@ -49,14 +50,12 @@ export class SVGRenderer {
 		this.#backgroundColor = color;
 	}
 
-	public drawPolygons(features: [Feature, FillStyle][], opacity: number): void {
+	public drawPolygons(features: [Feature, FillStyle][]): void {
 		if (features.length === 0) return;
-		if (opacity <= 0) return;
-
-		this.#svg.push(`<g opacity="${String(opacity)}">`);
 
 		const groups = new Map<string, { segments: Segment[]; attrs: string }>();
 		features.forEach(([feature, style]) => {
+			if (style.opacity <= 0) return;
 			const color = new Color(style.color);
 			if (color.alpha <= 0) return;
 
@@ -64,11 +63,12 @@ export class SVGRenderer {
 				style.translate[0] === 0 && style.translate[1] === 0
 					? ''
 					: ` transform="translate(${formatPoint(style.translate, this.#scale)})"`;
-			const key = color.hex + translate;
+			const opacityAttr = style.opacity < 1 ? ` opacity="${style.opacity.toFixed(3)}"` : '';
+			const key = color.hex + translate + opacityAttr;
 
 			let group = groups.get(key);
 			if (!group) {
-				group = { segments: [], attrs: `${fillAttr(color)}${translate}` };
+				group = { segments: [], attrs: `${fillAttr(color)}${translate}${opacityAttr}` };
 				groups.set(key, group);
 			}
 			feature.geometry.forEach((ring) => {
@@ -80,18 +80,14 @@ export class SVGRenderer {
 			const d = segmentsToPath(segments, true);
 			this.#svg.push(`<path d="${d}" ${attrs} />`);
 		}
-
-		this.#svg.push('</g>');
 	}
 
-	public drawLineStrings(features: [Feature, LineStyle][], opacity: number): void {
+	public drawLineStrings(features: [Feature, LineStyle][]): void {
 		if (features.length === 0) return;
-		if (opacity <= 0) return;
-
-		this.#svg.push(`<g opacity="${String(opacity)}">`);
 
 		const groups = new Map<string, { segments: Segment[]; attrs: string }>();
 		features.forEach(([feature, style]) => {
+			if (style.opacity <= 0) return;
 			const color = new Color(style.color);
 			if (style.width <= 0 || color.alpha <= 0) return;
 
@@ -103,6 +99,7 @@ export class SVGRenderer {
 			const dasharrayStr = style.dasharray
 				? style.dasharray.map((v) => formatScaled(v * style.width, this.#scale)).join(',')
 				: '';
+			const opacityAttr = style.opacity < 1 ? ` opacity="${style.opacity.toFixed(3)}"` : '';
 			const key = [
 				color.hex,
 				roundedWidth,
@@ -110,6 +107,7 @@ export class SVGRenderer {
 				style.join,
 				String(style.miterLimit),
 				dasharrayStr,
+				opacityAttr,
 				translate,
 			].join('\0');
 
@@ -125,7 +123,7 @@ export class SVGRenderer {
 				if (dasharrayStr) attrs.push(`stroke-dasharray="${dasharrayStr}"`);
 				group = {
 					segments: [],
-					attrs: attrs.join(' ') + translate,
+					attrs: attrs.join(' ') + translate + opacityAttr,
 				};
 				groups.set(key, group);
 			}
@@ -140,18 +138,14 @@ export class SVGRenderer {
 			const d = segmentsToPath(chains);
 			this.#svg.push(`<path d="${d}" ${attrs} />`);
 		}
-
-		this.#svg.push('</g>');
 	}
 
-	public drawCircles(features: [Feature, CircleStyle][], opacity: number): void {
+	public drawCircles(features: [Feature, CircleStyle][]): void {
 		if (features.length === 0) return;
-		if (opacity <= 0) return;
-
-		this.#svg.push(`<g opacity="${String(opacity)}">`);
 
 		const groups = new Map<string, { points: [number, number][]; attrs: string }>();
 		features.forEach(([feature, style]) => {
+			if (style.opacity <= 0) return;
 			const color = new Color(style.color);
 			if (style.radius <= 0 || color.alpha <= 0) return;
 
@@ -165,13 +159,14 @@ export class SVGRenderer {
 				style.strokeWidth > 0
 					? ` ${strokeAttr(strokeColor, formatScaled(style.strokeWidth, this.#scale))}`
 					: '';
-			const key = [color.hex, roundedRadius, strokeAttrs, translate].join('\0');
+			const opacityAttr = style.opacity < 1 ? ` opacity="${style.opacity.toFixed(3)}"` : '';
+			const key = [color.hex, roundedRadius, strokeAttrs, opacityAttr, translate].join('\0');
 
 			let group = groups.get(key);
 			if (!group) {
 				group = {
 					points: [],
-					attrs: `r="${roundedRadius}" ${fillAttr(color)}${strokeAttrs}${translate}`,
+					attrs: `r="${roundedRadius}" ${fillAttr(color)}${strokeAttrs}${translate}${opacityAttr}`,
 				};
 				groups.set(key, group);
 			}
@@ -186,8 +181,6 @@ export class SVGRenderer {
 				this.#svg.push(`<circle cx="${formatNum(x)}" cy="${formatNum(y)}" ${attrs} />`);
 			}
 		}
-
-		this.#svg.push('</g>');
 	}
 
 	public drawRasterTiles(tiles: RasterTile[], style: RasterStyle): void {

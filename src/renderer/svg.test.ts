@@ -89,20 +89,18 @@ describe('SVGRenderer', () => {
 					[0, 10],
 				],
 			]);
-			const style = { color: mc('#336699'), translate: [0, 0] as [number, number] };
-			r.drawPolygons([[feature, style]], 1);
+			const style = { color: mc('#336699'), opacity: 1, translate: [0, 0] as [number, number] };
+			r.drawPolygons([[feature, style]]);
 			const svg = r.getString();
 			expect(svg).toContain('<path d=');
 			expect(svg).toContain('fill="#336699"');
-			expect(svg).toContain('<g opacity="1">');
 		});
 
 		test('empty features produce no output', () => {
 			const r = makeRenderer();
-			r.drawPolygons([], 1);
+			r.drawPolygons([]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
-			expect(svg).not.toContain('<g opacity');
 		});
 
 		test('zero opacity produces no output', () => {
@@ -114,8 +112,8 @@ describe('SVGRenderer', () => {
 					[10, 10],
 				],
 			]);
-			const style = { color: mc('#336699'), translate: [0, 0] as [number, number] };
-			r.drawPolygons([[feature, style]], 0);
+			const style = { color: mc('#336699'), opacity: 0, translate: [0, 0] as [number, number] };
+			r.drawPolygons([[feature, style]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
 		});
@@ -129,8 +127,12 @@ describe('SVGRenderer', () => {
 					[10, 10],
 				],
 			]);
-			const style = { color: new Color(0, 0, 0, 0), translate: [0, 0] as [number, number] };
-			r.drawPolygons([[feature, style]], 1);
+			const style = {
+				color: new Color(0, 0, 0, 0),
+				opacity: 1,
+				translate: [0, 0] as [number, number],
+			};
+			r.drawPolygons([[feature, style]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
 		});
@@ -151,10 +153,11 @@ describe('SVGRenderer', () => {
 				join: 'round' as const,
 				miterLimit: 2,
 				offset: 0,
+				opacity: 1,
 				translate: [0, 0] as [number, number],
 				width: 2,
 			};
-			r.drawLineStrings([[feature, style]], 1);
+			r.drawLineStrings([[feature, style]]);
 			const svg = r.getString();
 			expect(svg).toContain('<path d=');
 			expect(svg).toContain('fill="none"');
@@ -165,7 +168,7 @@ describe('SVGRenderer', () => {
 
 		test('empty features produce no output', () => {
 			const r = makeRenderer();
-			r.drawLineStrings([], 1);
+			r.drawLineStrings([]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
 		});
@@ -184,10 +187,11 @@ describe('SVGRenderer', () => {
 				join: 'miter' as const,
 				miterLimit: 2,
 				offset: 0,
+				opacity: 0,
 				translate: [0, 0] as [number, number],
 				width: 1,
 			};
-			r.drawLineStrings([[feature, style]], 0);
+			r.drawLineStrings([[feature, style]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
 		});
@@ -206,10 +210,11 @@ describe('SVGRenderer', () => {
 				join: 'miter' as const,
 				miterLimit: 2,
 				offset: 0,
+				opacity: 1,
 				translate: [0, 0] as [number, number],
 				width: 0,
 			};
-			r.drawLineStrings([[feature, style]], 1);
+			r.drawLineStrings([[feature, style]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
 		});
@@ -227,6 +232,7 @@ describe('SVGRenderer', () => {
 		function defaultCircleStyle(overrides: Partial<CircleStyle> = {}): CircleStyle {
 			return {
 				color: mc('#FF0000'),
+				opacity: 1,
 				radius: 5,
 				translate: [0, 0] as [number, number],
 				strokeWidth: 0,
@@ -238,28 +244,26 @@ describe('SVGRenderer', () => {
 		test('generates circle elements with correct attributes', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
-			r.drawCircles([[feature, defaultCircleStyle()]], 1);
+			r.drawCircles([[feature, defaultCircleStyle()]]);
 			const svg = r.getString();
 			expect(svg).toContain('<circle');
 			expect(svg).toContain('cx=');
 			expect(svg).toContain('cy=');
-			expect(svg).toContain('r="5.000"');
+			expect(svg).toContain('r="5"');
 			expect(svg).toContain('fill="#FF0000"');
-			expect(svg).toContain('<g opacity="1">');
 		});
 
 		test('empty features produce no output', () => {
 			const r = makeRenderer();
-			r.drawCircles([], 1);
+			r.drawCircles([]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<circle');
-			expect(svg).not.toContain('<g opacity');
 		});
 
 		test('zero opacity produces no output', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
-			r.drawCircles([[feature, defaultCircleStyle()]], 0);
+			r.drawCircles([[feature, defaultCircleStyle({ opacity: 0 })]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<circle');
 		});
@@ -267,7 +271,7 @@ describe('SVGRenderer', () => {
 		test('zero-radius circles produce no output', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
-			r.drawCircles([[feature, defaultCircleStyle({ radius: 0 })]], 1);
+			r.drawCircles([[feature, defaultCircleStyle({ radius: 0 })]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<circle');
 		});
@@ -275,19 +279,18 @@ describe('SVGRenderer', () => {
 		test('stroke attributes appear when strokeWidth > 0', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
-			r.drawCircles(
-				[[feature, defaultCircleStyle({ strokeWidth: 2, strokeColor: mc('#00FF00') })]],
-				1,
-			);
+			r.drawCircles([
+				[feature, defaultCircleStyle({ strokeWidth: 2, strokeColor: mc('#00FF00') })],
+			]);
 			const svg = r.getString();
 			expect(svg).toContain('stroke="#00FF00"');
-			expect(svg).toContain('stroke-width="2.000"');
+			expect(svg).toContain('stroke-width="2"');
 		});
 
 		test('no stroke attributes when strokeWidth is 0', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
-			r.drawCircles([[feature, defaultCircleStyle({ strokeWidth: 0 })]], 1);
+			r.drawCircles([[feature, defaultCircleStyle({ strokeWidth: 0 })]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('stroke=');
 			expect(svg).not.toContain('stroke-width=');
