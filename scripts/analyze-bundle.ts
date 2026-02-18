@@ -81,7 +81,8 @@ if (depTracers.size > 0) {
 		idx = newSources.length;
 		const dep = depTracers.get(depIdx);
 		newSources.push(dep.resolvedSources[origSourceIdx] ?? '[unknown]');
-		newSourcesContent[idx] = (dep.depMap.sourcesContent?.[origSourceIdx] as string | undefined) ?? null;
+		newSourcesContent[idx] =
+			(dep.depMap.sourcesContent?.[origSourceIdx] as string | undefined) ?? null;
 		sourceIndexMap.set(key, idx);
 		return idx;
 	}
@@ -92,7 +93,10 @@ if (depTracers.size > 0) {
 			const dep = depTracers.get(seg[1]);
 			if (!dep) continue;
 
-			const result = originalPositionFor(dep.tracer, { line: (seg[2] ?? 0) + 1, column: seg[3] ?? 0 });
+			const result = originalPositionFor(dep.tracer, {
+				line: (seg[2] ?? 0) + 1,
+				column: seg[3] ?? 0,
+			});
 			if (result.source != null) {
 				const origIdx = dep.depMap.sources.indexOf(result.source);
 				if (origIdx >= 0) {
