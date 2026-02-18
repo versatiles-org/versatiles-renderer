@@ -5,22 +5,24 @@ describe('Color', () => {
 	describe('constructor', () => {
 		test('from #RRGGBB hex string', () => {
 			const c = new Color('#FF8040');
-			expect(c.values).toEqual([255, 128, 64, 255]);
+			expect(c.hex).toBe('#FF8040');
+			expect(c.alpha).toBe(255);
 		});
 
 		test('from #RRGGBBAA hex string', () => {
 			const c = new Color('#FF804080');
-			expect(c.values).toEqual([255, 128, 64, 128]);
+			expect(c.hex).toBe('#FF804080');
 		});
 
 		test('from RGB numbers', () => {
 			const c = new Color(10, 20, 30);
-			expect(c.values).toEqual([10, 20, 30, 255]);
+			expect(c.hex).toBe('#0A141E');
+			expect(c.alpha).toBe(255);
 		});
 
 		test('from RGBA numbers', () => {
 			const c = new Color(10, 20, 30, 40);
-			expect(c.values).toEqual([10, 20, 30, 40]);
+			expect(c.hex).toBe('#0A141E28');
 		});
 
 		test('throws on invalid string', () => {
@@ -113,7 +115,7 @@ describe('Color', () => {
 		test('returns an independent copy', () => {
 			const c = new Color(10, 20, 30, 40);
 			const copy = c.clone();
-			expect(copy.values).toEqual(c.values);
+			expect(copy.hex).toBe(c.hex);
 			copy.alpha = 200;
 			expect(c.alpha).toBe(40);
 		});
@@ -122,7 +124,8 @@ describe('Color', () => {
 	describe('transparent', () => {
 		test('returns a fully transparent color', () => {
 			const c = Color.transparent;
-			expect(c.values).toEqual([0, 0, 0, 0]);
+			expect(c.alpha).toBe(0);
+			expect(c.rgb).toBe('#000000');
 		});
 	});
 });

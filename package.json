@@ -66,6 +66,7 @@
     "test": "vitest run",
     "upgrade": "npm-check-updates -u -t minor; rm -f package-lock.json; rm -rf node_modules; npm i"
   },
+  "sideEffects": false,
   "type": "module",
   "author": "Michael Kreil <versatiles@michael-kreil.de>",
   "license": "MIT",

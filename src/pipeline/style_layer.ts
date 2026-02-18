@@ -155,8 +155,5 @@ export function createStyleLayer(spec: LayerSpecification): StyleLayer {
 }
 
 export function getLayerStyles(layers: LayerSpecification[]): StyleLayer[] {
-	return layers.map((layerSpecification) => {
-		const styleLayer = createStyleLayer(layerSpecification);
-		return styleLayer;
-	});
+	return layers.map(createStyleLayer);
 }
