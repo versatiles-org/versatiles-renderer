@@ -60,6 +60,8 @@ export class Feature implements MapLibreFeature {
 
 	public readonly geometry: Geometry;
 
+	#bbox: Bbox | undefined;
+
 	public constructor(opt: {
 		type: 'LineString' | 'Point' | 'Polygon';
 		id?: unknown;
@@ -75,6 +77,7 @@ export class Feature implements MapLibreFeature {
 	}
 
 	public getBbox(): Bbox {
+		if (this.#bbox) return this.#bbox;
 		let xMin = Infinity;
 		let yMin = Infinity;
 		let xMax = -Infinity;
@@ -87,7 +90,8 @@ export class Feature implements MapLibreFeature {
 				if (yMax < point.y) yMax = point.y;
 			});
 		});
-		return [xMin, yMin, xMax, yMax];
+		this.#bbox = [xMin, yMin, xMax, yMax];
+		return this.#bbox;
 	}
 
 	public doesOverlap(bbox: Bbox): boolean {
