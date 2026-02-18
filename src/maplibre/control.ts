@@ -226,7 +226,11 @@ export class SVGExportControl implements IControl {
 		} catch (error: unknown) {
 			if (this.renderGeneration !== generation) return;
 			const message = error instanceof Error ? error.message : 'Unknown error';
-			previewContainer.innerHTML = `<span class="preview-loading">Error: ${message}</span>`;
+			const errorSpan = document.createElement('span');
+			errorSpan.className = 'preview-loading';
+			errorSpan.textContent = `Error: ${message}`;
+			previewContainer.innerHTML = '';
+			previewContainer.appendChild(errorSpan);
 		}
 	}
 
