@@ -6,6 +6,9 @@ import { PNG } from 'pngjs';
 import { styles } from '@versatiles/style';
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import { renderToSVG } from '../src/index.js';
+import { installFetchCache } from './fetch-cache.js';
+
+installFetchCache();
 
 const WIDTH = 800;
 const HEIGHT = 600;
