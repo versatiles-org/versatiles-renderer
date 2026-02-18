@@ -18,9 +18,11 @@ function makeJob(sources: Record<string, unknown>): RenderJob {
 }
 
 function mockFetchPng(): void {
-	vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
+	vi.spyOn(globalThis, 'fetch').mockImplementation(() => {
 		const pngBytes = new Uint8Array([137, 80, 78, 71]);
-		return new Response(pngBytes.buffer, { headers: { 'content-type': 'image/png' } });
+		return Promise.resolve(
+			new Response(pngBytes.buffer, { headers: { 'content-type': 'image/png' } }),
+		);
 	});
 }
 
@@ -57,8 +59,8 @@ describe('getRasterTiles', () => {
 	});
 
 	test('filters out failed tile fetches', async () => {
-		vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
-			return new Response(null, { status: 404 });
+		vi.spyOn(globalThis, 'fetch').mockImplementation(() => {
+			return Promise.resolve(new Response(null, { status: 404 }));
 		});
 
 		const job = makeJob({ raster: { type: 'raster', tiles: ['https://a/{z}/{x}/{y}.png'] } });

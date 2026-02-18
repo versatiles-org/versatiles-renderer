@@ -73,9 +73,9 @@ describe('getTile', () => {
 		const result = await getTile('https://tiles.example.com/{z}/{x}/{y}.pbf', 5, 10, 12);
 
 		expect(fetch).toHaveBeenCalledWith('https://tiles.example.com/5/10/12.pbf');
-		expect(result).not.toBeNull();
-		expect(result!.contentType).toBe('application/x-protobuf');
-		expect(result!.buffer.byteLength).toBe(8);
+		if (result == null) throw new Error('expected result');
+		expect(result.contentType).toBe('application/x-protobuf');
+		expect(result.buffer.byteLength).toBe(8);
 	});
 
 	test('returns null on non-ok response', async () => {
@@ -106,7 +106,7 @@ describe('getTile', () => {
 
 		const result = await getTile('https://example.com/{z}/{x}/{y}', 0, 0, 0);
 
-		expect(result).not.toBeNull();
-		expect(result!.contentType).toBe('application/octet-stream');
+		if (result == null) throw new Error('expected result');
+		expect(result.contentType).toBe('application/octet-stream');
 	});
 });
