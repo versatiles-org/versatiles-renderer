@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-02-18
+
+### Bug Fixes
+
+- allow sanitized HTML as attribution
+- add coverage reporters to Vitest configuration
+
+### Tests
+
+- SVGExportControl and rendering tests
+- enhance renderMap tests with fill, line, and circle layer scenarios
+
 ## [0.5.0] - 2026-02-18
 
 ### Features
