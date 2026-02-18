@@ -7,4 +7,5 @@ dist
 lib/maplibre-gl-js/node_modules
 node_modules
 tmp
+e2e/.cache/
 e2e/output/
