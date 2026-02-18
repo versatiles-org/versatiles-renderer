@@ -27,7 +27,12 @@ export function loadGeoJSONSource(
 		);
 	}
 
-	function makeFeature(type: string, geometry: Point2D[][], id: unknown, properties: Record<string, unknown>): Feature | null {
+	function makeFeature(
+		type: string,
+		geometry: Point2D[][],
+		id: unknown,
+		properties: Record<string, unknown>,
+	): Feature | null {
 		const feature = new Feature({ type, geometry, id, properties });
 		if (!feature.doesOverlap([0, 0, width, height])) return null;
 		return feature;
@@ -53,7 +58,9 @@ export function loadGeoJSONSource(
 				const f = makeFeature('LineString', geometry, id, properties);
 				if (f) {
 					features.linestrings.push(f);
-					features.points.push(new Feature({ type: 'Point', geometry: extractPoints(geometry), id, properties }));
+					features.points.push(
+						new Feature({ type: 'Point', geometry: extractPoints(geometry), id, properties }),
+					);
 				}
 				break;
 			}
@@ -62,7 +69,9 @@ export function loadGeoJSONSource(
 				if (f) {
 					features.polygons.push(f);
 					features.linestrings.push(new Feature({ type: 'LineString', geometry, id, properties }));
-					features.points.push(new Feature({ type: 'Point', geometry: extractPoints(geometry), id, properties }));
+					features.points.push(
+						new Feature({ type: 'Point', geometry: extractPoints(geometry), id, properties }),
+					);
 				}
 				break;
 			}

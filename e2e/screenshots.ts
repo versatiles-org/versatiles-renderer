@@ -8,6 +8,7 @@ import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import { renderToSVG } from '../src/index.js';
 import type { Page } from 'playwright';
 import { ensureCacheDir, installFetchCache, readCache, writeCache } from './fetch-cache.js';
+import { Feature } from 'geojson';
 
 installFetchCache();
 
@@ -63,59 +64,51 @@ async function getStyle(type: Region['type']): Promise<StyleSpecification> {
 						type: 'FeatureCollection',
 						features: [
 							{
-								type: 'Feature',
-								properties: {},
-								geometry: {
-									type: 'Polygon',
-									coordinates: [
-										[
-											[13.383, 52.52],
-											[13.393, 52.52],
-											[13.393, 52.514],
-											[13.383, 52.514],
-											[13.383, 52.52],
-										],
+								type: 'Polygon',
+								coordinates: [
+									[
+										[13.38, 52.52],
+										[13.39, 52.52],
+										[13.39, 52.514],
+										[13.38, 52.514],
+										[13.38, 52.52],
 									],
-								},
-							},
-							{
-								type: 'Feature',
-								properties: {},
-								geometry: {
-									type: 'LineString',
-									coordinates: [
-										[13.38, 52.522],
-										[13.385, 52.519],
-										[13.39, 52.521],
-										[13.395, 52.518],
+									[
+										[13.383, 52.518],
+										[13.387, 52.518],
+										[13.387, 52.516],
+										[13.383, 52.516],
+										[13.383, 52.518],
 									],
-								},
+								],
 							},
 							{
-								type: 'Feature',
-								properties: {},
-								geometry: {
-									type: 'Point',
-									coordinates: [13.388, 52.517],
-								},
+								type: 'LineString',
+								coordinates: [
+									[13.391, 52.522],
+									[13.393, 52.519],
+									[13.391, 52.516],
+									[13.393, 52.513],
+								],
 							},
-							{
-								type: 'Feature',
-								properties: {},
-								geometry: {
-									type: 'Point',
-									coordinates: [13.385, 52.519],
-								},
-							},
-							{
-								type: 'Feature',
-								properties: {},
-								geometry: {
-									type: 'Point',
-									coordinates: [13.391, 52.515],
-								},
-							},
-						],
+							...(
+								[
+									[13.399, 52.519],
+									[13.398, 52.517],
+									[13.397, 52.515],
+								] as [number, number][]
+							).map((coordinates) => ({
+								type: 'Point',
+								coordinates,
+							})),
+						].map(
+							(geometry) =>
+								({
+									type: 'Feature',
+									properties: {},
+									geometry,
+								}) as Feature,
+						),
 					},
 				};
 				style.layers.push(
@@ -124,7 +117,7 @@ async function getStyle(type: Region['type']): Promise<StyleSpecification> {
 						type: 'fill',
 						source: 'geojson-overlay',
 						paint: {
-							'fill-color': '#ff0000',
+							'fill-color': '#00ff00',
 							'fill-opacity': 0.3,
 						},
 					},
@@ -143,7 +136,7 @@ async function getStyle(type: Region['type']): Promise<StyleSpecification> {
 						source: 'geojson-overlay',
 						paint: {
 							'circle-radius': 8,
-							'circle-color': '#00cc00',
+							'circle-color': '#cc0000',
 							'circle-stroke-width': 2,
 							'circle-stroke-color': '#ffffff',
 						},
