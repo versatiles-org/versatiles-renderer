@@ -1,4 +1,4 @@
-import { Point2D, Feature } from '../lib/geometry.js';
+import { Point2D, Feature } from './geometry.js';
 import type { RenderJob } from '../renderer/renderer_svg.js';
 import { calculateTileGrid, getTile } from './tiles.js';
 import type { LayerFeatures } from './types.js';

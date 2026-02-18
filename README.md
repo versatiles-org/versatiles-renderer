@@ -140,11 +140,11 @@ G["style_layer.ts"]
 end
 subgraph 5["lib"]
 6["color.ts"]
-A["geometry.ts"]
 end
 subgraph 7["sources"]
 8["index.ts"]
 9["geojson.ts"]
+A["geometry.ts"]
 B["helper.ts"]
 C["raster.ts"]
 D["tiles.ts"]

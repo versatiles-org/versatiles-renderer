@@ -1,4 +1,4 @@
-import { Point2D } from '../lib/geometry.js';
+import { Point2D } from './geometry.js';
 
 export interface TileInfo {
 	x: number;

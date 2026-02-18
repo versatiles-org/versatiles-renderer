@@ -1,4 +1,4 @@
-import { Point2D, Feature } from '../lib/geometry.js';
+import { Point2D, Feature } from './geometry.js';
 import type { Features, LayerFeatures } from './types.js';
 
 type Coord = [number, number];

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { SVGRenderer } from './renderer_svg.js';
 import { Color } from '../lib/color.js';
-import { Feature, Point2D } from '../lib/geometry.js';
+import { Feature, Point2D } from '../sources/geometry.js';
 import type { CircleStyle, RasterStyle, RasterTile } from './renderer_svg.js';
 
 function makeRenderer(scale = 1): SVGRenderer {
