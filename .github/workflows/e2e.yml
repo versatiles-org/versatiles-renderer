@@ -32,11 +32,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Run MapLibre plugin E2E test
-        run: npm run e2e:maplibre
-
       - name: Run E2E tests
-        run: npm run e2e
+        run: npm run test:e2e
 
       - name: Upload E2E report artifact
         uses: actions/upload-artifact@v6
