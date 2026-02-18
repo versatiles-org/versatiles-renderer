@@ -94,6 +94,7 @@ describe('getTile', () => {
 		expect(result).toBeNull();
 		expect(warnSpy).toHaveBeenCalledWith(
 			'Failed to load tile: https://tiles.example.com/5/10/12.pbf',
+			expect.any(Error),
 		);
 
 		warnSpy.mockRestore();

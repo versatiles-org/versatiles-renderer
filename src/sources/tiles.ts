@@ -66,8 +66,8 @@ export async function getTile(
 		const buffer = await response.arrayBuffer();
 		const contentType = response.headers.get('content-type') ?? 'application/octet-stream';
 		return { buffer, contentType };
-	} catch {
-		console.warn(`Failed to load tile: ${tileUrl}`);
+	} catch (error: unknown) {
+		console.warn(`Failed to load tile: ${tileUrl}`, error);
 		return null;
 	}
 }
