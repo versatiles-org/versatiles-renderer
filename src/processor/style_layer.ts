@@ -134,10 +134,7 @@ export class StyleLayer {
 
 		for (const [name, expr] of this.paintExpressions) {
 			if (expr.kind === 'constant' || expr.kind === 'camera') {
-				this.paint.set(
-					name,
-					expr.evaluate(params, null as unknown as Feature, {}, undefined, availableImages),
-				);
+				this.paint.set(name, expr.evaluate(params, undefined, {}, undefined, availableImages));
 			} else {
 				this.paint.set(name, new PossiblyEvaluatedPropertyValue(expr, params));
 			}
@@ -145,10 +142,7 @@ export class StyleLayer {
 
 		for (const [name, expr] of this.layoutExpressions) {
 			if (expr.kind === 'constant' || expr.kind === 'camera') {
-				this.layout.set(
-					name,
-					expr.evaluate(params, null as unknown as Feature, {}, undefined, availableImages),
-				);
+				this.layout.set(name, expr.evaluate(params, undefined, {}, undefined, availableImages));
 			} else {
 				this.layout.set(name, new PossiblyEvaluatedPropertyValue(expr, params));
 			}
