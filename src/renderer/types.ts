@@ -29,15 +29,12 @@ export interface FillStyle {
 }
 
 export interface LineStyle {
-	blur: number;
 	cap: 'butt' | 'round' | 'square';
 	color: MaplibreColor;
 	dasharray?: number[];
-	gapWidth: number;
 	join: 'bevel' | 'miter' | 'round';
 	miterLimit: number;
 	offset: number;
-	roundLimit: number;
 	translate: [number, number];
 	width: number;
 }
@@ -45,7 +42,6 @@ export interface LineStyle {
 export interface CircleStyle {
 	color: MaplibreColor;
 	radius: number;
-	blur: number;
 	translate: [number, number];
 	strokeWidth: number;
 	strokeColor: MaplibreColor;

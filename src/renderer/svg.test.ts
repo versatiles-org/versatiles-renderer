@@ -146,14 +146,11 @@ describe('SVGRenderer', () => {
 				],
 			]);
 			const style = {
-				blur: 0,
 				cap: 'round' as const,
 				color: mc('#FF0000'),
-				gapWidth: 0,
 				join: 'round' as const,
 				miterLimit: 2,
 				offset: 0,
-				roundLimit: 1,
 				translate: [0, 0] as [number, number],
 				width: 2,
 			};
@@ -182,14 +179,11 @@ describe('SVGRenderer', () => {
 				],
 			]);
 			const style = {
-				blur: 0,
 				cap: 'butt' as const,
 				color: mc('#FF0000'),
-				gapWidth: 0,
 				join: 'miter' as const,
 				miterLimit: 2,
 				offset: 0,
-				roundLimit: 1,
 				translate: [0, 0] as [number, number],
 				width: 1,
 			};
@@ -207,14 +201,11 @@ describe('SVGRenderer', () => {
 				],
 			]);
 			const style = {
-				blur: 0,
 				cap: 'butt' as const,
 				color: mc('#FF0000'),
-				gapWidth: 0,
 				join: 'miter' as const,
 				miterLimit: 2,
 				offset: 0,
-				roundLimit: 1,
 				translate: [0, 0] as [number, number],
 				width: 0,
 			};
@@ -237,7 +228,6 @@ describe('SVGRenderer', () => {
 			return {
 				color: mc('#FF0000'),
 				radius: 5,
-				blur: 0,
 				translate: [0, 0] as [number, number],
 				strokeWidth: 0,
 				strokeColor: mc('#000000'),

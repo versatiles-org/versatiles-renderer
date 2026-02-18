@@ -101,14 +101,11 @@ async function render(job: RenderJob): Promise<void> {
 							{
 								color: getPaint('line-color', feature) as MaplibreColor,
 								translate: getPaint('line-translate', feature) as [number, number],
-								blur: getPaint('line-blur', feature) as number,
 								cap: getLayout('line-cap', feature) as 'butt' | 'round' | 'square',
 								dasharray: getPaint('line-dasharray', feature) as number[] | undefined,
-								gapWidth: getPaint('line-gap-width', feature) as number,
 								join: getLayout('line-join', feature) as 'bevel' | 'miter' | 'round',
 								miterLimit: getLayout('line-miter-limit', feature) as number,
 								offset: getPaint('line-offset', feature) as number,
-								roundLimit: getLayout('line-round-limit', feature) as number,
 								width: getPaint('line-width', feature) as number,
 							},
 						]),
@@ -145,7 +142,6 @@ async function render(job: RenderJob): Promise<void> {
 							{
 								color: getPaint('circle-color', feature) as MaplibreColor,
 								radius: getPaint('circle-radius', feature) as number,
-								blur: getPaint('circle-blur', feature) as number,
 								translate: getPaint('circle-translate', feature) as [number, number],
 								strokeWidth: getPaint('circle-stroke-width', feature) as number,
 								strokeColor: getPaint('circle-stroke-color', feature) as MaplibreColor,
