@@ -133,36 +133,35 @@ flowchart TB
 subgraph 0["src"]
 1["demo.ts"]
 2["index.ts"]
-subgraph 3["processor"]
+subgraph 3["pipeline"]
 4["render.ts"]
-D["styles.ts"]
-E["style_layer.ts"]
+D["style_layer.ts"]
 end
 subgraph 5["sources"]
 6["index.ts"]
 7["geojson.ts"]
-8["geometry.ts"]
-9["helper.ts"]
+9["merge.ts"]
 A["raster.ts"]
 B["tiles.ts"]
 C["vector.ts"]
-O["types.ts"]
 end
-subgraph F["renderer"]
-G["renderer_svg.ts"]
-H["color.ts"]
-I["svg_path.ts"]
+8["geometry.ts"]
+subgraph E["renderer"]
+F["svg.ts"]
+G["color.ts"]
+H["svg_path.ts"]
+M["types.ts"]
+end
+subgraph I["maplibre"]
+J["control.ts"]
+K["panel_css.ts"]
+L["index.ts"]
+end
 N["types.ts"]
-end
-subgraph J["maplibre"]
-K["control.ts"]
-L["styles.ts"]
-M["index.ts"]
-end
 end
 1-->2
 2-->4
-2-->G
+2-->F
 4-->6
 4-->D
 6-->7
@@ -175,14 +174,13 @@ A-->B
 B-->8
 C-->8
 C-->B
-D-->E
-G-->H
-G-->I
-K-->2
-K-->L
-M-->2
-M-->K
+F-->G
+F-->H
+J-->2
+J-->K
+L-->2
+L-->J
 
-class 0,3,5,F,J subgraphs;
+class 0,3,5,E,I subgraphs;
 classDef subgraphs fill-opacity:0.1, fill:#888, color:#888, stroke:#888;
 ```
