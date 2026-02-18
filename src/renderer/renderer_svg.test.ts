@@ -37,26 +37,37 @@ describe('SVGRenderer', () => {
 			expect(svg).toContain('</svg>');
 		});
 
+		test('includes clipPath and clip group', () => {
+			const r = makeRenderer();
+			const svg = r.getString();
+			expect(svg).toContain(
+				'<defs><clipPath id="vb"><rect width="256" height="256"/></clipPath></defs>',
+			);
+			expect(svg).toContain('<g clip-path="url(#vb)">');
+		});
+
 		test('default background has no rect', () => {
 			const r = makeRenderer();
 			const svg = r.getString();
-			expect(svg).not.toContain('<rect');
+			expect(svg).not.toMatch(/<rect[^/]*fill/);
 		});
 	});
 
 	describe('drawBackgroundFill', () => {
-		test('sets background color as rect', () => {
+		test('sets background color as oversized rect', () => {
 			const r = makeRenderer();
 			r.drawBackgroundFill({ color: new Color('#FF0000'), opacity: 1 });
 			const svg = r.getString();
-			expect(svg).toContain('<rect width="256" height="256" fill="#FF0000" />');
+			expect(svg).toContain('<rect x="-1" y="-1" width="258" height="258" fill="#FF0000" />');
 		});
 
 		test('applies opacity to alpha', () => {
 			const r = makeRenderer();
 			r.drawBackgroundFill({ color: new Color('#FF0000'), opacity: 0.5 });
 			const svg = r.getString();
-			expect(svg).toContain('<rect width="256" height="256" fill="#FF0000" fill-opacity="0.502" />');
+			expect(svg).toContain(
+				'<rect x="-1" y="-1" width="258" height="258" fill="#FF0000" fill-opacity="0.502" />',
+			);
 		});
 	});
 
@@ -84,7 +95,7 @@ describe('SVGRenderer', () => {
 			r.drawPolygons([], 1);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
-			expect(svg).not.toContain('<g');
+			expect(svg).not.toContain('<g opacity');
 		});
 
 		test('zero opacity produces no output', () => {
@@ -245,7 +256,7 @@ describe('SVGRenderer', () => {
 			r.drawCircles([], 1);
 			const svg = r.getString();
 			expect(svg).not.toContain('<circle');
-			expect(svg).not.toContain('<g');
+			expect(svg).not.toContain('<g opacity');
 		});
 
 		test('zero opacity produces no output', () => {
@@ -334,7 +345,7 @@ describe('SVGRenderer', () => {
 			r.drawRasterTiles([], defaultRasterStyle());
 			const svg = r.getString();
 			expect(svg).not.toContain('<image');
-			expect(svg).not.toContain('<g');
+			expect(svg).not.toContain('<g opacity');
 		});
 
 		test('zero opacity produces no output', () => {

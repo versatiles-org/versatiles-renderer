@@ -196,13 +196,19 @@ export class SVGRenderer {
 	}
 
 	public getString(): string {
-		const w = String(this.width);
-		const h = String(this.height);
-		const parts = [`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`];
+		const w = this.width;
+		const h = this.height;
+		const parts = [
+			`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`,
+			`<defs><clipPath id="vb"><rect width="${w}" height="${h}"/></clipPath></defs>`,
+			`<g clip-path="url(#vb)">`,
+		];
 		if (this.#backgroundColor.alpha > 0) {
-			parts.push(`<rect width="${w}" height="${h}" ${fillAttr(this.#backgroundColor)} />`);
+			parts.push(
+				`<rect x="-1" y="-1" width="${this.width + 2}" height="${this.height + 2}" ${fillAttr(this.#backgroundColor)} />`,
+			);
 		}
-		parts.push(...this.#svg, '</svg>');
+		parts.push(...this.#svg, '</g>', '</svg>');
 		return parts.join('\n');
 	}
 }
