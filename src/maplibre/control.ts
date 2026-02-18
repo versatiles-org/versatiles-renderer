@@ -14,6 +14,40 @@ function querySelector(parent: Element, selector: string): HTMLElement {
 	return el;
 }
 
+const ALLOWED_TAGS = new Set(['a', 'b', 'i', 'em', 'strong', 'span']);
+
+function sanitizeHTML(html: string): string {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
+	return sanitizeNode(doc.body).textContent ?? '';
+}
+
+function sanitizeNode(node: Node): Node {
+	if (node.nodeType === Node.TEXT_NODE) {
+		return document.createTextNode(node.textContent ?? '');
+	}
+	if (node.nodeType === Node.ELEMENT_NODE && node instanceof HTMLElement) {
+		const tag = node.tagName.toLowerCase();
+		let span: HTMLElement | DocumentFragment;
+		if (!ALLOWED_TAGS.has(tag)) {
+			span = document.createDocumentFragment();
+		} else {
+			span = document.createElement(tag);
+			if (tag === 'a') {
+				const href = node.getAttribute('href');
+				if (href && /^https?:\/\//i.test(href)) span.setAttribute('href', href);
+				span.setAttribute('target', '_blank');
+				span.setAttribute('rel', 'noopener noreferrer');
+			}
+		}
+		for (const child of Array.from(node.childNodes)) {
+			span.append(sanitizeNode(child));
+		}
+		return span;
+	}
+	return document.createTextNode('');
+}
+
 export class SVGExportControl implements IControl {
 	private map: Map | undefined;
 	private container: HTMLDivElement | undefined;
@@ -103,9 +137,9 @@ export class SVGExportControl implements IControl {
 			),
 		];
 		if (attributions.length > 0) {
-			noticeEl.textContent =
+			noticeEl.innerHTML =
 				"When publishing the exported map, don't forget to add an attribution like: " +
-				attributions.join(', ');
+				attributions.map(sanitizeHTML).join(', ');
 		} else {
 			noticeEl.textContent =
 				'When publishing the exported map, please check the license terms of the data and include proper attribution.';
