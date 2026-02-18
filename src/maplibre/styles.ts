@@ -119,6 +119,15 @@ export const PANEL_CSS = `
 	max-width: 320px;
 }
 
+.svg-export-panel .panel-notice a {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.svg-export-panel .panel-notice a:hover {
+	text-decoration: underline;
+}
+
 .svg-export-panel .panel-actions {
 	display: flex;
 	gap: 8px;

@@ -74,6 +74,11 @@ export class SVGExportControl implements IControl {
 				<h3>Export SVG</h3>
 				<button class="panel-close" title="Close">\u00d7</button>
 			</div>
+			<div class="panel-notice">
+				Note:<br>
+				<span class="panel-attribution"></span><br>
+				Also export of symbols and texts is not supported yet, but you can improve me on <a href="https://github.com/versatiles-org/versatiles-svg-renderer" target="_blank" rel="noopener noreferrer">GitHub</a>.<br>
+			</div>
 			<div class="panel-inputs">
 				<label>Width<input type="number" class="input-width" value="${String(this.options.defaultWidth)}" min="1" max="8192"></label>
 				<label>Height<input type="number" class="input-height" value="${String(this.options.defaultHeight)}" min="1" max="8192"></label>
@@ -82,14 +87,29 @@ export class SVGExportControl implements IControl {
 			<div class="preview-container">
 				<span class="preview-loading">Rendering preview\u2026</span>
 			</div>
-			<div class="panel-notice">
-				The exported map data may be subject to copyright. Please check the license terms of your tile provider and include proper attribution when publishing.
-			</div>
 			<div class="panel-actions">
 				<button class="btn-download" disabled>Download</button>
 				<button class="btn-open" disabled>Open in Tab</button>
 			</div>
 		`;
+
+		const noticeEl = querySelector(this.panel, '.panel-attribution');
+		const sources = this.map.getStyle().sources ?? {};
+		const attributions = [
+			...new Set(
+				Object.values(sources)
+					.map((s) => (s as { attribution?: string }).attribution?.trim())
+					.filter((a): a is string => !!a),
+			),
+		];
+		if (attributions.length > 0) {
+			noticeEl.innerHTML =
+				"When publishing the exported map, don't forget to add an attribution like: " +
+				attributions.join(', ');
+		} else {
+			noticeEl.innerHTML =
+				'When publishing the exported map, please check the license terms of the data and include proper attribution.';
+		}
 
 		querySelector(this.panel, '.panel-close').addEventListener('click', () => {
 			this.closePanel();
