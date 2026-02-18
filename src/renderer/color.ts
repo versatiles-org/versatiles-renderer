@@ -1,7 +1,7 @@
 import { Color as MaplibreColor } from '@maplibre/maplibre-gl-style-spec';
 
 export class Color {
-	public readonly values: [number, number, number, number];
+	public values: [number, number, number, number];
 
 	public constructor(
 		...args:
