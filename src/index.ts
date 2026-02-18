@@ -11,12 +11,16 @@ export async function renderToSVG(options: {
 	lat?: number;
 	zoom?: number;
 }): Promise<string> {
+	const width = options.width ?? 1024;
+	const height = options.height ?? 1024;
+	const scale = options.scale ?? 1;
+
+	if (width <= 0) throw new Error('width must be positive');
+	if (height <= 0) throw new Error('height must be positive');
+	if (scale <= 0) throw new Error('scale must be positive');
+
 	return await renderVectorTiles({
-		renderer: new SVGRenderer({
-			width: options.width ?? 1024,
-			height: options.height ?? 1024,
-			scale: options.scale ?? 1,
-		}),
+		renderer: new SVGRenderer({ width, height, scale }),
 		style: options.style,
 		view: {
 			center: [options.lon ?? 0, options.lat ?? 0],
