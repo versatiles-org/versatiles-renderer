@@ -89,7 +89,7 @@
     "@types/node": "^25.2.3",
     "@types/pbf": "^3.0.5",
     "@types/pngjs": "^6.0.5",
-    "@versatiles/release-tool": "^2.7.1",
+    "@versatiles/release-tool": "^2.7.2",
     "@versatiles/style": "^5.9.4",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^10.0.0",
