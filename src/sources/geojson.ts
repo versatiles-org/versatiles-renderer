@@ -133,14 +133,14 @@ export function loadGeoJSONSource(
 				);
 				break;
 			case 'MultiPolygon':
-				addFeature(
-					'Polygon',
-					geom.coordinates.flatMap((polygon) =>
+				for (const polygon of geom.coordinates) {
+					addFeature(
+						'Polygon',
 						polygon.map((ring) => ring.map((c) => projectCoord(c as Coord))),
-					),
-					id,
-					properties,
-				);
+						id,
+						properties,
+					);
+				}
 				break;
 			case 'GeometryCollection':
 				for (const g of geom.geometries) {

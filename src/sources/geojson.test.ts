@@ -157,7 +157,7 @@ describe('loadGeoJSONSource', () => {
 			});
 
 			const features = getFeatures(lf);
-			expect(features.polygons.length).toBe(1);
+			expect(features.polygons.length).toBe(2);
 		});
 	});
 
