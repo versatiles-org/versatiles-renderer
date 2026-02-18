@@ -1,3 +1,4 @@
+import type { GeoJSON } from 'geojson';
 import type { RenderJob } from '../renderer/renderer_svg.js';
 import { mergePolygons } from './helper.js';
 import { loadVectorSource } from './vector.js';
@@ -23,7 +24,15 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 				break;
 			case 'geojson':
 				if (source.data) {
-					loadGeoJSONSource(sourceName, source.data, width, height, zoom, center, layerFeatures);
+					loadGeoJSONSource(
+						sourceName,
+						source.data as GeoJSON,
+						width,
+						height,
+						zoom,
+						center,
+						layerFeatures,
+					);
 				}
 				break;
 		}

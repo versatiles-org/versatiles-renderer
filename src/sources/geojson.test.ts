@@ -1,3 +1,4 @@
+import type { GeoJSON } from 'geojson';
 import { describe, expect, test } from 'vitest';
 import type { LayerFeatures } from './types.js';
 import { loadGeoJSONSource } from './geojson.js';
@@ -8,7 +9,7 @@ const WIDTH = 512;
 const HEIGHT = 512;
 const ZOOM = 0;
 
-function load(data: unknown): LayerFeatures {
+function load(data: GeoJSON): LayerFeatures {
 	const layerFeatures: LayerFeatures = new Map();
 	loadGeoJSONSource('test', data, WIDTH, HEIGHT, ZOOM, CENTER, layerFeatures);
 	return layerFeatures;

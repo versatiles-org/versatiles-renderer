@@ -1,3 +1,4 @@
+import type { GeoJSON, Geometry } from 'geojson';
 import { Point2D, Feature } from './geometry.js';
 import type { Features, LayerFeatures } from './types.js';
 
@@ -5,7 +6,7 @@ type Coord = [number, number];
 
 export function loadGeoJSONSource(
 	sourceName: string,
-	data: unknown,
+	data: GeoJSON,
 	width: number,
 	height: number,
 	zoom: number,
@@ -91,30 +92,34 @@ export function loadGeoJSONSource(
 	}
 
 	function processGeometry(
-		geom: Record<string, unknown>,
-		id: unknown,
+		geom: Geometry,
+		id: string | number | undefined,
 		properties: Record<string, unknown>,
 	): void {
-		const coords = geom.coordinates;
 		switch (geom.type) {
 			case 'Point':
-				addFeature('Point', [[projectCoord(coords as Coord)]], id, properties);
+				addFeature('Point', [[projectCoord(geom.coordinates as Coord)]], id, properties);
 				break;
 			case 'MultiPoint':
 				addFeature(
 					'Point',
-					(coords as Coord[]).map((c) => [projectCoord(c)]),
+					geom.coordinates.map((c) => [projectCoord(c as Coord)]),
 					id,
 					properties,
 				);
 				break;
 			case 'LineString':
-				addFeature('LineString', [(coords as Coord[]).map((c) => projectCoord(c))], id, properties);
+				addFeature(
+					'LineString',
+					[geom.coordinates.map((c) => projectCoord(c as Coord))],
+					id,
+					properties,
+				);
 				break;
 			case 'MultiLineString':
 				addFeature(
 					'LineString',
-					(coords as Coord[][]).map((line) => line.map((c) => projectCoord(c))),
+					geom.coordinates.map((line) => line.map((c) => projectCoord(c as Coord))),
 					id,
 					properties,
 				);
@@ -122,7 +127,7 @@ export function loadGeoJSONSource(
 			case 'Polygon':
 				addFeature(
 					'Polygon',
-					(coords as Coord[][]).map((ring) => ring.map((c) => projectCoord(c))),
+					geom.coordinates.map((ring) => ring.map((c) => projectCoord(c as Coord))),
 					id,
 					properties,
 				);
@@ -130,41 +135,32 @@ export function loadGeoJSONSource(
 			case 'MultiPolygon':
 				addFeature(
 					'Polygon',
-					(coords as Coord[][][]).flatMap((polygon) =>
-						polygon.map((ring) => ring.map((c) => projectCoord(c))),
+					geom.coordinates.flatMap((polygon) =>
+						polygon.map((ring) => ring.map((c) => projectCoord(c as Coord))),
 					),
 					id,
 					properties,
 				);
 				break;
 			case 'GeometryCollection':
-				for (const g of geom.geometries as Record<string, unknown>[]) {
+				for (const g of geom.geometries) {
 					processGeometry(g, id, properties);
 				}
 				break;
 		}
 	}
 
-	const geojson = data as Record<string, unknown>;
-	switch (geojson.type) {
+	switch (data.type) {
 		case 'FeatureCollection':
-			for (const f of geojson.features as Record<string, unknown>[]) {
-				processGeometry(
-					f.geometry as Record<string, unknown>,
-					f.id,
-					(f.properties ?? {}) as Record<string, unknown>,
-				);
+			for (const f of data.features) {
+				processGeometry(f.geometry, f.id, (f.properties ?? {}) as Record<string, unknown>);
 			}
 			break;
 		case 'Feature':
-			processGeometry(
-				geojson.geometry as Record<string, unknown>,
-				geojson.id,
-				(geojson.properties ?? {}) as Record<string, unknown>,
-			);
+			processGeometry(data.geometry, data.id, (data.properties ?? {}) as Record<string, unknown>);
 			break;
 		default:
-			processGeometry(geojson, undefined, {});
+			processGeometry(data, undefined, {});
 			break;
 	}
 }
