@@ -1,76 +1,28 @@
 import type { Feature, Point2D } from '../lib/geometry.js';
 import { Color } from '../lib/color.js';
-import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
+import type { Segment } from './svg_path.js';
+import { chainSegments, formatNum, segmentsToPath } from './svg_path.js';
+import type {
+	BackgroundStyle,
+	CircleStyle,
+	FillStyle,
+	LineStyle,
+	RasterStyle,
+	RasterTile,
+	RendererOptions,
+} from './types.js';
 
-export interface View {
-	center: Point2D;
-	zoom: number;
-}
-
-export interface RenderJob {
-	style: StyleSpecification;
-	view: View;
-	renderer: SVGRenderer;
-}
-
-export interface RendererOptions {
-	width: number;
-	height: number;
-	scale: number;
-}
-
-export interface BackgroundStyle {
-	color: Color;
-	opacity: number;
-}
-
-export interface FillStyle {
-	color: Color;
-	translate: Point2D;
-}
-
-export interface LineStyle {
-	blur: number;
-	cap: 'butt' | 'round' | 'square';
-	color: Color;
-	dasharray?: number[];
-	gapWidth: number;
-	join: 'bevel' | 'miter' | 'round';
-	miterLimit: number;
-	offset: number;
-	roundLimit: number;
-	translate: Point2D;
-	width: number;
-}
-
-export interface CircleStyle {
-	color: Color;
-	radius: number;
-	blur: number;
-	translate: Point2D;
-	strokeWidth: number;
-	strokeColor: Color;
-}
-
-export interface RasterStyle {
-	opacity: number;
-	hueRotate: number;
-	brightnessMin: number;
-	brightnessMax: number;
-	saturation: number;
-	contrast: number;
-	resampling: 'linear' | 'nearest';
-}
-
-export interface RasterTile {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-	dataUri: string;
-}
-
-type Segment = [number, number][];
+export type {
+	BackgroundStyle,
+	CircleStyle,
+	FillStyle,
+	LineStyle,
+	RasterStyle,
+	RasterTile,
+	RenderJob,
+	RendererOptions,
+	View,
+} from './types.js';
 
 export class SVGRenderer {
 	public readonly width: number;
@@ -296,103 +248,4 @@ function roundXY(p: Point2D, scale: number): [number, number] {
 function formatPoint(p: Point2D, scale: number): string {
 	const [x, y] = roundXY(p, scale);
 	return formatNum(x) + ',' + formatNum(y);
-}
-
-function chainSegments(segments: Segment[]): Segment[] {
-	// Phase 1: normalize segments left-to-right, then chain
-	normalizeSegments(segments, 0);
-	let chains = greedyChain(segments);
-
-	// Phase 2: normalize remaining chains top-to-bottom, then chain again
-	normalizeSegments(chains, 1);
-	chains = greedyChain(chains);
-
-	return chains;
-}
-
-function normalizeSegments(segments: Segment[], coordIndex: number): void {
-	for (const seg of segments) {
-		if (seg[seg.length - 1][coordIndex] < seg[0][coordIndex]) seg.reverse();
-	}
-}
-
-function greedyChain(segments: Segment[]): Segment[] {
-	const byStart = new Map<string, Segment[]>();
-	for (const seg of segments) {
-		const key = String(seg[0][0]) + ',' + String(seg[0][1]);
-		let list = byStart.get(key);
-		if (!list) {
-			list = [];
-			byStart.set(key, list);
-		}
-		list.push(seg);
-	}
-
-	const visited = new Set<Segment>();
-	const chains: Segment[] = [];
-	for (const seg of segments) {
-		if (visited.has(seg)) continue;
-		visited.add(seg);
-		const chain: Segment = [...seg];
-		let endPoint = chain[chain.length - 1];
-		let candidates = byStart.get(String(endPoint[0]) + ',' + String(endPoint[1]));
-		while (candidates) {
-			let next: Segment | undefined;
-			for (const c of candidates) {
-				if (!visited.has(c)) {
-					next = c;
-					break;
-				}
-			}
-			if (!next) break;
-			visited.add(next);
-			for (let i = 1; i < next.length; i++) chain.push(next[i]);
-			endPoint = chain[chain.length - 1];
-			candidates = byStart.get(String(endPoint[0]) + ',' + String(endPoint[1]));
-		}
-		chains.push(chain);
-	}
-
-	return chains;
-}
-
-function segmentsToPath(chains: Segment[], close = false): string {
-	let d = '';
-	for (const chain of chains) {
-		d += 'M' + formatNum(chain[0][0]) + ',' + formatNum(chain[0][1]);
-		let px = chain[0][0];
-		let py = chain[0][1];
-		for (let i = 1; i < chain.length; i++) {
-			const x = chain[i][0];
-			const y = chain[i][1];
-			const dx = x - px;
-			const dy = y - py;
-			if (dy === 0) {
-				const rel = 'h' + formatNum(dx);
-				const abs = 'H' + formatNum(x);
-				d += rel.length <= abs.length ? rel : abs;
-			} else if (dx === 0) {
-				const rel = 'v' + formatNum(dy);
-				const abs = 'V' + formatNum(y);
-				d += rel.length <= abs.length ? rel : abs;
-			} else {
-				const rel = 'l' + formatNum(dx) + ',' + formatNum(dy);
-				const abs = 'L' + formatNum(x) + ',' + formatNum(y);
-				d += rel.length <= abs.length ? rel : abs;
-			}
-			px = x;
-			py = y;
-		}
-		if (close) d += 'z';
-	}
-	return d;
-}
-
-function formatNum(tenths: number): string {
-	if (tenths % 10 === 0) return String(tenths / 10);
-	const negative = tenths < 0;
-	if (negative) tenths = -tenths;
-	const whole = Math.floor(tenths / 10);
-	const frac = tenths % 10;
-	return (negative ? '-' : '') + String(whole) + '.' + String(frac);
 }
