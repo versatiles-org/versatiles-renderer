@@ -74,9 +74,8 @@ export function loadGeoJSONSource(
 						area += ring[i].x * ring[j].y;
 						area -= ring[j].x * ring[i].y;
 					}
-					let isClockwise = area < 0;
 
-					if (isClockwise !== needsCW) ring.reverse();
+					if (area < 0 !== needsCW) ring.reverse();
 				});
 				const f = makeFeature('Polygon', geometry, id, properties);
 				if (f) {

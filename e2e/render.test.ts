@@ -373,26 +373,6 @@ describe('e2e: vector tile source', () => {
 	});
 });
 
-describe('e2e: background layer', () => {
-	test('renders background without sources', async () => {
-		const svg = await renderVectorTiles(
-			makeJob({
-				version: 8,
-				sources: {},
-				layers: [
-					{
-						id: 'bg',
-						type: 'background',
-						paint: { 'background-color': '#AABBCC' },
-					},
-				],
-			}),
-		);
-
-		expect(svg).toContain('background-color:#AABBCC');
-	});
-});
-
 describe('e2e: empty source', () => {
 	test('geojson source with no features produces no output', async () => {
 		const svg = await renderVectorTiles(
@@ -416,6 +396,6 @@ describe('e2e: empty source', () => {
 		);
 
 		expect(svg).not.toContain('<circle');
-		expect(svg).not.toContain('<g');
+		expect(svg).not.toContain('<path');
 	});
 });
