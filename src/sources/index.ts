@@ -14,15 +14,18 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 
 	const layerFeatures: LayerFeatures = new Map();
 
+	const loadPromises: Promise<void>[] = [];
 	for (const [sourceName, sourceSpec] of Object.entries(sources)) {
 		const source = sourceSpec as Record<string, unknown>;
 
 		switch (source.type) {
 			case 'vector':
-				await loadVectorSource(
-					source as unknown as { type: 'vector'; tiles?: string[]; maxzoom?: number },
-					job,
-					layerFeatures,
+				loadPromises.push(
+					loadVectorSource(
+						source as unknown as { type: 'vector'; tiles?: string[]; maxzoom?: number },
+						job,
+						layerFeatures,
+					),
 				);
 				break;
 			case 'geojson':
@@ -40,6 +43,7 @@ export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 				break;
 		}
 	}
+	await Promise.all(loadPromises);
 
 	for (const [name, features] of layerFeatures) {
 		layerFeatures.set(name, {
