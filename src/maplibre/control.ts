@@ -109,7 +109,7 @@ export class SVGExportControl implements IControl {
 			<div class="panel-notice">
 				Note:<br>
 				<span class="panel-attribution"></span><br>
-				Also export of symbols and texts is not supported yet, but you can improve me on <a href="https://github.com/versatiles-org/versatiles-svg-renderer" target="_blank" rel="noopener noreferrer">GitHub</a>.<br>
+				Text labels are rendered without collision detection, so labels may overlap. You can improve me on <a href="https://github.com/versatiles-org/versatiles-svg-renderer" target="_blank" rel="noopener noreferrer">GitHub</a>.<br>
 			</div>
 			<div class="panel-inputs">
 				<label>Width<input type="number" class="input-width" value="${String(this.options.defaultWidth)}" min="1" max="8192"></label>
