@@ -10,6 +10,7 @@ import type {
 	RasterStyle,
 	RasterTile,
 	RendererOptions,
+	SymbolStyle,
 } from './types.js';
 
 export type {
@@ -22,6 +23,7 @@ export type {
 	Renderer,
 	RenderJob,
 	RendererOptions,
+	SymbolStyle,
 	View,
 } from './types.js';
 
@@ -178,6 +180,63 @@ export class SVGRenderer {
 		}
 	}
 
+	public drawSymbols(features: [Feature, SymbolStyle][]): void {
+		if (features.length === 0) return;
+
+		for (const [feature, style] of features) {
+			if (style.opacity <= 0 || !style.text) continue;
+
+			const color = new Color(style.color);
+			if (color.alpha <= 0) continue;
+
+			const ring = feature.geometry[0];
+			if (!ring || ring.length === 0) continue;
+			const point = ring[Math.floor(ring.length / 2)]!;
+			const [px, py] = roundXY(point.x, point.y);
+
+			const fontSize = formatScaled(style.size);
+			const fontFamily = style.font.length > 0 ? style.font.join(', ') : 'sans-serif';
+			const [svgAnchor, baseline] = mapTextAnchor(style.anchor);
+
+			const offsetX = style.offset[0] * style.size;
+			const offsetY = style.offset[1] * style.size;
+			const [dx, dy] = roundXY(offsetX, offsetY);
+
+			const attrs: string[] = [
+				`x="${formatNum(px)}"`,
+				`y="${formatNum(py)}"`,
+				`font-family="${escapeXml(fontFamily)}"`,
+				`font-size="${fontSize}"`,
+				`text-anchor="${svgAnchor}"`,
+				`dominant-baseline="${baseline}"`,
+			];
+
+			if (dx !== 0) attrs.push(`dx="${formatNum(dx)}"`);
+			if (dy !== 0) attrs.push(`dy="${formatNum(dy)}"`);
+
+			if (style.rotate !== 0) {
+				attrs.push(`transform="rotate(${String(style.rotate)},${formatNum(px)},${formatNum(py)})"`);
+			}
+
+			const haloColor = new Color(style.haloColor);
+			if (style.haloWidth > 0 && haloColor.alpha > 0) {
+				const haloWidth = formatScaled(style.haloWidth);
+				attrs.push(
+					'paint-order="stroke fill"',
+					`stroke="${haloColor.rgb}"`,
+					`stroke-width="${haloWidth}"`,
+					'stroke-linejoin="round"',
+				);
+				if (haloColor.alpha < 255) attrs.push(`stroke-opacity="${haloColor.opacity.toFixed(3)}"`);
+			}
+
+			attrs.push(fillAttr(color));
+			if (style.opacity < 1) attrs.push(`opacity="${style.opacity.toFixed(3)}"`);
+
+			this.#svg.push(`<text ${attrs.join(' ')}>${escapeXml(style.text)}</text>`);
+		}
+	}
+
 	public drawRasterTiles(tiles: RasterTile[], style: RasterStyle): void {
 		if (tiles.length === 0) return;
 		if (style.opacity <= 0) return;
@@ -248,4 +307,35 @@ function roundXY(x: number, y: number): [number, number] {
 function formatPoint(p: [number, number]): string {
 	const [x, y] = roundXY(p[0], p[1]);
 	return formatNum(x) + ',' + formatNum(y);
+}
+
+function mapTextAnchor(anchor: string): [string, string] {
+	switch (anchor) {
+		case 'left':
+			return ['start', 'central'];
+		case 'right':
+			return ['end', 'central'];
+		case 'top':
+			return ['middle', 'text-before-edge'];
+		case 'bottom':
+			return ['middle', 'text-after-edge'];
+		case 'top-left':
+			return ['start', 'text-before-edge'];
+		case 'top-right':
+			return ['end', 'text-before-edge'];
+		case 'bottom-left':
+			return ['start', 'text-after-edge'];
+		case 'bottom-right':
+			return ['end', 'text-after-edge'];
+		default:
+			return ['middle', 'central'];
+	}
+}
+
+function escapeXml(s: string): string {
+	return s
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;');
 }
