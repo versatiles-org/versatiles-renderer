@@ -6,6 +6,8 @@ import { loadGeoJSONSource } from './geojson.js';
 import type { LayerFeatures } from '../geometry.js';
 
 export { getRasterTiles } from './raster.js';
+export { loadSpriteAtlas } from './sprite.js';
+export type { SpriteAtlas, SpriteEntry } from './sprite.js';
 
 export async function getLayerFeatures(job: RenderJob): Promise<LayerFeatures> {
 	const { width, height } = job.renderer;

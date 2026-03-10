@@ -1,5 +1,7 @@
 import { type Feature, type Color as MaplibreColor } from '@maplibre/maplibre-gl-style-spec';
 import { getLayerFeatures, getRasterTiles } from '../sources/index.js';
+import { loadSpriteAtlas } from '../sources/sprite.js';
+import type { SpriteAtlas } from '../sources/sprite.js';
 import { getLayerStyles } from './style_layer.js';
 import type { PossiblyEvaluatedPropertyValue, StyleLayer } from './style_layer.js';
 import type { RenderJob } from '../renderer/svg.js';
@@ -24,9 +26,12 @@ function getFeatures(layerFeatures: LayerFeatures, layerStyle: StyleLayer): Feat
 async function render(job: RenderJob): Promise<void> {
 	const { renderer } = job;
 	const { zoom } = job.view;
-	const layerFeatures = await getLayerFeatures(job);
+	const [layerFeatures, spriteAtlas] = await Promise.all([
+		getLayerFeatures(job),
+		job.renderLabels ? loadSpriteAtlas(job.style) : Promise.resolve(new Map() as SpriteAtlas),
+	]);
 	const layerStyles = getLayerStyles(job.style.layers);
-	const availableImages: string[] = [];
+	const availableImages: string[] = [...spriteAtlas.keys()];
 	const featureState = {};
 
 	for (const layerStyle of layerStyles) {
@@ -171,6 +176,36 @@ async function render(job: RenderJob): Promise<void> {
 
 					if (symbolFeatures.length === 0) continue;
 
+					// Render icons first (underneath text)
+					renderer.drawIcons(
+						symbolFeatures.flatMap((feature) => {
+							const iconImage = getLayout('icon-image', feature);
+							const iconName =
+								iconImage != null
+									? resolveTokens(
+											(iconImage as { toString(): string }).toString(),
+											feature.properties as Record<string, unknown>,
+										)
+									: '';
+							if (!iconName || !spriteAtlas.has(iconName)) return [];
+							return [
+								[
+									feature,
+									{
+										image: iconName,
+										size: getLayout('icon-size', feature) as number,
+										anchor: getLayout('icon-anchor', feature) as string,
+										offset: getLayout('icon-offset', feature) as [number, number],
+										rotate: getLayout('icon-rotate', feature) as number,
+										opacity: getPaint('icon-opacity', feature) as number,
+									},
+								],
+							];
+						}),
+						spriteAtlas,
+					);
+
+					// Render text labels on top
 					renderer.drawSymbols(
 						symbolFeatures.flatMap((feature) => {
 							const textField = getLayout('text-field', feature);

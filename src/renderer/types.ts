@@ -1,5 +1,6 @@
 import type { Color as MaplibreColor, StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { Feature } from '../geometry.js';
+import type { SpriteAtlas } from '../sources/sprite.js';
 
 export interface View {
 	center: [number, number];
@@ -14,6 +15,7 @@ export interface Renderer {
 	drawLineStrings(features: [Feature, LineStyle][]): void;
 	drawCircles(features: [Feature, CircleStyle][]): void;
 	drawSymbols(features: [Feature, SymbolStyle][]): void;
+	drawIcons(features: [Feature, IconStyle][], spriteAtlas: SpriteAtlas): void;
 	drawRasterTiles(tiles: RasterTile[], style: RasterStyle): void;
 	getString(): string;
 }
@@ -83,6 +85,15 @@ export interface SymbolStyle {
 	opacity: number;
 	haloColor: MaplibreColor;
 	haloWidth: number;
+}
+
+export interface IconStyle {
+	image: string;
+	size: number;
+	anchor: string;
+	offset: [number, number];
+	rotate: number;
+	opacity: number;
 }
 
 export interface RasterTile {

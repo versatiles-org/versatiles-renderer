@@ -6,17 +6,20 @@ import type {
 	BackgroundStyle,
 	CircleStyle,
 	FillStyle,
+	IconStyle,
 	LineStyle,
 	RasterStyle,
 	RasterTile,
 	RendererOptions,
 	SymbolStyle,
 } from './types.js';
+import type { SpriteAtlas } from '../sources/sprite.js';
 
 export type {
 	BackgroundStyle,
 	CircleStyle,
 	FillStyle,
+	IconStyle,
 	LineStyle,
 	RasterStyle,
 	RasterTile,
@@ -237,6 +240,60 @@ export class SVGRenderer {
 		}
 	}
 
+	public drawIcons(features: [Feature, IconStyle][], spriteAtlas: SpriteAtlas): void {
+		if (features.length === 0) return;
+
+		for (const [feature, style] of features) {
+			if (style.opacity <= 0) continue;
+
+			const sprite = spriteAtlas.get(style.image);
+			if (!sprite) continue;
+
+			const ring = feature.geometry[0];
+			if (!ring || ring.length === 0) continue;
+			const point = ring[Math.floor(ring.length / 2)]!;
+
+			const scale = style.size / sprite.pixelRatio;
+			const iconW = sprite.width * scale;
+			const iconH = sprite.height * scale;
+
+			const [anchorDx, anchorDy] = mapIconAnchor(style.anchor, iconW, iconH);
+			const ox = style.offset[0] * style.size + anchorDx;
+			const oy = style.offset[1] * style.size + anchorDy;
+
+			const x = point.x + ox;
+			const y = point.y + oy;
+
+			const [sx, sy] = roundXY(x, y);
+			const [sw, sh] = roundXY(iconW, iconH);
+
+			const viewBox = `${String(sprite.x)} ${String(sprite.y)} ${String(sprite.width)} ${String(sprite.height)}`;
+
+			const attrs: string[] = [
+				`x="${formatNum(sx)}"`,
+				`y="${formatNum(sy)}"`,
+				`width="${formatNum(sw)}"`,
+				`height="${formatNum(sh)}"`,
+			];
+
+			if (style.opacity < 1) attrs.push(`opacity="${style.opacity.toFixed(3)}"`);
+
+			if (style.rotate !== 0) {
+				const [cx, cy] = roundXY(
+					point.x + style.offset[0] * style.size,
+					point.y + style.offset[1] * style.size,
+				);
+				attrs.push(`transform="rotate(${String(style.rotate)},${formatNum(cx)},${formatNum(cy)})"`);
+			}
+
+			this.#svg.push(
+				`<svg ${attrs.join(' ')} viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg">` +
+					`<image width="${String(sprite.sheetWidth)}" height="${String(sprite.sheetHeight)}" href="${sprite.sheetDataUri}" />` +
+					`</svg>`,
+			);
+		}
+	}
+
 	public drawRasterTiles(tiles: RasterTile[], style: RasterStyle): void {
 		if (tiles.length === 0) return;
 		if (style.opacity <= 0) return;
@@ -329,6 +386,29 @@ function mapTextAnchor(anchor: string): [string, string] {
 			return ['end', 'text-after-edge'];
 		default:
 			return ['middle', 'central'];
+	}
+}
+
+function mapIconAnchor(anchor: string, w: number, h: number): [number, number] {
+	switch (anchor) {
+		case 'left':
+			return [0, -h / 2];
+		case 'right':
+			return [-w, -h / 2];
+		case 'top':
+			return [-w / 2, 0];
+		case 'bottom':
+			return [-w / 2, -h];
+		case 'top-left':
+			return [0, 0];
+		case 'top-right':
+			return [-w, 0];
+		case 'bottom-left':
+			return [0, -h];
+		case 'bottom-right':
+			return [-w, -h];
+		default:
+			return [-w / 2, -h / 2];
 	}
 }
 
