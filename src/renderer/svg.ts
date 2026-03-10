@@ -195,7 +195,7 @@ export class SVGRenderer {
 			const [px, py] = roundXY(point.x, point.y);
 
 			const fontSize = formatScaled(style.size);
-			const fontFamily = style.font.length > 0 ? style.font.join(', ') : 'sans-serif';
+			const fontFamily = style.font.join(', ') + ', Helvetica, Arial, sans-serif';
 			const [svgAnchor, baseline] = mapTextAnchor(style.anchor);
 
 			const offsetX = style.offset[0] * style.size;
