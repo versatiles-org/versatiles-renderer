@@ -2,7 +2,8 @@ import { describe, expect, test } from 'vitest';
 import { SVGRenderer } from './svg.js';
 import { Color } from '@maplibre/maplibre-gl-style-spec';
 import { Feature, Point2D } from '../geometry.js';
-import type { CircleStyle, RasterStyle, RasterTile } from './svg.js';
+import type { CircleStyle, IconStyle, RasterStyle, RasterTile, SymbolStyle } from './svg.js';
+import type { SpriteAtlas } from '../sources/sprite.js';
 
 function mc(hex: string, alpha = 1): Color {
 	const r = (parseInt(hex.slice(1, 3), 16) / 255) * alpha;
@@ -90,15 +91,16 @@ describe('SVGRenderer', () => {
 				],
 			]);
 			const style = { color: mc('#336699'), opacity: 1, translate: [0, 0] as [number, number] };
-			r.drawPolygons([[feature, style]]);
+			r.drawPolygons('fill-test', [[feature, style]]);
 			const svg = r.getString();
+			expect(svg).toContain('<g id="fill-test">');
 			expect(svg).toContain('<path d=');
 			expect(svg).toContain('fill="#336699"');
 		});
 
 		test('empty features produce no output', () => {
 			const r = makeRenderer();
-			r.drawPolygons([]);
+			r.drawPolygons('fill-test', []);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
 		});
@@ -113,7 +115,7 @@ describe('SVGRenderer', () => {
 				],
 			]);
 			const style = { color: mc('#336699'), opacity: 0, translate: [0, 0] as [number, number] };
-			r.drawPolygons([[feature, style]]);
+			r.drawPolygons('fill-test', [[feature, style]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
 		});
@@ -132,7 +134,7 @@ describe('SVGRenderer', () => {
 				opacity: 1,
 				translate: [0, 0] as [number, number],
 			};
-			r.drawPolygons([[feature, style]]);
+			r.drawPolygons('fill-test', [[feature, style]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
 		});
@@ -157,8 +159,9 @@ describe('SVGRenderer', () => {
 				translate: [0, 0] as [number, number],
 				width: 2,
 			};
-			r.drawLineStrings([[feature, style]]);
+			r.drawLineStrings('line-test', [[feature, style]]);
 			const svg = r.getString();
+			expect(svg).toContain('<g id="line-test">');
 			expect(svg).toContain('<path d=');
 			expect(svg).toContain('fill="none"');
 			expect(svg).toContain('stroke="#FF0000"');
@@ -168,7 +171,7 @@ describe('SVGRenderer', () => {
 
 		test('empty features produce no output', () => {
 			const r = makeRenderer();
-			r.drawLineStrings([]);
+			r.drawLineStrings('line-test', []);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
 		});
@@ -191,7 +194,7 @@ describe('SVGRenderer', () => {
 				translate: [0, 0] as [number, number],
 				width: 1,
 			};
-			r.drawLineStrings([[feature, style]]);
+			r.drawLineStrings('line-test', [[feature, style]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
 		});
@@ -214,7 +217,7 @@ describe('SVGRenderer', () => {
 				translate: [0, 0] as [number, number],
 				width: 0,
 			};
-			r.drawLineStrings([[feature, style]]);
+			r.drawLineStrings('line-test', [[feature, style]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<path');
 		});
@@ -244,8 +247,9 @@ describe('SVGRenderer', () => {
 		test('generates circle elements with correct attributes', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
-			r.drawCircles([[feature, defaultCircleStyle()]]);
+			r.drawCircles('circle-test', [[feature, defaultCircleStyle()]]);
 			const svg = r.getString();
+			expect(svg).toContain('<g id="circle-test">');
 			expect(svg).toContain('<circle');
 			expect(svg).toContain('cx=');
 			expect(svg).toContain('cy=');
@@ -255,7 +259,7 @@ describe('SVGRenderer', () => {
 
 		test('empty features produce no output', () => {
 			const r = makeRenderer();
-			r.drawCircles([]);
+			r.drawCircles('circle-test', []);
 			const svg = r.getString();
 			expect(svg).not.toContain('<circle');
 		});
@@ -263,7 +267,7 @@ describe('SVGRenderer', () => {
 		test('zero opacity produces no output', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
-			r.drawCircles([[feature, defaultCircleStyle({ opacity: 0 })]]);
+			r.drawCircles('circle-test', [[feature, defaultCircleStyle({ opacity: 0 })]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<circle');
 		});
@@ -271,7 +275,7 @@ describe('SVGRenderer', () => {
 		test('zero-radius circles produce no output', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
-			r.drawCircles([[feature, defaultCircleStyle({ radius: 0 })]]);
+			r.drawCircles('circle-test', [[feature, defaultCircleStyle({ radius: 0 })]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('<circle');
 		});
@@ -279,7 +283,7 @@ describe('SVGRenderer', () => {
 		test('stroke attributes appear when strokeWidth > 0', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
-			r.drawCircles([
+			r.drawCircles('circle-test', [
 				[feature, defaultCircleStyle({ strokeWidth: 2, strokeColor: mc('#00FF00') })],
 			]);
 			const svg = r.getString();
@@ -290,7 +294,7 @@ describe('SVGRenderer', () => {
 		test('no stroke attributes when strokeWidth is 0', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
-			r.drawCircles([[feature, defaultCircleStyle({ strokeWidth: 0 })]]);
+			r.drawCircles('circle-test', [[feature, defaultCircleStyle({ strokeWidth: 0 })]]);
 			const svg = r.getString();
 			expect(svg).not.toContain('stroke=');
 			expect(svg).not.toContain('stroke-width=');
@@ -324,17 +328,17 @@ describe('SVGRenderer', () => {
 
 		test('generates image elements', () => {
 			const r = makeRenderer();
-			r.drawRasterTiles([makeTile()], defaultRasterStyle());
+			r.drawRasterTiles('raster-test', [makeTile()], defaultRasterStyle());
 			const svg = r.getString();
 			expect(svg).toContain('<image');
 			expect(svg).toContain('href="data:image/png;base64,AAAA"');
-			expect(svg).toContain('<g opacity="1">');
+			expect(svg).toContain('id="raster-test"');
 		});
 
 		test('multiple tiles generate multiple image elements', () => {
 			const r = makeRenderer();
 			const tiles = [makeTile({ x: 0, y: 0 }), makeTile({ x: 256, y: 0 })];
-			r.drawRasterTiles(tiles, defaultRasterStyle());
+			r.drawRasterTiles('raster-test', tiles, defaultRasterStyle());
 			const svg = r.getString();
 			const imageCount = (svg.match(/<image /g) ?? []).length;
 			expect(imageCount).toBe(2);
@@ -342,7 +346,7 @@ describe('SVGRenderer', () => {
 
 		test('empty tiles produce no output', () => {
 			const r = makeRenderer();
-			r.drawRasterTiles([], defaultRasterStyle());
+			r.drawRasterTiles('raster-test', [], defaultRasterStyle());
 			const svg = r.getString();
 			expect(svg).not.toContain('<image');
 			expect(svg).not.toContain('<g opacity');
@@ -350,35 +354,35 @@ describe('SVGRenderer', () => {
 
 		test('zero opacity produces no output', () => {
 			const r = makeRenderer();
-			r.drawRasterTiles([makeTile()], defaultRasterStyle({ opacity: 0 }));
+			r.drawRasterTiles('raster-test', [makeTile()], defaultRasterStyle({ opacity: 0 }));
 			const svg = r.getString();
 			expect(svg).not.toContain('<image');
 		});
 
 		test('applies opacity attribute', () => {
 			const r = makeRenderer();
-			r.drawRasterTiles([makeTile()], defaultRasterStyle({ opacity: 0.5 }));
+			r.drawRasterTiles('raster-test', [makeTile()], defaultRasterStyle({ opacity: 0.5 }));
 			const svg = r.getString();
 			expect(svg).toContain('opacity="0.5"');
 		});
 
 		test('applies hue-rotate filter', () => {
 			const r = makeRenderer();
-			r.drawRasterTiles([makeTile()], defaultRasterStyle({ hueRotate: 90 }));
+			r.drawRasterTiles('raster-test', [makeTile()], defaultRasterStyle({ hueRotate: 90 }));
 			const svg = r.getString();
 			expect(svg).toContain('filter="hue-rotate(90deg)"');
 		});
 
 		test('applies saturate filter', () => {
 			const r = makeRenderer();
-			r.drawRasterTiles([makeTile()], defaultRasterStyle({ saturation: 0.5 }));
+			r.drawRasterTiles('raster-test', [makeTile()], defaultRasterStyle({ saturation: 0.5 }));
 			const svg = r.getString();
 			expect(svg).toContain('saturate(1.5)');
 		});
 
 		test('applies contrast filter', () => {
 			const r = makeRenderer();
-			r.drawRasterTiles([makeTile()], defaultRasterStyle({ contrast: -0.5 }));
+			r.drawRasterTiles('raster-test', [makeTile()], defaultRasterStyle({ contrast: -0.5 }));
 			const svg = r.getString();
 			expect(svg).toContain('contrast(0.5)');
 		});
@@ -386,6 +390,7 @@ describe('SVGRenderer', () => {
 		test('applies brightness filter', () => {
 			const r = makeRenderer();
 			r.drawRasterTiles(
+				'raster-test',
 				[makeTile()],
 				defaultRasterStyle({ brightnessMin: 0.2, brightnessMax: 0.8 }),
 			);
@@ -395,23 +400,280 @@ describe('SVGRenderer', () => {
 
 		test('no filter attribute when all defaults', () => {
 			const r = makeRenderer();
-			r.drawRasterTiles([makeTile()], defaultRasterStyle());
+			r.drawRasterTiles('raster-test', [makeTile()], defaultRasterStyle());
 			const svg = r.getString();
 			expect(svg).not.toContain('filter=');
 		});
 
 		test('nearest resampling adds image-rendering:pixelated', () => {
 			const r = makeRenderer();
-			r.drawRasterTiles([makeTile()], defaultRasterStyle({ resampling: 'nearest' }));
+			r.drawRasterTiles('raster-test', [makeTile()], defaultRasterStyle({ resampling: 'nearest' }));
 			const svg = r.getString();
 			expect(svg).toContain('image-rendering:pixelated');
 		});
 
 		test('linear resampling does not add image-rendering', () => {
 			const r = makeRenderer();
-			r.drawRasterTiles([makeTile()], defaultRasterStyle({ resampling: 'linear' }));
+			r.drawRasterTiles('raster-test', [makeTile()], defaultRasterStyle({ resampling: 'linear' }));
 			const svg = r.getString();
 			expect(svg).not.toContain('image-rendering');
+		});
+	});
+
+	describe('drawLabels', () => {
+		function makePointFeature(points: [number, number][]): Feature {
+			return new Feature({
+				type: 'Point',
+				properties: {},
+				geometry: points.map(([x, y]) => [new Point2D(x, y)]),
+			});
+		}
+
+		function defaultSymbolStyle(overrides: Partial<SymbolStyle> = {}): SymbolStyle {
+			return {
+				text: 'Hello',
+				size: 16,
+				font: ['Arial'],
+				anchor: 'center',
+				offset: [0, 0] as [number, number],
+				rotate: 0,
+				color: mc('#333333'),
+				opacity: 1,
+				haloColor: mc('#FFFFFF'),
+				haloWidth: 0,
+				...overrides,
+			};
+		}
+
+		test('generates text elements', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawLabels('symbol-test', [[feature, defaultSymbolStyle()]]);
+			const svg = r.getString();
+			expect(svg).toContain('<g id="symbol-test">');
+			expect(svg).toContain('<text');
+			expect(svg).toContain('>Hello</text>');
+			expect(svg).toContain('font-family="Arial, Helvetica, Arial, sans-serif"');
+			expect(svg).toContain('fill="#333333"');
+		});
+
+		test('empty features produce no output', () => {
+			const r = makeRenderer();
+			r.drawLabels('symbol-test', []);
+			const svg = r.getString();
+			expect(svg).not.toContain('<text');
+		});
+
+		test('empty text produces no output', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawLabels('symbol-test', [[feature, defaultSymbolStyle({ text: '' })]]);
+			const svg = r.getString();
+			expect(svg).not.toContain('<text');
+		});
+
+		test('zero opacity produces no output', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawLabels('symbol-test', [[feature, defaultSymbolStyle({ opacity: 0 })]]);
+			const svg = r.getString();
+			expect(svg).not.toContain('<text');
+		});
+
+		test('applies text anchor mapping', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawLabels('symbol-test', [[feature, defaultSymbolStyle({ anchor: 'left' })]]);
+			const svg = r.getString();
+			expect(svg).toContain('text-anchor="start"');
+			expect(svg).toContain('dominant-baseline="central"');
+		});
+
+		test('applies rotation', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawLabels('symbol-test', [[feature, defaultSymbolStyle({ rotate: 45 })]]);
+			const svg = r.getString();
+			expect(svg).toContain('transform="rotate(45,');
+		});
+
+		test('applies halo when haloWidth > 0', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawLabels('symbol-test', [
+				[feature, defaultSymbolStyle({ haloWidth: 2, haloColor: mc('#FFFFFF') })],
+			]);
+			const svg = r.getString();
+			expect(svg).toContain('paint-order="stroke fill"');
+			expect(svg).toContain('stroke="#FFFFFF"');
+			expect(svg).toContain('stroke-linejoin="round"');
+		});
+
+		test('no halo attributes when haloWidth is 0', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawLabels('symbol-test', [[feature, defaultSymbolStyle({ haloWidth: 0 })]]);
+			const svg = r.getString();
+			expect(svg).not.toContain('paint-order');
+			expect(svg).not.toContain('stroke=');
+		});
+
+		test('applies offset as dx/dy', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawLabels('symbol-test', [[feature, defaultSymbolStyle({ offset: [1, 0.5], size: 16 })]]);
+			const svg = r.getString();
+			expect(svg).toContain('dx=');
+			expect(svg).toContain('dy=');
+		});
+
+		test('escapes XML special characters in text', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawLabels('symbol-test', [[feature, defaultSymbolStyle({ text: '<b>A&B</b>' })]]);
+			const svg = r.getString();
+			expect(svg).toContain('&lt;b&gt;A&amp;B&lt;/b&gt;');
+		});
+
+		test('uses midpoint for line features', () => {
+			const feature = new Feature({
+				type: 'LineString',
+				properties: {},
+				geometry: [[new Point2D(0, 0), new Point2D(50, 50), new Point2D(100, 100)]],
+			});
+			const r = makeRenderer();
+			r.drawLabels('symbol-test', [[feature, defaultSymbolStyle()]]);
+			const svg = r.getString();
+			expect(svg).toContain('<text');
+			// midpoint is (50,50), scaled by 10 → 500, formatNum → "50"
+			expect(svg).toContain('x="50"');
+			expect(svg).toContain('y="50"');
+		});
+
+		test('applies opacity attribute when < 1', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawLabels('symbol-test', [[feature, defaultSymbolStyle({ opacity: 0.5 })]]);
+			const svg = r.getString();
+			expect(svg).toContain('opacity="0.500"');
+		});
+	});
+
+	describe('drawIcons', () => {
+		function makePointFeature(points: [number, number][]): Feature {
+			return new Feature({
+				type: 'Point',
+				properties: {},
+				geometry: points.map(([x, y]) => [new Point2D(x, y)]),
+			});
+		}
+
+		function defaultIconStyle(overrides: Partial<IconStyle> = {}): IconStyle {
+			return {
+				image: 'airport',
+				size: 1,
+				anchor: 'center',
+				offset: [0, 0] as [number, number],
+				rotate: 0,
+				opacity: 1,
+				...overrides,
+			};
+		}
+
+		function makeSpriteAtlas(
+			entries?: Record<string, { x: number; y: number; width: number; height: number }>,
+		): SpriteAtlas {
+			const atlas: SpriteAtlas = new Map();
+			const defaultEntries = entries ?? {
+				airport: { x: 0, y: 0, width: 32, height: 32 },
+			};
+			for (const [name, e] of Object.entries(defaultEntries)) {
+				atlas.set(name, {
+					...e,
+					pixelRatio: 1,
+					sheetDataUri: 'data:image/png;base64,AAAA',
+					sheetWidth: 256,
+					sheetHeight: 256,
+				});
+			}
+			return atlas;
+		}
+
+		test('generates nested SVG with image for icon', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawIcons('icon-test', [[feature, defaultIconStyle()]], makeSpriteAtlas());
+			const svg = r.getString();
+			expect(svg).toContain('<g id="icon-test">');
+			expect(svg).toContain('<svg');
+			expect(svg).toContain('<image');
+			expect(svg).toContain('viewBox="0 0 32 32"');
+			expect(svg).toContain('href="data:image/png;base64,AAAA"');
+		});
+
+		test('empty features produce no output', () => {
+			const r = makeRenderer();
+			r.drawIcons('icon-test', [], makeSpriteAtlas());
+			const svg = r.getString();
+			// Only the wrapper SVG should exist
+			expect(svg.match(/<svg/g)?.length).toBe(1);
+		});
+
+		test('missing sprite produces no output', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawIcons(
+				'icon-test',
+				[[feature, defaultIconStyle({ image: 'nonexistent' })]],
+				makeSpriteAtlas(),
+			);
+			const svg = r.getString();
+			expect(svg).not.toContain('<image');
+		});
+
+		test('zero opacity produces no output', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawIcons('icon-test', [[feature, defaultIconStyle({ opacity: 0 })]], makeSpriteAtlas());
+			const svg = r.getString();
+			expect(svg).not.toContain('<image');
+		});
+
+		test('applies rotation', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawIcons('icon-test', [[feature, defaultIconStyle({ rotate: 45 })]], makeSpriteAtlas());
+			const svg = r.getString();
+			expect(svg).toContain('transform="rotate(45,');
+		});
+
+		test('applies opacity when < 1', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawIcons('icon-test', [[feature, defaultIconStyle({ opacity: 0.5 })]], makeSpriteAtlas());
+			const svg = r.getString();
+			expect(svg).toContain('opacity="0.500"');
+		});
+
+		test('scales icon by size and pixelRatio', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			const atlas: SpriteAtlas = new Map();
+			atlas.set('icon', {
+				x: 0,
+				y: 0,
+				width: 20,
+				height: 20,
+				pixelRatio: 2,
+				sheetDataUri: 'data:image/png;base64,AAAA',
+				sheetWidth: 256,
+				sheetHeight: 256,
+			});
+			r.drawIcons('icon-test', [[feature, defaultIconStyle({ image: 'icon', size: 2 })]], atlas);
+			const svg = r.getString();
+			// size=2, pixelRatio=2 → scale=1 → icon dimensions = 20x20
+			expect(svg).toContain('width="20"');
+			expect(svg).toContain('height="20"');
 		});
 	});
 });
