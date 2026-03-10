@@ -13,6 +13,7 @@ export interface Renderer {
 	drawPolygons(features: [Feature, FillStyle][]): void;
 	drawLineStrings(features: [Feature, LineStyle][]): void;
 	drawCircles(features: [Feature, CircleStyle][]): void;
+	drawSymbols(features: [Feature, SymbolStyle][]): void;
 	drawRasterTiles(tiles: RasterTile[], style: RasterStyle): void;
 	getString(): string;
 }
@@ -68,6 +69,19 @@ export interface RasterStyle {
 	saturation: number;
 	contrast: number;
 	resampling: 'linear' | 'nearest';
+}
+
+export interface SymbolStyle {
+	text: string;
+	size: number;
+	font: string[];
+	anchor: string;
+	offset: [number, number];
+	rotate: number;
+	color: MaplibreColor;
+	opacity: number;
+	haloColor: MaplibreColor;
+	haloWidth: number;
 }
 
 export interface RasterTile {
