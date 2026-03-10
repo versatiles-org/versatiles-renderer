@@ -9,18 +9,24 @@ vi.mock('../sources/index.js', () => ({
 	getRasterTiles: vi.fn().mockResolvedValue([]),
 }));
 
+vi.mock('../sources/sprite.js', () => ({
+	loadSpriteAtlas: vi.fn().mockResolvedValue(new Map()),
+}));
+
 const { getLayerFeatures, getRasterTiles } = await import('../sources/index.js');
+const { loadSpriteAtlas } = await import('../sources/sprite.js');
 const { renderMap } = await import('./render.js');
 
 function makeStyle(layers: StyleSpecification['layers']): StyleSpecification {
 	return { version: 8, sources: {}, layers };
 }
 
-function makeJob(style: StyleSpecification, zoom = 10) {
+function makeJob(style: StyleSpecification, zoom = 10, options?: { renderLabels?: boolean }) {
 	return {
 		renderer: new SVGRenderer({ width: 256, height: 256 }),
 		style,
 		view: { center: [0, 0] as [number, number], zoom },
+		renderLabels: options?.renderLabels,
 	};
 }
 
@@ -74,6 +80,7 @@ describe('renderMap', () => {
 		vi.clearAllMocks();
 		(getLayerFeatures as Mock).mockResolvedValue(new Map());
 		(getRasterTiles as Mock).mockResolvedValue([]);
+		(loadSpriteAtlas as Mock).mockResolvedValue(new Map());
 	});
 
 	test('returns valid SVG for empty style', async () => {
@@ -490,6 +497,233 @@ describe('renderMap', () => {
 			]);
 			const result = await renderMap(makeJob(style));
 			expect(result).not.toContain('<circle');
+		});
+	});
+
+	describe('symbol layers', () => {
+		test('renders symbol layer with text-field', async () => {
+			const point = makePointFeature([[[50, 50]]], { name: 'Berlin' });
+			const features = new Map<string, Features>();
+			features.set('places', makeFeatures({ points: [point] }));
+			setLayerFeatures(features);
+
+			const style = makeStyle([
+				{
+					id: 'label-layer',
+					type: 'symbol',
+					source: 'src',
+					'source-layer': 'places',
+					layout: {
+						'text-field': '{name}',
+						'text-size': 14,
+					},
+					paint: {
+						'text-color': '#333333',
+					},
+				} as StyleSpecification['layers'][number],
+			]);
+			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
+			expect(result).toContain('<text');
+			expect(result).toContain('Berlin');
+		});
+
+		test('skips symbol layer when renderLabels is false', async () => {
+			const point = makePointFeature([[[50, 50]]], { name: 'Berlin' });
+			const features = new Map<string, Features>();
+			features.set('places', makeFeatures({ points: [point] }));
+			setLayerFeatures(features);
+
+			const style = makeStyle([
+				{
+					id: 'label-layer',
+					type: 'symbol',
+					source: 'src',
+					'source-layer': 'places',
+					layout: { 'text-field': '{name}' },
+				} as StyleSpecification['layers'][number],
+			]);
+			const result = await renderMap(makeJob(style));
+			expect(result).not.toContain('<text');
+		});
+
+		test('skips symbol layer when no features exist', async () => {
+			setLayerFeatures(new Map());
+
+			const style = makeStyle([
+				{
+					id: 'label-layer',
+					type: 'symbol',
+					source: 'src',
+					'source-layer': 'places',
+					layout: { 'text-field': '{name}' },
+				} as StyleSpecification['layers'][number],
+			]);
+			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
+			expect(result).not.toContain('<text');
+		});
+
+		test('skips features without text-field value', async () => {
+			const point = makePointFeature([[[50, 50]]], {});
+			const features = new Map<string, Features>();
+			features.set('places', makeFeatures({ points: [point] }));
+			setLayerFeatures(features);
+
+			const style = makeStyle([
+				{
+					id: 'label-layer',
+					type: 'symbol',
+					source: 'src',
+					'source-layer': 'places',
+					layout: {
+						'text-field': '{name}',
+					},
+				} as StyleSpecification['layers'][number],
+			]);
+			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
+			expect(result).not.toContain('<text');
+		});
+
+		test('applies filter to symbol features', async () => {
+			const matching = makePointFeature([[[50, 50]]], { name: 'Berlin', class: 'city' });
+			const nonMatching = makePointFeature([[[80, 80]]], { name: 'Park', class: 'poi' });
+			const features = new Map<string, Features>();
+			features.set('places', makeFeatures({ points: [matching, nonMatching] }));
+			setLayerFeatures(features);
+
+			const style = makeStyle([
+				{
+					id: 'label-filtered',
+					type: 'symbol',
+					source: 'src',
+					'source-layer': 'places',
+					filter: ['==', 'class', 'city'],
+					layout: { 'text-field': '{name}' },
+				} as StyleSpecification['layers'][number],
+			]);
+			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
+			expect(result).toContain('Berlin');
+			expect(result).not.toContain('Park');
+		});
+
+		test('renders symbols from linestring features', async () => {
+			const line = makeLineFeature(
+				[
+					[
+						[10, 10],
+						[100, 100],
+					],
+				],
+				{ name: 'Main St' },
+			);
+			const features = new Map<string, Features>();
+			features.set('roads', makeFeatures({ linestrings: [line] }));
+			setLayerFeatures(features);
+
+			const style = makeStyle([
+				{
+					id: 'road-label',
+					type: 'symbol',
+					source: 'src',
+					'source-layer': 'roads',
+					layout: { 'text-field': '{name}' },
+				} as StyleSpecification['layers'][number],
+			]);
+			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
+			expect(result).toContain('<text');
+			expect(result).toContain('Main St');
+		});
+
+		test('renders icons from sprite atlas', async () => {
+			const point = makePointFeature([[[50, 50]]], { name: 'Berlin' });
+			const features = new Map<string, Features>();
+			features.set('places', makeFeatures({ points: [point] }));
+			setLayerFeatures(features);
+
+			const spriteAtlas = new Map();
+			spriteAtlas.set('city-icon', {
+				x: 0,
+				y: 0,
+				width: 24,
+				height: 24,
+				pixelRatio: 1,
+				sheetDataUri: 'data:image/png;base64,AAAA',
+				sheetWidth: 256,
+				sheetHeight: 256,
+			});
+			(loadSpriteAtlas as Mock).mockResolvedValue(spriteAtlas);
+
+			const style = makeStyle([
+				{
+					id: 'icon-layer',
+					type: 'symbol',
+					source: 'src',
+					'source-layer': 'places',
+					layout: {
+						'icon-image': 'city-icon',
+					},
+				} as StyleSpecification['layers'][number],
+			]);
+			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
+			expect(result).toContain('<image');
+			expect(result).toContain('data:image/png;base64,AAAA');
+		});
+
+		test('skips icons when sprite is not found', async () => {
+			const point = makePointFeature([[[50, 50]]], {});
+			const features = new Map<string, Features>();
+			features.set('places', makeFeatures({ points: [point] }));
+			setLayerFeatures(features);
+
+			const style = makeStyle([
+				{
+					id: 'icon-layer',
+					type: 'symbol',
+					source: 'src',
+					'source-layer': 'places',
+					layout: {
+						'icon-image': 'nonexistent',
+					},
+				} as StyleSpecification['layers'][number],
+			]);
+			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
+			expect(result).not.toContain('<image');
+		});
+
+		test('renders both icons and text on same symbol layer', async () => {
+			const point = makePointFeature([[[50, 50]]], { name: 'Berlin' });
+			const features = new Map<string, Features>();
+			features.set('places', makeFeatures({ points: [point] }));
+			setLayerFeatures(features);
+
+			const spriteAtlas = new Map();
+			spriteAtlas.set('city-icon', {
+				x: 0,
+				y: 0,
+				width: 24,
+				height: 24,
+				pixelRatio: 1,
+				sheetDataUri: 'data:image/png;base64,AAAA',
+				sheetWidth: 256,
+				sheetHeight: 256,
+			});
+			(loadSpriteAtlas as Mock).mockResolvedValue(spriteAtlas);
+
+			const style = makeStyle([
+				{
+					id: 'icon-text-layer',
+					type: 'symbol',
+					source: 'src',
+					'source-layer': 'places',
+					layout: {
+						'icon-image': 'city-icon',
+						'text-field': '{name}',
+					},
+				} as StyleSpecification['layers'][number],
+			]);
+			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
+			expect(result).toContain('<image');
+			expect(result).toContain('<text');
+			expect(result).toContain('Berlin');
 		});
 	});
 
