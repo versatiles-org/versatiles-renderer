@@ -9,6 +9,7 @@ export async function renderToSVG(options: {
 	lon?: number;
 	lat?: number;
 	zoom?: number;
+	renderLabels?: boolean;
 }): Promise<string> {
 	const width = options.width ?? 1024;
 	const height = options.height ?? 1024;
@@ -23,5 +24,6 @@ export async function renderToSVG(options: {
 			center: [options.lon ?? 0, options.lat ?? 0],
 			zoom: options.zoom ?? 2,
 		},
+		renderLabels: options.renderLabels ?? false,
 	});
 }

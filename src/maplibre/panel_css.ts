@@ -63,6 +63,10 @@ export const PANEL_CSS = `
 }
 
 .svg-export-panel .panel-inputs {
+	margin-bottom: 12px;
+}
+
+.svg-export-panel .panel-inputs .grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 8px;
@@ -70,11 +74,15 @@ export const PANEL_CSS = `
 }
 
 .svg-export-panel .panel-inputs label {
+	font-size: 12px;
+	color: #666;
+}
+
+.svg-export-panel .panel-inputs .grid label {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
-	font-size: 12px;
-	color: #666;
+	width: 100%;
 }
 
 .svg-export-panel .panel-inputs input {
@@ -82,7 +90,6 @@ export const PANEL_CSS = `
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	font-size: 13px;
-	width: 100%;
 	box-sizing: border-box;
 }
 

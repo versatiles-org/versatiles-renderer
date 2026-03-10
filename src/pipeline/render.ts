@@ -157,6 +157,7 @@ async function render(job: RenderJob): Promise<void> {
 				continue;
 			case 'symbol':
 				{
+					if (!job.renderLabels) continue;
 					const features = getFeatures(layerFeatures, layerStyle);
 					const allFeatures = [
 						...(features?.points ?? []),

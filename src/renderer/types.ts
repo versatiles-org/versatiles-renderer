@@ -22,6 +22,7 @@ export interface RenderJob {
 	style: StyleSpecification;
 	view: View;
 	renderer: Renderer;
+	renderLabels?: boolean;
 }
 
 export interface RendererOptions {

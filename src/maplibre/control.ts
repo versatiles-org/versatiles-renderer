@@ -112,8 +112,11 @@ export class SVGExportControl implements IControl {
 				Text labels are rendered without collision detection, so labels may overlap. You can improve me on <a href="https://github.com/versatiles-org/versatiles-svg-renderer" target="_blank" rel="noopener noreferrer">GitHub</a>.<br>
 			</div>
 			<div class="panel-inputs">
-				<label>Width<input type="number" class="input-width" value="${String(this.options.defaultWidth)}" min="1" max="8192"></label>
-				<label>Height<input type="number" class="input-height" value="${String(this.options.defaultHeight)}" min="1" max="8192"></label>
+				<div class="grid">
+					<label>Width<input type="number" class="input-width" value="${String(this.options.defaultWidth)}" min="1" max="8192"></label>
+					<label>Height<input type="number" class="input-height" value="${String(this.options.defaultHeight)}" min="1" max="8192"></label>
+				</div>
+				<label class="label-checkbox"><input type="checkbox" class="input-labels"> Include text labels (buggy)</label>
 			</div>
 			<div class="preview-container">
 				<span class="preview-loading">Rendering preview\u2026</span>
@@ -148,6 +151,9 @@ export class SVGExportControl implements IControl {
 
 		this.panel.querySelectorAll('input').forEach((input) => {
 			input.addEventListener('input', () => {
+				this.schedulePreview();
+			});
+			input.addEventListener('change', () => {
 				this.schedulePreview();
 			});
 		});
@@ -222,6 +228,7 @@ export class SVGExportControl implements IControl {
 
 		const width = Number((querySelector(panel, '.input-width') as HTMLInputElement).value);
 		const height = Number((querySelector(panel, '.input-height') as HTMLInputElement).value);
+		const renderLabels = (querySelector(panel, '.input-labels') as HTMLInputElement).checked;
 
 		if (!width || !height || width < 1 || height < 1) {
 			previewContainer.innerHTML = '<span class="preview-loading">Invalid input values</span>';
@@ -240,6 +247,7 @@ export class SVGExportControl implements IControl {
 				lon: center.lng,
 				lat: center.lat,
 				zoom,
+				renderLabels,
 			});
 
 			if (this.renderGeneration !== generation) return;
