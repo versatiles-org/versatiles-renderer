@@ -5,6 +5,13 @@ import type { PossiblyEvaluatedPropertyValue, StyleLayer } from './style_layer.j
 import type { RenderJob } from '../renderer/svg.js';
 import type { Features, LayerFeatures } from '../geometry.js';
 
+function resolveTokens(text: string, properties: Record<string, unknown>): string {
+	return text.replace(/\{([^}]+)\}/g, (_, key: string) => {
+		const value = properties[key];
+		return value != null ? String(value as string | number) : '';
+	});
+}
+
 export async function renderMap(job: RenderJob): Promise<string> {
 	await render(job);
 	return job.renderer.getString();
@@ -148,11 +155,53 @@ async function render(job: RenderJob): Promise<void> {
 					);
 				}
 				continue;
+			case 'symbol':
+				{
+					const features = getFeatures(layerFeatures, layerStyle);
+					const allFeatures = [
+						...(features?.points ?? []),
+						...(features?.linestrings ?? []),
+						...(features?.polygons ?? []),
+					];
+					if (allFeatures.length === 0) continue;
+					const symbolFeatures = layerStyle.filterFn
+						? allFeatures.filter((feature) => layerStyle.filterFn!.filter({ zoom }, feature))
+						: allFeatures;
+
+					if (symbolFeatures.length === 0) continue;
+
+					renderer.drawSymbols(
+						symbolFeatures.flatMap((feature) => {
+							const textField = getLayout('text-field', feature);
+							const textRaw =
+								textField != null ? (textField as { toString(): string }).toString() : '';
+							const text = resolveTokens(textRaw, feature.properties as Record<string, unknown>);
+							if (!text) return [];
+							return [
+								[
+									feature,
+									{
+										text,
+										size: getLayout('text-size', feature) as number,
+										font: getLayout('text-font', feature) as string[],
+										anchor: getLayout('text-anchor', feature) as string,
+										offset: getLayout('text-offset', feature) as [number, number],
+										rotate: getLayout('text-rotate', feature) as number,
+										color: getPaint('text-color', feature) as MaplibreColor,
+										opacity: getPaint('text-opacity', feature) as number,
+										haloColor: getPaint('text-halo-color', feature) as MaplibreColor,
+										haloWidth: getPaint('text-halo-width', feature) as number,
+									},
+								],
+							];
+						}),
+					);
+				}
+				continue;
 			case 'color-relief':
 			case 'fill-extrusion':
 			case 'heatmap':
 			case 'hillshade':
-			case 'symbol':
 				continue;
 			default:
 				throw Error('layerStyle.type: ' + String(layerStyle.type));
