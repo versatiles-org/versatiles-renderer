@@ -116,7 +116,7 @@ export class SVGExportControl implements IControl {
 					<label>Width<input type="number" class="input-width" value="${String(this.options.defaultWidth)}" min="1" max="8192"></label>
 					<label>Height<input type="number" class="input-height" value="${String(this.options.defaultHeight)}" min="1" max="8192"></label>
 				</div>
-				<label class="label-checkbox"><input type="checkbox" class="input-labels"> Include text labels (buggy)</label>
+				<label class="label-checkbox"><input type="checkbox" class="input-labels"> Include labels and icons (buggy)</label>
 			</div>
 			<div class="preview-container">
 				<span class="preview-loading">Rendering preview\u2026</span>
