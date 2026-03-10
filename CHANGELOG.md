@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-03-10
+
+### Features
+
+- add drawSymbols method for rendering text with styles in SVG
+- add support for rendering symbols with dynamic text in SVG
+- add drawSymbols method and SymbolStyle interface for enhanced SVG rendering
+- add option to include text labels in SVG rendering and update related UI components
+- implement icon rendering support in SVG with sprite atlas integration
+- update rendering methods to include layer IDs
+- add support for rendering symbol layers with text and icons in SVG
+- enhance SVG rendering tests with support for symbol and icon layers
+- add tests for loadSpriteAtlas function to validate sprite loading and error handling
+- enable hash support in map configuration for improved URL handling
+
+### Bug Fixes
+
+- add viewport meta tag for better mobile rendering
+- update notice about text label rendering and collision detection in SVG export panel
+- update default font family in SVG rendering to include Helvetica and Arial
+- update label for checkbox to include icons in SVG export options
+
+### Chores
+
+- **deps-dev:** bump the npm group with 8 updates
+- **deps:** bump actions/upload-artifact in the action group
+- update sub dependencies
+
 ## [0.5.2] - 2026-02-18
 
 ### Code Refactoring
