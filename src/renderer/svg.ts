@@ -11,7 +11,7 @@ import type {
 	RasterStyle,
 	RasterTile,
 	RendererOptions,
-	SymbolStyle,
+	SymbolStyle as LabelStyle,
 } from './types.js';
 import type { SpriteAtlas } from '../sources/sprite.js';
 
@@ -52,7 +52,7 @@ export class SVGRenderer {
 		this.#backgroundColor = color;
 	}
 
-	public drawPolygons(features: [Feature, FillStyle][]): void {
+	public drawPolygons(id: string, features: [Feature, FillStyle][]): void {
 		if (features.length === 0) return;
 
 		const groups = new Map<string, { segments: Segment[]; attrs: string }>();
@@ -78,13 +78,15 @@ export class SVGRenderer {
 			});
 		});
 
+		this.#svg.push(`<g id="${escapeXml(id)}">`);
 		for (const { segments, attrs } of groups.values()) {
 			const d = segmentsToPath(segments, true);
 			this.#svg.push(`<path d="${d}" ${attrs} />`);
 		}
+		this.#svg.push('</g>');
 	}
 
-	public drawLineStrings(features: [Feature, LineStyle][]): void {
+	public drawLineStrings(id: string, features: [Feature, LineStyle][]): void {
 		if (features.length === 0) return;
 
 		const groups = new Map<string, { segments: Segment[]; attrs: string }>();
@@ -135,14 +137,16 @@ export class SVGRenderer {
 			});
 		});
 
+		this.#svg.push(`<g id="${escapeXml(id)}">`);
 		for (const { segments, attrs } of groups.values()) {
 			const chains = chainSegments(segments);
 			const d = segmentsToPath(chains);
 			this.#svg.push(`<path d="${d}" ${attrs} />`);
 		}
+		this.#svg.push('</g>');
 	}
 
-	public drawCircles(features: [Feature, CircleStyle][]): void {
+	public drawCircles(id: string, features: [Feature, CircleStyle][]): void {
 		if (features.length === 0) return;
 
 		const groups = new Map<string, { points: [number, number][]; attrs: string }>();
@@ -176,16 +180,19 @@ export class SVGRenderer {
 			});
 		});
 
+		this.#svg.push(`<g id="${escapeXml(id)}">`);
 		for (const { points, attrs } of groups.values()) {
 			for (const [x, y] of points) {
 				this.#svg.push(`<circle cx="${formatNum(x)}" cy="${formatNum(y)}" ${attrs} />`);
 			}
 		}
+		this.#svg.push('</g>');
 	}
 
-	public drawSymbols(features: [Feature, SymbolStyle][]): void {
+	public drawLabels(id: string, features: [Feature, LabelStyle][]): void {
 		if (features.length === 0) return;
 
+		this.#svg.push(`<g id="${escapeXml(id)}">`);
 		for (const [feature, style] of features) {
 			if (style.opacity <= 0 || !style.text) continue;
 
@@ -238,11 +245,13 @@ export class SVGRenderer {
 
 			this.#svg.push(`<text ${attrs.join(' ')}>${escapeXml(style.text)}</text>`);
 		}
+		this.#svg.push('</g>');
 	}
 
-	public drawIcons(features: [Feature, IconStyle][], spriteAtlas: SpriteAtlas): void {
+	public drawIcons(id: string, features: [Feature, IconStyle][], spriteAtlas: SpriteAtlas): void {
 		if (features.length === 0) return;
 
+		this.#svg.push(`<g id="${escapeXml(id)}">`);
 		for (const [feature, style] of features) {
 			if (style.opacity <= 0) continue;
 
@@ -292,9 +301,10 @@ export class SVGRenderer {
 					`</svg>`,
 			);
 		}
+		this.#svg.push('</g>');
 	}
 
-	public drawRasterTiles(tiles: RasterTile[], style: RasterStyle): void {
+	public drawRasterTiles(id: string, tiles: RasterTile[], style: RasterStyle): void {
 		if (tiles.length === 0) return;
 		if (style.opacity <= 0) return;
 
@@ -307,7 +317,7 @@ export class SVGRenderer {
 			filters.push(`brightness(${String(brightness)})`);
 		}
 
-		let gAttrs = `opacity="${String(style.opacity)}"`;
+		let gAttrs = `id="${escapeXml(id)}" opacity="${String(style.opacity)}"`;
 		if (filters.length > 0) gAttrs += ` filter="${filters.join(' ')}"`;
 
 		this.#svg.push(`<g ${gAttrs}>`);

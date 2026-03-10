@@ -62,6 +62,8 @@ async function render(job: RenderJob): Promise<void> {
 			return getStyleValue(layerStyle.layout, key, feature);
 		}
 
+		const layerId = layerStyle.id;
+
 		switch (layerStyle.type) {
 			case 'background':
 				{
@@ -82,6 +84,7 @@ async function render(job: RenderJob): Promise<void> {
 					if (polygonFeatures.length === 0) continue;
 
 					renderer.drawPolygons(
+						layerId,
 						polygonFeatures.map((feature) => [
 							feature,
 							{
@@ -104,6 +107,7 @@ async function render(job: RenderJob): Promise<void> {
 					if (lineStringFeatures.length === 0) continue;
 
 					renderer.drawLineStrings(
+						layerId,
 						lineStringFeatures.map((feature) => [
 							feature,
 							{
@@ -124,7 +128,7 @@ async function render(job: RenderJob): Promise<void> {
 			case 'raster':
 				{
 					const tiles = await getRasterTiles(job, layerStyle.source);
-					renderer.drawRasterTiles(tiles, {
+					renderer.drawRasterTiles(layerId, tiles, {
 						opacity: getPaint('raster-opacity') as number,
 						hueRotate: getPaint('raster-hue-rotate') as number,
 						brightnessMin: getPaint('raster-brightness-min') as number,
@@ -146,6 +150,7 @@ async function render(job: RenderJob): Promise<void> {
 					if (pointFeatures.length === 0) continue;
 
 					renderer.drawCircles(
+						layerId,
 						pointFeatures.map((feature) => [
 							feature,
 							{
@@ -178,6 +183,7 @@ async function render(job: RenderJob): Promise<void> {
 
 					// Render icons first (underneath text)
 					renderer.drawIcons(
+						`${layerId}-icons`,
 						symbolFeatures.flatMap((feature) => {
 							const iconImage = getLayout('icon-image', feature);
 							const iconName =
@@ -206,7 +212,8 @@ async function render(job: RenderJob): Promise<void> {
 					);
 
 					// Render text labels on top
-					renderer.drawSymbols(
+					renderer.drawLabels(
+						`${layerId}-labels`,
 						symbolFeatures.flatMap((feature) => {
 							const textField = getLayout('text-field', feature);
 							const textRaw =

@@ -11,12 +11,12 @@ export interface Renderer {
 	readonly width: number;
 	readonly height: number;
 	drawBackgroundFill(style: BackgroundStyle): void;
-	drawPolygons(features: [Feature, FillStyle][]): void;
-	drawLineStrings(features: [Feature, LineStyle][]): void;
-	drawCircles(features: [Feature, CircleStyle][]): void;
-	drawSymbols(features: [Feature, SymbolStyle][]): void;
-	drawIcons(features: [Feature, IconStyle][], spriteAtlas: SpriteAtlas): void;
-	drawRasterTiles(tiles: RasterTile[], style: RasterStyle): void;
+	drawPolygons(id: string, features: [Feature, FillStyle][]): void;
+	drawLineStrings(id: string, features: [Feature, LineStyle][]): void;
+	drawCircles(id: string, features: [Feature, CircleStyle][]): void;
+	drawLabels(id: string, features: [Feature, SymbolStyle][]): void;
+	drawIcons(id: string, features: [Feature, IconStyle][], spriteAtlas: SpriteAtlas): void;
+	drawRasterTiles(id: string, tiles: RasterTile[], style: RasterStyle): void;
 	getString(): string;
 }
 
