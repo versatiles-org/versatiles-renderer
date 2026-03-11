@@ -49,7 +49,7 @@
   "scripts": {
     "build": "rm -rf dist && rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript && rm -rf dist/types",
     "build-analyze": "npm run build && tsx scripts/analyze-bundle.ts",
-    "check": "npm run format && npm run lint && npm run build && npm run test && npm run test:e2e",
+    "check": "npm run format && npm run lint && npm run typecheck && npm run build && npm run test && npm run test:e2e",
     "demo": "tsx src/demo.ts",
     "dev": "tsx dev/serve.ts",
     "doc:graph": "vrt deps-graph | vrt doc-insert README.md '## Dependency Graph'",
@@ -59,6 +59,7 @@
     "prepack": "npm run doc:graph && npm run build",
     "release": "npx vrt release-npm",
     "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
     "test:coverage": "vitest run --coverage",
     "test:e2e:maplibre": "tsx e2e/maplibre-control.ts",
     "test:e2e:screenshots": "tsx e2e/screenshots.ts",
