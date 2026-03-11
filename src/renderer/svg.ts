@@ -49,6 +49,8 @@ export class SVGRenderer {
 		{ symbolId: string; sheetDefId: string; x: number; y: number; width: number; height: number }
 	>();
 
+	readonly #sdfFilterDefs = new Map<string, { filterId: string; content: string }>();
+
 	public constructor(opt: RendererOptions) {
 		this.width = opt.width;
 		this.height = opt.height;
@@ -319,6 +321,54 @@ export class SVGRenderer {
 			const scaleStr = scale === 1 ? '' : ` scale(${formatScale(scale)})`;
 			const opacityAttr = style.opacity < 1 ? ` opacity="${style.opacity.toFixed(3)}"` : '';
 
+			// SDF filter for colorable icons
+			let filterAttr = '';
+			if (style.sdf) {
+				const iconColor = new Color(style.color);
+				const haloColor = new Color(style.haloColor);
+				const hasHalo = style.haloWidth > 0 && haloColor.alpha > 0;
+				const filterKey = hasHalo
+					? `sdf\0${iconColor.hex}\0${haloColor.hex}\0${String(style.haloWidth)}`
+					: `sdf\0${iconColor.hex}`;
+
+				if (!this.#sdfFilterDefs.has(filterKey)) {
+					const filterId = `sdf-${String(this.#sdfFilterDefs.size)}`;
+					const iconFloodOpacity =
+						iconColor.alpha < 255 ? ` flood-opacity="${iconColor.opacity.toFixed(3)}"` : '';
+					let content: string;
+					if (hasHalo) {
+						const haloRadius = formatScale(style.haloWidth);
+						const haloFloodOpacity =
+							haloColor.alpha < 255 ? ` flood-opacity="${haloColor.opacity.toFixed(3)}"` : '';
+						content =
+							`<filter id="${filterId}" color-interpolation-filters="sRGB">` +
+							// Threshold alpha at 0.75 (MapLibre SDF edge) to get sharp icon mask
+							`<feComponentTransfer in="SourceGraphic" result="sharp"><feFuncA type="discrete" tableValues="0 0 0 1" /></feComponentTransfer>` +
+							// Dilate sharp mask for halo
+							`<feMorphology in="sharp" operator="dilate" radius="${haloRadius}" result="dilated" />` +
+							`<feFlood flood-color="${haloColor.rgb}"${haloFloodOpacity} result="haloColor" />` +
+							`<feComposite in="haloColor" in2="dilated" operator="in" result="halo" />` +
+							// Color the sharp icon
+							`<feFlood flood-color="${iconColor.rgb}"${iconFloodOpacity} result="iconColor" />` +
+							`<feComposite in="iconColor" in2="sharp" operator="in" result="colored" />` +
+							`<feComposite in="colored" in2="halo" operator="over" />` +
+							`</filter>`;
+					} else {
+						content =
+							`<filter id="${filterId}" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">` +
+							// Threshold alpha at 0.75 (MapLibre SDF edge) to get sharp mask
+							`<feComponentTransfer in="SourceGraphic" result="sharp"><feFuncA type="discrete" tableValues="0 0 0 1" /></feComponentTransfer>` +
+							// Replace color while keeping sharp alpha
+							`<feFlood flood-color="${iconColor.rgb}"${iconFloodOpacity} result="color" />` +
+							`<feComposite in="color" in2="sharp" operator="in" />` +
+							`</filter>`;
+					}
+					this.#sdfFilterDefs.set(filterKey, { filterId, content });
+				}
+				const { filterId } = this.#sdfFilterDefs.get(filterKey)!;
+				filterAttr = ` filter="url(#${filterId})"`;
+			}
+
 			if (style.rotate !== 0) {
 				const [cx, cy] = roundXY(
 					point.x + style.offset[0] * style.size,
@@ -326,13 +376,13 @@ export class SVGRenderer {
 				);
 				elements.push(
 					`<g transform="rotate(${String(style.rotate)},${formatNum(cx)},${formatNum(cy)})">` +
-						`<g transform="translate(${formatNum(iconXr)},${formatNum(iconYr)})${scaleStr}"${opacityAttr}>` +
+						`<g transform="translate(${formatNum(iconXr)},${formatNum(iconYr)})${scaleStr}"${opacityAttr}${filterAttr}>` +
 						`<use href="#${escapeXml(symDef.symbolId)}" />` +
 						`</g></g>`,
 				);
 			} else {
 				elements.push(
-					`<g transform="translate(${formatNum(iconXr)},${formatNum(iconYr)})${scaleStr}"${opacityAttr}>` +
+					`<g transform="translate(${formatNum(iconXr)},${formatNum(iconYr)})${scaleStr}"${opacityAttr}${filterAttr}>` +
 						`<use href="#${escapeXml(symDef.symbolId)}" />` +
 						`</g>`,
 				);
@@ -392,6 +442,9 @@ export class SVGRenderer {
 				`<clipPath id="${escapeXml(clipId)}"><rect width="${formatNum(sym.width)}" height="${formatNum(sym.height)}" /></clipPath>`,
 				`<symbol id="${escapeXml(sym.symbolId)}"><g clip-path="url(#${escapeXml(clipId)})"><use href="#${escapeXml(sym.sheetDefId)}" x="${formatNum(-sym.x)}" y="${formatNum(-sym.y)}" /></g></symbol>`,
 			);
+		}
+		for (const { content } of this.#sdfFilterDefs.values()) {
+			defsContent.push(content);
 		}
 
 		const parts = [

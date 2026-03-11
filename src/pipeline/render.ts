@@ -194,6 +194,7 @@ async function render(job: RenderJob): Promise<void> {
 										)
 									: '';
 							if (!iconName || !spriteAtlas.has(iconName)) return [];
+							const spriteEntry = spriteAtlas.get(iconName)!;
 							return [
 								[
 									feature,
@@ -204,6 +205,10 @@ async function render(job: RenderJob): Promise<void> {
 										offset: getLayout('icon-offset', feature) as [number, number],
 										rotate: getLayout('icon-rotate', feature) as number,
 										opacity: getPaint('icon-opacity', feature) as number,
+										sdf: spriteEntry.sdf,
+										color: getPaint('icon-color', feature) as MaplibreColor,
+										haloColor: getPaint('icon-halo-color', feature) as MaplibreColor,
+										haloWidth: getPaint('icon-halo-width', feature) as number,
 									},
 								],
 							];

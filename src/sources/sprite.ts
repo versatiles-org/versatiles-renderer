@@ -6,6 +6,7 @@ export interface SpriteEntry {
 	x: number;
 	y: number;
 	pixelRatio: number;
+	sdf: boolean;
 	sheetDataUri: string;
 	sheetWidth: number;
 	sheetHeight: number;
@@ -19,6 +20,7 @@ interface SpriteJsonEntry {
 	x: number;
 	y: number;
 	pixelRatio?: number;
+	sdf?: boolean;
 }
 
 async function fetchSpritePair(
@@ -80,6 +82,7 @@ export async function loadSpriteAtlas(style: StyleSpecification): Promise<Sprite
 						x: entry.x,
 						y: entry.y,
 						pixelRatio: entry.pixelRatio ?? 1,
+						sdf: entry.sdf ?? false,
 						sheetDataUri,
 						sheetWidth,
 						sheetHeight,

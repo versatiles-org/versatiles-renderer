@@ -94,6 +94,10 @@ export interface IconStyle {
 	offset: [number, number];
 	rotate: number;
 	opacity: number;
+	sdf: boolean;
+	color: MaplibreColor;
+	haloColor: MaplibreColor;
+	haloWidth: number;
 }
 
 export interface RasterTile {
