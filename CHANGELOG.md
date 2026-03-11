@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-03-11
+
+### Features
+
+- enhance SVG rendering with sprite sheet and symbol definitions for improved icon handling
+- add test-icons script for SVG rendering and rasterization
+- add support for SDF filters in SVG rendering for colorable icons
+- implement SDF icon rendering with color filters and halo effects
+
+### Bug Fixes
+
+- repair feature handling by splitting MultiPoint into individual Point features
+- use retina sprites
+- update check script to include typecheck step
+- update tsconfig.json to exclude 'dev' directory from compilation
+- handle undefined spritePair in loadSpriteAtlas function
+- update format script to include log level warning for prettier
+
 ## [0.6.0] - 2026-03-10
 
 ### Features
