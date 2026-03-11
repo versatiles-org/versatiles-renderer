@@ -54,9 +54,9 @@ export async function loadSpriteAtlas(style: StyleSpecification): Promise<Sprite
 		sources.map(async ({ id, url }) => {
 			try {
 				// Try @2x retina sprites first, fall back to 1x
-				const { jsonResponse, imageResponse } = (await fetchSpritePair(`${url}@2x`)) ??
-					(await fetchSpritePair(url)) ?? { jsonResponse: undefined, imageResponse: undefined };
-				if (!jsonResponse || !imageResponse) return;
+				const spritePair = (await fetchSpritePair(`${url}@2x`)) ?? (await fetchSpritePair(url));
+				if (!spritePair) return;
+				const { jsonResponse, imageResponse } = spritePair;
 
 				const json = (await jsonResponse.json()) as Record<string, SpriteJsonEntry>;
 				const imageBuffer = await imageResponse.arrayBuffer();
