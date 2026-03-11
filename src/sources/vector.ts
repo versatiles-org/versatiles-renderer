@@ -75,14 +75,26 @@ export async function loadVectorSource(
 							break;
 					}
 
-					const feature = new Feature({
-						type,
-						geometry,
-						id: featureSrc.id,
-						properties: featureSrc.properties,
-					});
-
-					if (feature.doesOverlap([0, 0, width, height])) list.push(feature);
+					// Split MultiPoint into individual Point features
+					if (type === 'Point' && geometry.length > 1) {
+						for (const ring of geometry) {
+							const feature = new Feature({
+								type,
+								geometry: [ring],
+								id: featureSrc.id,
+								properties: featureSrc.properties,
+							});
+							if (feature.doesOverlap([0, 0, width, height])) list.push(feature);
+						}
+					} else {
+						const feature = new Feature({
+							type,
+							geometry,
+							id: featureSrc.id,
+							properties: featureSrc.properties,
+						});
+						if (feature.doesOverlap([0, 0, width, height])) list.push(feature);
+					}
 				}
 			}
 		}),
