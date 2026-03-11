@@ -21,6 +21,16 @@ interface SpriteJsonEntry {
 	pixelRatio?: number;
 }
 
+async function fetchSpritePair(
+	url: string,
+): Promise<{ jsonResponse: Response; imageResponse: Response } | undefined> {
+	const [jsonResponse, imageResponse] = await Promise.all([
+		fetch(`${url}.json`),
+		fetch(`${url}.png`),
+	]);
+	if (jsonResponse.ok && imageResponse.ok) return { jsonResponse, imageResponse };
+}
+
 export async function loadSpriteAtlas(style: StyleSpecification): Promise<SpriteAtlas> {
 	const atlas: SpriteAtlas = new Map();
 	const sprite = style.sprite;
@@ -41,11 +51,10 @@ export async function loadSpriteAtlas(style: StyleSpecification): Promise<Sprite
 	await Promise.all(
 		sources.map(async ({ id, url }) => {
 			try {
-				const [jsonResponse, imageResponse] = await Promise.all([
-					fetch(`${url}.json`),
-					fetch(`${url}.png`),
-				]);
-				if (!jsonResponse.ok || !imageResponse.ok) return;
+				// Try @2x retina sprites first, fall back to 1x
+				const { jsonResponse, imageResponse } = (await fetchSpritePair(`${url}@2x`)) ??
+					(await fetchSpritePair(url)) ?? { jsonResponse: undefined, imageResponse: undefined };
+				if (!jsonResponse || !imageResponse) return;
 
 				const json = (await jsonResponse.json()) as Record<string, SpriteJsonEntry>;
 				const imageBuffer = await imageResponse.arrayBuffer();
