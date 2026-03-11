@@ -574,6 +574,10 @@ describe('SVGRenderer', () => {
 				offset: [0, 0] as [number, number],
 				rotate: 0,
 				opacity: 1,
+				sdf: false,
+				color: mc('#000000'),
+				haloColor: mc('#000000', 0),
+				haloWidth: 0,
 				...overrides,
 			};
 		}
@@ -589,6 +593,7 @@ describe('SVGRenderer', () => {
 				atlas.set(name, {
 					...e,
 					pixelRatio: 1,
+					sdf: false,
 					sheetDataUri: 'data:image/png;base64,AAAA',
 					sheetWidth: 256,
 					sheetHeight: 256,
@@ -673,6 +678,7 @@ describe('SVGRenderer', () => {
 				width: 20,
 				height: 20,
 				pixelRatio: 2,
+				sdf: false,
 				sheetDataUri: 'data:image/png;base64,AAAA',
 				sheetWidth: 256,
 				sheetHeight: 256,
@@ -700,6 +706,88 @@ describe('SVGRenderer', () => {
 			const svg = r.getString();
 			// size=0.5, pixelRatio=1 → scale=0.5
 			expect(svg).toContain('scale(0.5)');
+		});
+
+		test('SDF icon applies color filter with threshold', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawIcons(
+				'icon-test',
+				[[feature, defaultIconStyle({ sdf: true, color: mc('#FF0000') })]],
+				makeSpriteAtlas(),
+			);
+			const svg = r.getString();
+			expect(svg).toContain(
+				'<filter id="sdf-0" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">',
+			);
+			// Threshold step for sharp edges
+			expect(svg).toContain('feComponentTransfer');
+			expect(svg).toContain('tableValues="0 0 0 1"');
+			expect(svg).toContain('flood-color="#FF0000"');
+			expect(svg).toContain('filter="url(#sdf-0)"');
+		});
+
+		test('SDF icon with halo applies threshold and dilate filter', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawIcons(
+				'icon-test',
+				[
+					[
+						feature,
+						defaultIconStyle({
+							sdf: true,
+							color: mc('#FF0000'),
+							haloColor: mc('#FFFFFF'),
+							haloWidth: 2,
+						}),
+					],
+				],
+				makeSpriteAtlas(),
+			);
+			const svg = r.getString();
+			expect(svg).toContain('<filter id="sdf-0" color-interpolation-filters="sRGB">');
+			// Threshold step
+			expect(svg).toContain('feComponentTransfer');
+			expect(svg).toContain('tableValues="0 0 0 1"');
+			// Dilate for halo
+			expect(svg).toContain('feMorphology');
+			expect(svg).toContain('operator="dilate"');
+			expect(svg).toContain('radius="2"');
+			expect(svg).toContain('flood-color="#FFFFFF"');
+			expect(svg).toContain('flood-color="#FF0000"');
+			expect(svg).toContain('filter="url(#sdf-0)"');
+		});
+
+		test('non-SDF icon has no filter', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawIcons('icon-test', [[feature, defaultIconStyle({ sdf: false })]], makeSpriteAtlas());
+			const svg = r.getString();
+			expect(svg).not.toContain('<filter');
+			expect(svg).not.toContain('filter="url(');
+		});
+
+		test('SDF icons with same color share filter', () => {
+			const r = makeRenderer();
+			const f1 = makePointFeature([[100, 50]]);
+			const f2 = makePointFeature([[200, 50]]);
+			const atlas = makeSpriteAtlas({
+				airport: { x: 0, y: 0, width: 32, height: 32 },
+				bus: { x: 32, y: 0, width: 32, height: 32 },
+			});
+			r.drawIcons(
+				'icon-test',
+				[
+					[f1, defaultIconStyle({ image: 'airport', sdf: true, color: mc('#FF0000') })],
+					[f2, defaultIconStyle({ image: 'bus', sdf: true, color: mc('#FF0000') })],
+				],
+				atlas,
+			);
+			const svg = r.getString();
+			// Only one filter definition
+			const filterCount = (svg.match(/<filter /g) ?? []).length;
+			expect(filterCount).toBe(1);
 		});
 	});
 });
