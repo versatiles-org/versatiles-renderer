@@ -48,9 +48,7 @@ describe('SVGRenderer', () => {
 		test('includes clipPath and clip group', () => {
 			const r = makeRenderer();
 			const svg = r.getString();
-			expect(svg).toContain(
-				'<defs><clipPath id="vb"><rect width="256" height="256"/></clipPath></defs>',
-			);
+			expect(svg).toContain('<clipPath id="vb"><rect width="256" height="256"/></clipPath>');
 			expect(svg).toContain('<g clip-path="url(#vb)">');
 		});
 
@@ -599,24 +597,32 @@ describe('SVGRenderer', () => {
 			return atlas;
 		}
 
-		test('generates nested SVG with image for icon', () => {
+		test('generates symbol and use element for icon', () => {
 			const r = makeRenderer();
 			const feature = makePointFeature([[100, 50]]);
 			r.drawIcons('icon-test', [[feature, defaultIconStyle()]], makeSpriteAtlas());
 			const svg = r.getString();
 			expect(svg).toContain('<g id="icon-test">');
-			expect(svg).toContain('<svg');
-			expect(svg).toContain('<image');
-			expect(svg).toContain('viewBox="0 0 32 32"');
+			// Shared sprite sheet image in defs
+			expect(svg).toContain('<image id="sprite-sheet-0" width="256" height="256"');
 			expect(svg).toContain('href="data:image/png;base64,AAAA"');
+			// ClipPath and symbol with <g clip-path> wrapping <use>
+			expect(svg).toContain(
+				'<clipPath id="sprite-airport-clip"><rect width="32" height="32" /></clipPath>',
+			);
+			expect(svg).toContain(
+				'<symbol id="sprite-airport"><g clip-path="url(#sprite-airport-clip)"><use href="#sprite-sheet-0" x="0" y="0" /></g></symbol>',
+			);
+			// Icon rendered as <use> inside positioned <g>
+			expect(svg).toContain('<use href="#sprite-airport"');
 		});
 
 		test('empty features produce no output', () => {
 			const r = makeRenderer();
 			r.drawIcons('icon-test', [], makeSpriteAtlas());
 			const svg = r.getString();
-			// Only the wrapper SVG should exist
-			expect(svg.match(/<svg/g)?.length).toBe(1);
+			expect(svg).not.toContain('<image');
+			expect(svg).not.toContain('icon-test');
 		});
 
 		test('missing sprite produces no output', () => {
@@ -629,6 +635,7 @@ describe('SVGRenderer', () => {
 			);
 			const svg = r.getString();
 			expect(svg).not.toContain('<image');
+			expect(svg).not.toContain('icon-test');
 		});
 
 		test('zero opacity produces no output', () => {
@@ -637,6 +644,7 @@ describe('SVGRenderer', () => {
 			r.drawIcons('icon-test', [[feature, defaultIconStyle({ opacity: 0 })]], makeSpriteAtlas());
 			const svg = r.getString();
 			expect(svg).not.toContain('<image');
+			expect(svg).not.toContain('icon-test');
 		});
 
 		test('applies rotation', () => {
@@ -644,7 +652,7 @@ describe('SVGRenderer', () => {
 			const feature = makePointFeature([[100, 50]]);
 			r.drawIcons('icon-test', [[feature, defaultIconStyle({ rotate: 45 })]], makeSpriteAtlas());
 			const svg = r.getString();
-			expect(svg).toContain('transform="rotate(45,');
+			expect(svg).toContain('rotate(45,');
 		});
 
 		test('applies opacity when < 1', () => {
@@ -671,9 +679,27 @@ describe('SVGRenderer', () => {
 			});
 			r.drawIcons('icon-test', [[feature, defaultIconStyle({ image: 'icon', size: 2 })]], atlas);
 			const svg = r.getString();
-			// size=2, pixelRatio=2 → scale=1 → icon dimensions = 20x20
-			expect(svg).toContain('width="20"');
-			expect(svg).toContain('height="20"');
+			// size=2, pixelRatio=2 → scale=1 → no scale() transform needed
+			// Symbol defined at native sprite size (20x20 in 10x coords → "20" x "20")
+			expect(svg).toContain(
+				'<clipPath id="sprite-icon-clip"><rect width="20" height="20" /></clipPath>',
+			);
+			expect(svg).toContain(
+				'<symbol id="sprite-icon"><g clip-path="url(#sprite-icon-clip)"><use href="#sprite-sheet-0" x="0" y="0" /></g></symbol>',
+			);
+			// Shared sheet image in defs at native size (256*10=2560 → "256")
+			expect(svg).toContain('<image id="sprite-sheet-0" width="256" height="256"');
+			// Instance has no scale() since scale=1
+			expect(svg).not.toContain('scale(');
+		});
+
+		test('applies scale transform when size differs from pixelRatio', () => {
+			const r = makeRenderer();
+			const feature = makePointFeature([[100, 50]]);
+			r.drawIcons('icon-test', [[feature, defaultIconStyle({ size: 0.5 })]], makeSpriteAtlas());
+			const svg = r.getString();
+			// size=0.5, pixelRatio=1 → scale=0.5
+			expect(svg).toContain('scale(0.5)');
 		});
 	});
 });

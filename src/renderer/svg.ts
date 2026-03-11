@@ -39,6 +39,16 @@ export class SVGRenderer {
 
 	#backgroundColor: Color;
 
+	readonly #spriteSheetDefs = new Map<
+		string,
+		{ defId: string; width: number; height: number; href: string }
+	>();
+
+	readonly #spriteSymbolDefs = new Map<
+		string,
+		{ symbolId: string; sheetDefId: string; x: number; y: number; width: number; height: number }
+	>();
+
 	public constructor(opt: RendererOptions) {
 		this.width = opt.width;
 		this.height = opt.height;
@@ -251,7 +261,8 @@ export class SVGRenderer {
 	public drawIcons(id: string, features: [Feature, IconStyle][], spriteAtlas: SpriteAtlas): void {
 		if (features.length === 0) return;
 
-		this.#svg.push(`<g id="${escapeXml(id)}">`);
+		const elements: string[] = [];
+
 		for (const [feature, style] of features) {
 			if (style.opacity <= 0) continue;
 
@@ -270,37 +281,68 @@ export class SVGRenderer {
 			const ox = style.offset[0] * style.size + anchorDx;
 			const oy = style.offset[1] * style.size + anchorDy;
 
-			const x = point.x + ox;
-			const y = point.y + oy;
+			const [iconXr, iconYr] = roundXY(point.x + ox, point.y + oy);
 
-			const [sx, sy] = roundXY(x, y);
-			const [sw, sh] = roundXY(iconW, iconH);
+			// Register sprite sheet in global defs (once per unique data URI)
+			const imgW = Math.round(sprite.sheetWidth * 10);
+			const imgH = Math.round(sprite.sheetHeight * 10);
+			const sheetKey = sprite.sheetDataUri;
+			if (!this.#spriteSheetDefs.has(sheetKey)) {
+				this.#spriteSheetDefs.set(sheetKey, {
+					defId: `sprite-sheet-${String(this.#spriteSheetDefs.size)}`,
+					width: imgW,
+					height: imgH,
+					href: sprite.sheetDataUri,
+				});
+			}
+			const sheetDef = this.#spriteSheetDefs.get(sheetKey)!;
 
-			const viewBox = `${String(sprite.x)} ${String(sprite.y)} ${String(sprite.width)} ${String(sprite.height)}`;
+			// Register symbol for this sprite (once per sprite name + sheet)
+			const sprX = Math.round(sprite.x * 10);
+			const sprY = Math.round(sprite.y * 10);
+			const sprW = Math.round(sprite.width * 10);
+			const sprH = Math.round(sprite.height * 10);
+			const symKey = `${style.image}\0${sheetKey}`;
+			if (!this.#spriteSymbolDefs.has(symKey)) {
+				this.#spriteSymbolDefs.set(symKey, {
+					symbolId: `sprite-${escapeXml(style.image)}`,
+					sheetDefId: sheetDef.defId,
+					x: sprX,
+					y: sprY,
+					width: sprW,
+					height: sprH,
+				});
+			}
+			const symDef = this.#spriteSymbolDefs.get(symKey)!;
 
-			const attrs: string[] = [
-				`x="${formatNum(sx)}"`,
-				`y="${formatNum(sy)}"`,
-				`width="${formatNum(sw)}"`,
-				`height="${formatNum(sh)}"`,
-			];
-
-			if (style.opacity < 1) attrs.push(`opacity="${style.opacity.toFixed(3)}"`);
+			// Build instance: translate to position, scale from native to desired size
+			const scaleStr = scale === 1 ? '' : ` scale(${formatScale(scale)})`;
+			const opacityAttr = style.opacity < 1 ? ` opacity="${style.opacity.toFixed(3)}"` : '';
 
 			if (style.rotate !== 0) {
 				const [cx, cy] = roundXY(
 					point.x + style.offset[0] * style.size,
 					point.y + style.offset[1] * style.size,
 				);
-				attrs.push(`transform="rotate(${String(style.rotate)},${formatNum(cx)},${formatNum(cy)})"`);
+				elements.push(
+					`<g transform="rotate(${String(style.rotate)},${formatNum(cx)},${formatNum(cy)})">` +
+						`<g transform="translate(${formatNum(iconXr)},${formatNum(iconYr)})${scaleStr}"${opacityAttr}>` +
+						`<use href="#${escapeXml(symDef.symbolId)}" />` +
+						`</g></g>`,
+				);
+			} else {
+				elements.push(
+					`<g transform="translate(${formatNum(iconXr)},${formatNum(iconYr)})${scaleStr}"${opacityAttr}>` +
+						`<use href="#${escapeXml(symDef.symbolId)}" />` +
+						`</g>`,
+				);
 			}
-
-			this.#svg.push(
-				`<svg ${attrs.join(' ')} viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg">` +
-					`<image width="${String(sprite.sheetWidth)}" height="${String(sprite.sheetHeight)}" href="${sprite.sheetDataUri}" />` +
-					`</svg>`,
-			);
 		}
+
+		if (elements.length === 0) return;
+
+		this.#svg.push(`<g id="${escapeXml(id)}">`);
+		this.#svg.push(...elements);
 		this.#svg.push('</g>');
 	}
 
@@ -336,9 +378,25 @@ export class SVGRenderer {
 	public getString(): string {
 		const w = this.width.toFixed(0);
 		const h = this.height.toFixed(0);
+
+		// Build defs content
+		const defsContent = [`<clipPath id="vb"><rect width="${w}" height="${h}"/></clipPath>`];
+		for (const sheet of this.#spriteSheetDefs.values()) {
+			defsContent.push(
+				`<image id="${escapeXml(sheet.defId)}" width="${formatNum(sheet.width)}" height="${formatNum(sheet.height)}" href="${escapeXml(sheet.href)}" />`,
+			);
+		}
+		for (const sym of this.#spriteSymbolDefs.values()) {
+			const clipId = `${sym.symbolId}-clip`;
+			defsContent.push(
+				`<clipPath id="${escapeXml(clipId)}"><rect width="${formatNum(sym.width)}" height="${formatNum(sym.height)}" /></clipPath>`,
+				`<symbol id="${escapeXml(sym.symbolId)}"><g clip-path="url(#${escapeXml(clipId)})"><use href="#${escapeXml(sym.sheetDefId)}" x="${formatNum(-sym.x)}" y="${formatNum(-sym.y)}" /></g></symbol>`,
+			);
+		}
+
 		const parts = [
 			`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`,
-			`<defs><clipPath id="vb"><rect width="${w}" height="${h}"/></clipPath></defs>`,
+			`<defs>\n  ${defsContent.join('\n  ')}\n</defs>`,
 			`<g clip-path="url(#vb)">`,
 		];
 		if (this.#backgroundColor.alpha > 0) {
@@ -365,6 +423,10 @@ function strokeAttr(color: Color, width: string): string {
 
 function formatScaled(v: number): string {
 	return formatNum(Math.round(v * 10));
+}
+
+function formatScale(v: number): string {
+	return (Math.round(v * 10000) / 10000).toString();
 }
 
 function roundXY(x: number, y: number): [number, number] {
