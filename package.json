@@ -54,7 +54,7 @@
     "dev": "tsx dev/serve.ts",
     "doc:graph": "vrt deps-graph | vrt doc-insert README.md '## Dependency Graph'",
     "doc:typescript": "npx vrt doc-typescript -f html -o ./doc-typescript",
-    "format": "prettier --write .",
+    "format": "prettier --write --log-level warn .",
     "lint": "eslint --color .",
     "prepack": "npm run doc:graph && npm run build",
     "release": "npx vrt release-npm",
