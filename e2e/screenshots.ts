@@ -237,6 +237,7 @@ for (const region of regions) {
 		timeout: 15000,
 	});
 
+	// @ts-expect-error page.evaluate type instantiation too deep
 	await page.evaluate(
 		({ styleJson, center, zoom }: { styleJson: any; center: [number, number]; zoom: number }) => {
 			return new Promise<void>((resolve, reject) => {

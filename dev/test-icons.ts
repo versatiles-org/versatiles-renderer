@@ -126,6 +126,7 @@ await mlPage.waitForFunction(() => typeof (window as any).maplibregl !== 'undefi
 	timeout: 15000,
 });
 
+// @ts-expect-error page.evaluate type instantiation too deep
 await mlPage.evaluate(
 	({ styleJson, center, zoom }: { styleJson: any; center: [number, number]; zoom: number }) => {
 		return new Promise<void>((resolve, reject) => {

@@ -108,6 +108,7 @@ console.log('Map initialized, loading plugin...');
 
 // Add the control to the map using dynamic import of the served plugin
 await page.evaluate(async () => {
+	// @ts-expect-error dynamic import of served plugin
 	const mod = await import('/svg-export-plugin.js');
 	const control = new mod.SVGExportControl({ defaultWidth: 400, defaultHeight: 300 });
 	(window as any)._map.addControl(control, 'top-right');
