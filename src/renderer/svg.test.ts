@@ -49,7 +49,7 @@ describe('SVGRenderer', () => {
 			const r = makeRenderer();
 			const svg = r.getString();
 			expect(svg).toContain('<clipPath id="vb"><rect width="256" height="256"/></clipPath>');
-			expect(svg).toContain('<g clip-path="url(#vb)">');
+			expect(svg).toContain('<g id="map" clip-path="url(#vb)">');
 		});
 
 		test('default background has no rect', () => {

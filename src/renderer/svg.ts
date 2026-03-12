@@ -450,7 +450,7 @@ export class SVGRenderer {
 		const parts = [
 			`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">`,
 			`<defs>\n  ${defsContent.join('\n  ')}\n</defs>`,
-			`<g clip-path="url(#vb)">`,
+			`<g id="map" clip-path="url(#vb)">`,
 		];
 		if (this.#backgroundColor.alpha > 0) {
 			parts.push(
