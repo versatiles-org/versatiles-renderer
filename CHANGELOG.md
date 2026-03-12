@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.1] - 2026-03-12
+
+### Features
+
+- add dev script for render comparison
+- enhance SVG rasterization by supporting multiple Playwright browsers
+- enhance render comparison output with improved HTML structure and styling
+- add Inkscape installation and enhance render comparison output in GitHub Pages workflow
+- update render comparison HTML title and add description for experimental feature
+- update render comparison link text to indicate experimental status
+- set HOME environment variable for render comparison step
+
+### Bug Fixes
+
+- update HTML table structure for rendered images in test-icons
+- refactor location handling and improve HTML output for icon rendering
+- add TypeScript error suppression comments for deep type instantiation
+- swap test and typecheck scripts in package.json
+- simplify MapLibre GL JS map initialization options
+
+### Code Refactoring
+
+- rename render comparison script
+
+### Documentation
+
+- update README to include additional supported layer types and new renderLabels option
+
+### CI/CD
+
+- rename GitHub workflow
+
+### Styles
+
+- format code
+
 ## [0.7.0] - 2026-03-11
 
 ### Features

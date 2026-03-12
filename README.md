@@ -103,15 +103,15 @@ new SVGExportControl({
 
 ### `renderToSVG(options): Promise<string>`
 
-| Option         | Type                 | Default      | Description                                     |
-| -------------- | -------------------- | ------------ | ----------------------------------------------- |
-| `style`        | `StyleSpecification` | *(required)* | MapLibre style specification                    |
-| `width`        | `number`             | `1024`       | Output width in pixels                          |
-| `height`       | `number`             | `1024`       | Output height in pixels                         |
-| `lon`          | `number`             | `0`          | Center longitude                                |
-| `lat`          | `number`             | `0`          | Center latitude                                 |
-| `zoom`         | `number`             | `2`          | Zoom level                                      |
-| `renderLabels` | `boolean`            | `false`      | Enable rendering of text labels and icons       |
+| Option         | Type                 | Default      | Description                               |
+| -------------- | -------------------- | ------------ | ----------------------------------------- |
+| `style`        | `StyleSpecification` | *(required)* | MapLibre style specification              |
+| `width`        | `number`             | `1024`       | Output width in pixels                    |
+| `height`       | `number`             | `1024`       | Output height in pixels                   |
+| `lon`          | `number`             | `0`          | Center longitude                          |
+| `lat`          | `number`             | `0`          | Center latitude                           |
+| `zoom`         | `number`             | `2`          | Zoom level                                |
+| `renderLabels` | `boolean`            | `false`      | Enable rendering of text labels and icons |
 
 ### About `renderLabels`
 
@@ -119,6 +119,7 @@ When `renderLabels` is set to `true`, symbol layers are rendered, including text
 
 > [!WARNING]
 > The rendering of labels and icons is experimental and may produce imperfect results. Since we cannot use the original layouting engine of MapLibre GL JS, there are known limitations:
+>
 > - **No collision detection:** Text labels are rendered without collision detection, so labels may overlap.
 > - **Simplified text placement:** Labels can not be positioned along lines.
 
