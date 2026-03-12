@@ -174,12 +174,14 @@ function card(label: string, sublabel: string, src: string): string {
 const html = `<!DOCTYPE html>
 <html><head>
 <meta charset="utf-8">
-<title>Render Comparison</title>
+<title>Label &amp; Icon Rendering Comparison (experimental)</title>
 <style>
 	*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 	body { font-family: system-ui, -apple-system, sans-serif; background: #f0f0f0; color: #1a1a1a; padding: 2rem; }
 	header { max-width: 1200px; margin: 0 auto 2rem; }
-	h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+	h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+	.description { font-size: 0.9rem; color: #444; margin-bottom: 0.5rem; line-height: 1.5; }
+	.description code { background: #e0e0e0; padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.85em; }
 	.meta { font-size: 0.85rem; color: #666; }
 	.meta span { margin-right: 1.5rem; }
 	h2 { font-size: 1.1rem; font-weight: 600; color: #444; margin: 2rem auto 0.75rem; max-width: 1200px; }
@@ -193,7 +195,8 @@ const html = `<!DOCTYPE html>
 </style>
 </head><body>
 <header>
-	<h1>Render Comparison</h1>
+	<h1>Label &amp; Icon Rendering Comparison</h1>
+	<p class="description">This report compares the experimental <code>renderLabels</code> feature, which enables rendering of text labels and icons in the SVG output. This feature is optional and may produce imperfect results, since the original layouting engine of MapLibre GL JS cannot be used.</p>
 	<div class="meta">
 		<span>Location: ${LOCATION.lat}, ${LOCATION.lon} @ zoom ${LOCATION.zoom}</span>
 		<span>SVG size: ${svgSizeKB} KB</span>
