@@ -9,7 +9,7 @@ import type { Page } from 'playwright';
 
 const WIDTH = 800;
 const HEIGHT = 600;
-const outDir = resolve(import.meta.dirname, 'test-icons-output');
+const outDir = resolve(import.meta.dirname, 'render-comparison-output');
 
 mkdirSync(outDir, { recursive: true });
 

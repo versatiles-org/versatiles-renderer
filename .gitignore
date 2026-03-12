@@ -10,4 +10,4 @@ tmp
 e2e/.cache/
 e2e/output/
 doc-typescript/
-dev/test-icons-output/
+dev/render-comparison-output/
