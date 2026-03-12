@@ -23,17 +23,21 @@ const style = styles.colorful({});
 for (const layer of style.layers) {
 	if (layer.type === 'symbol' && 'layout' in layer && layer.layout) {
 		// Remove text rendering but keep icon rendering
-		delete (layer.layout as Record<string, unknown>)['text-field'];
+		//delete (layer.layout as Record<string, unknown>)['text-field'];
 	}
 }
+
+const location = {
+	lon: 12.4914,
+	lat: 41.8912,
+	zoom: 17,
+};
 
 const svg = await renderToSVG({
 	width: WIDTH,
 	height: HEIGHT,
 	style,
-	lon: 13.415893,
-	lat: 52.524852,
-	zoom: 16.97,
+	...location,
 	renderLabels: true,
 });
 
@@ -141,8 +145,8 @@ await mlPage.evaluate(
 	},
 	{
 		styleJson: maplibreStyle,
-		center: [13.415893, 52.524852] as [number, number],
-		zoom: 16.97,
+		center: [location.lon, location.lat] as [number, number],
+		zoom: location.zoom,
 	},
 );
 
@@ -166,12 +170,12 @@ const html = `<!DOCTYPE html>
 </style>
 </head><body>
 <h1>Icon Rendering Comparison</h1>
-<p>Location: 52.524852, 13.415893 @ zoom 16.97</p>
+<p>Location: ${location.lat}, ${location.lon} @ zoom ${location.zoom}</p>
 <p>SVG size: ${(Buffer.byteLength(svg) / 1024).toFixed(0)} KB</p>
 <table>
 <tr><th>Renderer</th><th>Result</th></tr>
-<tr><td>MapLibre GL JS<br>(Original)</td><td><a href="maplibre.png"><img src="maplibre.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
-<tr><td>SVG export</td><td><a href="map.svg"><img src="map.svg" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
+<tr><td>Screenshot of MapLibre GL JS<br>(Original)</td><td><a href="maplibre.png"><img src="maplibre.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
+<tr><td>SVG export (rendered in this browser)</td><td><a href="map.svg"><img src="map.svg" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
 <tr><td>SVG rendered with Inkscape</td><td><a href="inkscape.png"><img src="inkscape.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
 <tr><td>SVG rendered with Chromium</td><td><a href="chromium.png"><img src="chromium.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
 </table>
