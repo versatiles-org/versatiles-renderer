@@ -1,11 +1,11 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { execSync } from 'node:child_process';
-import { chromium } from 'playwright';
+import { chromium, firefox, webkit } from 'playwright';
 import { styles } from '@versatiles/style';
 import { renderToSVG } from '../src/index.js';
-import { ensureCacheDir, installFetchCache, readCache, writeCache } from '../e2e/fetch-cache.js';
-import type { Page } from 'playwright';
+import { ensureCacheDir, readCache, writeCache } from '../e2e/fetch-cache.js';
+import type { BrowserType, Page } from 'playwright';
 
 const WIDTH = 800;
 const HEIGHT = 600;
@@ -43,7 +43,7 @@ const svg = await renderToSVG({
 
 const svgPath = resolve(outDir, 'map.svg');
 writeFileSync(svgPath, svg);
-console.log(`  SVG saved: ${svgPath} (${(Buffer.byteLength(svg) / 1024).toFixed(0)} KB)`);
+console.log(`  SVG saved: ${(Buffer.byteLength(svg) / 1024).toFixed(0)} KB`);
 
 // Rasterize with Inkscape
 console.log('Rasterizing with Inkscape...');
@@ -56,23 +56,29 @@ execSync(
 );
 console.log('  Inkscape done.');
 
-// Rasterize with Chromium (Playwright)
-console.log('Rasterizing with Chromium (Playwright)...');
-const chromiumPng = resolve(outDir, 'chromium.png');
-const browser = await chromium.launch({
-	args: ['--use-gl=angle', '--use-angle=swiftshader'],
-});
+// Rasterize SVG with all Playwright browsers
+const browsers: { name: string; type: BrowserType; args?: string[] }[] = [
+	{ name: 'chromium', type: chromium, args: ['--use-gl=angle', '--use-angle=swiftshader'] },
+	{ name: 'firefox', type: firefox },
+	{ name: 'webkit', type: webkit },
+];
 
-const svgPage = await browser.newPage({
-	viewport: { width: WIDTH, height: HEIGHT },
-	deviceScaleFactor: 1,
-});
-await svgPage.setContent(`<!DOCTYPE html>
+for (const { name, type, args } of browsers) {
+	console.log(`Rasterizing with ${name}...`);
+	const png = resolve(outDir, `${name}.png`);
+	const browser = await type.launch({ args });
+	const page = await browser.newPage({
+		viewport: { width: WIDTH, height: HEIGHT },
+		deviceScaleFactor: 1,
+	});
+	await page.setContent(`<!DOCTYPE html>
 <html><head><style>* { margin: 0; padding: 0; }</style></head>
 <body>${svg}</body></html>`);
-await svgPage.screenshot({ path: chromiumPng });
-await svgPage.close();
-console.log('  Chromium done.');
+	await page.screenshot({ path: png });
+	await page.close();
+	await browser.close();
+	console.log(`  ${name} done.`);
+}
 
 // Render MapLibre GL JS reference screenshot
 console.log('Rendering MapLibre GL JS...');
@@ -109,7 +115,10 @@ for (const layer of maplibreStyle.layers) {
 	}
 }
 
-const mlPage = await browser.newPage({
+const mlBrowser = await chromium.launch({
+	args: ['--use-gl=angle', '--use-angle=swiftshader'],
+});
+const mlPage = await mlBrowser.newPage({
 	viewport: { width: WIDTH, height: HEIGHT },
 	deviceScaleFactor: 1,
 });
@@ -148,7 +157,7 @@ await mlPage.evaluate(
 
 await mlPage.screenshot({ path: maplibrePng });
 await mlPage.close();
-await browser.close();
+await mlBrowser.close();
 console.log('  MapLibre done.');
 
 // Generate comparison HTML
@@ -174,6 +183,8 @@ const html = `<!DOCTYPE html>
 <tr><td>SVG export (rendered in this browser)</td><td><a href="map.svg"><img src="map.svg" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
 <tr><td>SVG rendered with Inkscape</td><td><a href="inkscape.png"><img src="inkscape.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
 <tr><td>SVG rendered with Chromium</td><td><a href="chromium.png"><img src="chromium.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
+<tr><td>SVG rendered with Firefox</td><td><a href="firefox.png"><img src="firefox.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
+<tr><td>SVG rendered with WebKit</td><td><a href="webkit.png"><img src="webkit.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
 </table>
 </body></html>`;
 
