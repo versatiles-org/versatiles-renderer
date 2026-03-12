@@ -169,13 +169,11 @@ const html = `<!DOCTYPE html>
 <p>Location: 52.524852, 13.415893 @ zoom 16.97</p>
 <p>SVG size: ${(Buffer.byteLength(svg) / 1024).toFixed(0)} KB</p>
 <table>
-<tr><th>SVG (source)</th><th>Inkscape</th><th>Chromium (SVG)</th><th>MapLibre GL JS</th></tr>
-<tr>
-	<td><a href="map.svg"><img src="map.svg" width="${WIDTH / 2}" height="${HEIGHT / 2}"></a></td>
-	<td><a href="inkscape.png"><img src="inkscape.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></a></td>
-	<td><a href="chromium.png"><img src="chromium.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></a></td>
-	<td><a href="maplibre.png"><img src="maplibre.png" width="${WIDTH / 2}" height="${HEIGHT / 2}"></a></td>
-</tr>
+<tr><th>Renderer</th><th>Result</th></tr>
+<tr><td>MapLibre GL JS<br>(Original)</td><td><a href="maplibre.png"><img src="maplibre.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
+<tr><td>SVG export</td><td><a href="map.svg"><img src="map.svg" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
+<tr><td>SVG rendered with Inkscape</td><td><a href="inkscape.png"><img src="inkscape.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
+<tr><td>SVG rendered with Chromium</td><td><a href="chromium.png"><img src="chromium.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
 </table>
 </body></html>`;
 
