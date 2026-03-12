@@ -126,28 +126,23 @@ await mlPage.waitForFunction(() => typeof (window as any).maplibregl !== 'undefi
 	timeout: 15000,
 });
 
-// @ts-expect-error page.evaluate type instantiation too deep
 await mlPage.evaluate(
-	({ styleJson, center, zoom }: { styleJson: any; center: [number, number]; zoom: number }) => {
+	(options: any) => {
 		return new Promise<void>((resolve, reject) => {
-			const map = new (window as any).maplibregl.Map({
-				container: 'map',
-				style: styleJson,
-				center,
-				zoom,
-				interactive: false,
-				fadeDuration: 0,
-				attributionControl: false,
-				pixelRatio: 1,
-			});
+			const map = new (window as any).maplibregl.Map(options);
 			map.once('idle', () => resolve());
 			setTimeout(() => reject(new Error('MapLibre idle timeout')), 30000);
 		});
 	},
 	{
-		styleJson: maplibreStyle,
+		container: 'map',
+		style: maplibreStyle,
 		center: [location.lon, location.lat] as [number, number],
 		zoom: location.zoom,
+		interactive: false,
+		fadeDuration: 0,
+		attributionControl: false,
+		pixelRatio: 1,
 	},
 );
 
