@@ -616,10 +616,10 @@ describe('SVGRenderer', () => {
 				'<clipPath id="sprite-airport-clip"><rect width="32" height="32" /></clipPath>',
 			);
 			expect(svg).toContain(
-				'<symbol id="sprite-airport"><g clip-path="url(#sprite-airport-clip)"><use href="#sprite-sheet-0" x="0" y="0" /></g></symbol>',
+				'<symbol id="sprite-airport"><g clip-path="url(#sprite-airport-clip)"><use xlink:href="#sprite-sheet-0" x="0" y="0" /></g></symbol>',
 			);
 			// Icon rendered as <use> inside positioned <g>
-			expect(svg).toContain('<use href="#sprite-airport"');
+			expect(svg).toContain('<use xlink:href="#sprite-airport"');
 		});
 
 		test('empty features produce no output', () => {
@@ -691,7 +691,7 @@ describe('SVGRenderer', () => {
 				'<clipPath id="sprite-icon-clip"><rect width="20" height="20" /></clipPath>',
 			);
 			expect(svg).toContain(
-				'<symbol id="sprite-icon"><g clip-path="url(#sprite-icon-clip)"><use href="#sprite-sheet-0" x="0" y="0" /></g></symbol>',
+				'<symbol id="sprite-icon"><g clip-path="url(#sprite-icon-clip)"><use xlink:href="#sprite-sheet-0" x="0" y="0" /></g></symbol>',
 			);
 			// Shared sheet image in defs at native size (256*10=2560 → "256")
 			expect(svg).toContain('<image id="sprite-sheet-0" width="256" height="256"');

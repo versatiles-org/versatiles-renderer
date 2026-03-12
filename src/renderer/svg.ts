@@ -377,13 +377,13 @@ export class SVGRenderer {
 				elements.push(
 					`<g transform="rotate(${String(style.rotate)},${formatNum(cx)},${formatNum(cy)})">` +
 						`<g transform="translate(${formatNum(iconXr)},${formatNum(iconYr)})${scaleStr}"${opacityAttr}${filterAttr}>` +
-						`<use href="#${escapeXml(symDef.symbolId)}" />` +
+						`<use xlink:href="#${escapeXml(symDef.symbolId)}" />` +
 						`</g></g>`,
 				);
 			} else {
 				elements.push(
 					`<g transform="translate(${formatNum(iconXr)},${formatNum(iconYr)})${scaleStr}"${opacityAttr}${filterAttr}>` +
-						`<use href="#${escapeXml(symDef.symbolId)}" />` +
+						`<use xlink:href="#${escapeXml(symDef.symbolId)}" />` +
 						`</g>`,
 				);
 			}
@@ -417,7 +417,7 @@ export class SVGRenderer {
 		const pixelated = style.resampling === 'nearest';
 		for (const tile of tiles) {
 			const overlap = Math.min(tile.width, tile.height) / 10000; // slight overlap to prevent sub-pixel gaps between tiles
-			let attrs = `x="${formatScaled(tile.x - overlap)}" y="${formatScaled(tile.y - overlap)}" width="${formatScaled(tile.width + overlap * 2)}" height="${formatScaled(tile.height + overlap * 2)}" href="${tile.dataUri}"`;
+			let attrs = `x="${formatScaled(tile.x - overlap)}" y="${formatScaled(tile.y - overlap)}" width="${formatScaled(tile.width + overlap * 2)}" height="${formatScaled(tile.height + overlap * 2)}" xlink:href="${tile.dataUri}"`;
 			if (pixelated) attrs += ' style="image-rendering:pixelated"';
 			this.#svg.push(`<image ${attrs} />`);
 		}
@@ -433,14 +433,14 @@ export class SVGRenderer {
 		const defsContent = [`<clipPath id="vb"><rect width="${w}" height="${h}"/></clipPath>`];
 		for (const sheet of this.#spriteSheetDefs.values()) {
 			defsContent.push(
-				`<image id="${escapeXml(sheet.defId)}" width="${formatNum(sheet.width)}" height="${formatNum(sheet.height)}" href="${escapeXml(sheet.href)}" />`,
+				`<image id="${escapeXml(sheet.defId)}" width="${formatNum(sheet.width)}" height="${formatNum(sheet.height)}" xlink:href="${escapeXml(sheet.href)}" />`,
 			);
 		}
 		for (const sym of this.#spriteSymbolDefs.values()) {
 			const clipId = `${sym.symbolId}-clip`;
 			defsContent.push(
 				`<clipPath id="${escapeXml(clipId)}"><rect width="${formatNum(sym.width)}" height="${formatNum(sym.height)}" /></clipPath>`,
-				`<symbol id="${escapeXml(sym.symbolId)}"><g clip-path="url(#${escapeXml(clipId)})"><use href="#${escapeXml(sym.sheetDefId)}" x="${formatNum(-sym.x)}" y="${formatNum(-sym.y)}" /></g></symbol>`,
+				`<symbol id="${escapeXml(sym.symbolId)}"><g clip-path="url(#${escapeXml(clipId)})"><use xlink:href="#${escapeXml(sym.sheetDefId)}" x="${formatNum(-sym.x)}" y="${formatNum(-sym.y)}" /></g></symbol>`,
 			);
 		}
 		for (const { content } of this.#sdfFilterDefs.values()) {
@@ -448,7 +448,7 @@ export class SVGRenderer {
 		}
 
 		const parts = [
-			`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`,
+			`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">`,
 			`<defs>\n  ${defsContent.join('\n  ')}\n</defs>`,
 			`<g clip-path="url(#vb)">`,
 		];
