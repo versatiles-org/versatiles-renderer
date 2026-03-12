@@ -135,6 +135,7 @@ await mlPage.waitForFunction(() => typeof (window as any).maplibregl !== 'undefi
 	timeout: 15000,
 });
 
+// @ts-expect-error page.evaluate type instantiation too deep
 await mlPage.evaluate(
 	(options: any) => {
 		return new Promise<void>((resolve, reject) => {
@@ -161,31 +162,56 @@ await mlBrowser.close();
 console.log('  MapLibre done.');
 
 // Generate comparison HTML
+const svgSizeKB = (Buffer.byteLength(svg) / 1024).toFixed(0);
+
+function card(label: string, sublabel: string, src: string): string {
+	return `<div class="card">
+	<a href="${src}"><img src="${src}" width="${WIDTH / 2}" height="${HEIGHT / 2}"></a>
+	<div class="label">${label}</div>
+	<div class="sublabel">${sublabel}</div>
+</div>`;
+}
+
 const html = `<!DOCTYPE html>
 <html><head>
 <meta charset="utf-8">
-<title>Icon Rendering Comparison</title>
+<title>Render Comparison</title>
 <style>
-	body { font-family: sans-serif; margin: 20px; background: #f5f5f5; }
-	h1 { margin-bottom: 10px; }
-	table { border-collapse: collapse; }
-	th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; background: white; }
-	th { background: #eee; }
-	img { display: block; }
+	*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+	body { font-family: system-ui, -apple-system, sans-serif; background: #f0f0f0; color: #1a1a1a; padding: 2rem; }
+	header { max-width: 1200px; margin: 0 auto 2rem; }
+	h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+	.meta { font-size: 0.85rem; color: #666; }
+	.meta span { margin-right: 1.5rem; }
+	h2 { font-size: 1.1rem; font-weight: 600; color: #444; margin: 2rem auto 0.75rem; max-width: 1200px; }
+	.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(${WIDTH / 2}px, 100%), 1fr)); gap: 1rem; max-width: 1200px; margin: 0 auto; }
+	.card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: box-shadow 0.15s; }
+	.card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+	.card a { display: block; line-height: 0; }
+	.card img { width: 100%; height: auto; }
+	.label { padding: 0.6rem 0.8rem 0.1rem; font-weight: 600; font-size: 0.9rem; }
+	.sublabel { padding: 0.1rem 0.8rem 0.6rem; font-size: 0.8rem; color: #888; }
 </style>
 </head><body>
-<h1>Icon Rendering Comparison</h1>
-<p>Location: ${location.lat}, ${location.lon} @ zoom ${location.zoom}</p>
-<p>SVG size: ${(Buffer.byteLength(svg) / 1024).toFixed(0)} KB</p>
-<table>
-<tr><th>Renderer</th><th>Result</th></tr>
-<tr><td>Screenshot of MapLibre GL JS<br>(Original)</td><td><a href="maplibre.png"><img src="maplibre.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
-<tr><td>SVG export (rendered in this browser)</td><td><a href="map.svg"><img src="map.svg" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
-<tr><td>SVG rendered with Inkscape</td><td><a href="inkscape.png"><img src="inkscape.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
-<tr><td>SVG rendered with Chromium</td><td><a href="chromium.png"><img src="chromium.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
-<tr><td>SVG rendered with Firefox</td><td><a href="firefox.png"><img src="firefox.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
-<tr><td>SVG rendered with WebKit</td><td><a href="webkit.png"><img src="webkit.png" width="${WIDTH}" height="${HEIGHT}"></a></td></tr>
-</table>
+<header>
+	<h1>Render Comparison</h1>
+	<div class="meta">
+		<span>Location: ${location.lat}, ${location.lon} @ zoom ${location.zoom}</span>
+		<span>SVG size: ${svgSizeKB} KB</span>
+	</div>
+</header>
+<h2>Reference</h2>
+<div class="grid">
+	${card('MapLibre GL JS', 'Reference rendering', 'maplibre.png')}
+	${card('SVG', 'Rendered in this browser', 'map.svg')}
+</div>
+<h2>SVG rasterized with …</h2>
+<div class="grid">
+	${card('Inkscape', 'SVG rasterized with Inkscape', 'inkscape.png')}
+	${card('Chromium', 'SVG rasterized with Chromium', 'chromium.png')}
+	${card('Firefox', 'SVG rasterized with Firefox', 'firefox.png')}
+	${card('WebKit', 'SVG rasterized with WebKit', 'webkit.png')}
+</div>
 </body></html>`;
 
 const reportPath = resolve(outDir, 'report.html');
