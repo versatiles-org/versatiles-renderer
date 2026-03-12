@@ -68,7 +68,7 @@ jobs:
               <h1>VersaTiles SVG Renderer</h1>
               <a href="e2e/report.html">E2E Visual Comparison Report</a>
               <a href="doc-typescript/index.html">TypeScript API Documentation</a>
-              <a href="render-comparison/report.html">Render Comparison</a>
+              <a href="render-comparison/report.html">Label &amp; Icon Rendering Comparison (experimental)</a>
               <a href="demo/index.html">MapLibre Plugin Demo</a>
             </body>
           </html>
