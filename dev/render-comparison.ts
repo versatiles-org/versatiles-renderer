@@ -7,8 +7,13 @@ import { renderToSVG } from '../src/index.js';
 import { ensureCacheDir, readCache, writeCache } from '../e2e/fetch-cache.js';
 import type { BrowserType, Page } from 'playwright';
 
-const WIDTH = 800;
-const HEIGHT = 600;
+const WIDTH = 1024;
+const HEIGHT = 768;
+const LOCATION = {
+	lon: 12.4914,
+	lat: 41.8912,
+	zoom: 17,
+};
 const outDir = resolve(import.meta.dirname, 'render-comparison-output');
 
 mkdirSync(outDir, { recursive: true });
@@ -27,17 +32,11 @@ for (const layer of style.layers) {
 	}
 }
 
-const location = {
-	lon: 12.4914,
-	lat: 41.8912,
-	zoom: 17,
-};
-
 const svg = await renderToSVG({
 	width: WIDTH,
 	height: HEIGHT,
 	style,
-	...location,
+	...LOCATION,
 	renderLabels: true,
 });
 
@@ -147,8 +146,8 @@ await mlPage.evaluate(
 	{
 		container: 'map',
 		style: maplibreStyle,
-		center: [location.lon, location.lat] as [number, number],
-		zoom: location.zoom,
+		center: [LOCATION.lon, LOCATION.lat] as [number, number],
+		zoom: LOCATION.zoom,
 		interactive: false,
 		fadeDuration: 0,
 		attributionControl: false,
@@ -184,11 +183,11 @@ const html = `<!DOCTYPE html>
 	.meta { font-size: 0.85rem; color: #666; }
 	.meta span { margin-right: 1.5rem; }
 	h2 { font-size: 1.1rem; font-weight: 600; color: #444; margin: 2rem auto 0.75rem; max-width: 1200px; }
-	.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(${WIDTH / 2}px, 100%), 1fr)); gap: 1rem; max-width: 1200px; margin: 0 auto; }
+	.grid { display: grid; grid-template-columns: repeat(auto-fill, ${WIDTH / 2}px); gap: 1rem; max-width: 1200px; margin: 0 auto; }
 	.card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: box-shadow 0.15s; }
 	.card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 	.card a { display: block; line-height: 0; }
-	.card img { width: 100%; height: auto; }
+	.card img { width: ${WIDTH / 2}px; height: ${HEIGHT / 2}px; }
 	.label { padding: 0.6rem 0.8rem 0.1rem; font-weight: 600; font-size: 0.9rem; }
 	.sublabel { padding: 0.1rem 0.8rem 0.6rem; font-size: 0.8rem; color: #888; }
 </style>
@@ -196,7 +195,7 @@ const html = `<!DOCTYPE html>
 <header>
 	<h1>Render Comparison</h1>
 	<div class="meta">
-		<span>Location: ${location.lat}, ${location.lon} @ zoom ${location.zoom}</span>
+		<span>Location: ${LOCATION.lat}, ${LOCATION.lon} @ zoom ${LOCATION.zoom}</span>
 		<span>SVG size: ${svgSizeKB} KB</span>
 	</div>
 </header>
