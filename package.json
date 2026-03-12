@@ -52,6 +52,7 @@
     "check": "npm run format && npm run lint && npm run typecheck && npm run build && npm run test && npm run test:e2e",
     "demo": "tsx src/demo.ts",
     "dev": "tsx dev/serve.ts",
+    "dev:render-comparison": "tsx dev/render-comparison.ts",
     "doc:graph": "vrt deps-graph | vrt doc-insert README.md '## Dependency Graph'",
     "doc:typescript": "npx vrt doc-typescript -f html -o ./doc-typescript",
     "format": "prettier --write --log-level warn .",
