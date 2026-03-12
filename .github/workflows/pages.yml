@@ -40,6 +40,8 @@ jobs:
 
       - name: Run render comparison
         run: npm run dev:render-comparison
+        env:
+          HOME: /root
 
       - name: Generate TypeScript docs
         run: npm run doc:typescript
