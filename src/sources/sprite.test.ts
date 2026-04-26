@@ -7,7 +7,7 @@ function makeStyle(sprite?: string | { id: string; url: string }[]): StyleSpecif
 		version: 8,
 		sources: {},
 		layers: [],
-		sprite: sprite as StyleSpecification['sprite'],
+		sprite: sprite,
 	};
 }
 

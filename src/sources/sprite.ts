@@ -44,8 +44,8 @@ export async function loadSpriteAtlas(style: StyleSpecification): Promise<Sprite
 	} else if (Array.isArray(sprite)) {
 		for (const s of sprite) {
 			sources.push({
-				id: (s as { id: string; url: string }).id,
-				url: (s as { id: string; url: string }).url,
+				id: s.id,
+				url: s.url,
 			});
 		}
 	}

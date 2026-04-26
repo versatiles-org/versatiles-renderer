@@ -102,7 +102,7 @@ export class StyleLayer {
 			latest as Record<string, Record<string, StylePropertySpecification> | undefined>
 		)[`paint_${spec.type}`];
 		if (paintSpec) {
-			const paintValues = (spec.paint ?? {}) as Record<string, unknown>;
+			const paintValues: Record<string, unknown> = spec.paint ?? {};
 			for (const [name, propSpec] of Object.entries(paintSpec)) {
 				const raw = paintValues[name];
 				const value = raw === undefined ? propSpec.default : raw;

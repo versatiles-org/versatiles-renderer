@@ -156,11 +156,11 @@ export function loadGeoJSONSource(options: GeoJSONLoadOptions): void {
 	switch (data.type) {
 		case 'FeatureCollection':
 			for (const f of data.features) {
-				processGeometry(f.geometry, f.id, (f.properties ?? {}) as Record<string, unknown>);
+				processGeometry(f.geometry, f.id, f.properties ?? {});
 			}
 			break;
 		case 'Feature':
-			processGeometry(data.geometry, data.id, (data.properties ?? {}) as Record<string, unknown>);
+			processGeometry(data.geometry, data.id, data.properties ?? {});
 			break;
 		default:
 			processGeometry(data, undefined, {});

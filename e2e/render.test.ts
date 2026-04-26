@@ -347,7 +347,7 @@ describe('e2e: vector tile source', () => {
 							type: 'vector',
 							tiles: ['https://tiles.versatiles.org/tiles/osm/{z}/{x}/{y}'],
 							maxzoom: 14,
-						} as StyleSpecification['sources'][string],
+						},
 					},
 					layers: [
 						{

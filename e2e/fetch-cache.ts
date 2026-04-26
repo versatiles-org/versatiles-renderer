@@ -66,7 +66,7 @@ function cachedFetch(input: string | URL | Request, init?: RequestInit): Promise
 
 export function installFetchCache(): void {
 	ensureCacheDir();
-	globalThis.fetch = cachedFetch as typeof fetch;
+	globalThis.fetch = cachedFetch;
 }
 
 export function uninstallFetchCache(): void {

@@ -3,7 +3,7 @@ import type { LayerSpecification } from '@maplibre/maplibre-gl-style-spec';
 import { StyleLayer, createStyleLayer, PossiblyEvaluatedPropertyValue } from './style_layer.js';
 
 function makeBackground(paint?: Record<string, unknown>): LayerSpecification {
-	return { id: 'bg', type: 'background', paint } as LayerSpecification;
+	return { id: 'bg', type: 'background', paint };
 }
 
 function makeFill(

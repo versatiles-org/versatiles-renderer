@@ -138,7 +138,7 @@ describe('renderMap', () => {
 				type: 'symbol',
 				source: 'src',
 				'source-layer': 'labels',
-			} as StyleSpecification['layers'][number],
+			},
 		]);
 		const result = await renderMap(makeJob(style));
 		expect(result).toContain('<svg');
@@ -520,7 +520,7 @@ describe('renderMap', () => {
 					paint: {
 						'text-color': '#333333',
 					},
-				} as StyleSpecification['layers'][number],
+				},
 			]);
 			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
 			expect(result).toContain('<text');
@@ -540,7 +540,7 @@ describe('renderMap', () => {
 					source: 'src',
 					'source-layer': 'places',
 					layout: { 'text-field': '{name}' },
-				} as StyleSpecification['layers'][number],
+				},
 			]);
 			const result = await renderMap(makeJob(style));
 			expect(result).not.toContain('<text');
@@ -556,7 +556,7 @@ describe('renderMap', () => {
 					source: 'src',
 					'source-layer': 'places',
 					layout: { 'text-field': '{name}' },
-				} as StyleSpecification['layers'][number],
+				},
 			]);
 			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
 			expect(result).not.toContain('<text');
@@ -577,7 +577,7 @@ describe('renderMap', () => {
 					layout: {
 						'text-field': '{name}',
 					},
-				} as StyleSpecification['layers'][number],
+				},
 			]);
 			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
 			expect(result).not.toContain('<text');
@@ -598,7 +598,7 @@ describe('renderMap', () => {
 					'source-layer': 'places',
 					filter: ['==', 'class', 'city'],
 					layout: { 'text-field': '{name}' },
-				} as StyleSpecification['layers'][number],
+				},
 			]);
 			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
 			expect(result).toContain('Berlin');
@@ -626,7 +626,7 @@ describe('renderMap', () => {
 					source: 'src',
 					'source-layer': 'roads',
 					layout: { 'text-field': '{name}' },
-				} as StyleSpecification['layers'][number],
+				},
 			]);
 			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
 			expect(result).toContain('<text');
@@ -661,7 +661,7 @@ describe('renderMap', () => {
 					layout: {
 						'icon-image': 'city-icon',
 					},
-				} as StyleSpecification['layers'][number],
+				},
 			]);
 			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
 			expect(result).toContain('<image');
@@ -683,7 +683,7 @@ describe('renderMap', () => {
 					layout: {
 						'icon-image': 'nonexistent',
 					},
-				} as StyleSpecification['layers'][number],
+				},
 			]);
 			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
 			expect(result).not.toContain('<image');
@@ -718,7 +718,7 @@ describe('renderMap', () => {
 						'icon-image': 'city-icon',
 						'text-field': '{name}',
 					},
-				} as StyleSpecification['layers'][number],
+				},
 			]);
 			const result = await renderMap(makeJob(style, 10, { renderLabels: true }));
 			expect(result).toContain('<image');
@@ -744,7 +744,7 @@ describe('renderMap', () => {
 					id: 'raster-layer',
 					type: 'raster',
 					source: 'satellite',
-				} as StyleSpecification['layers'][number],
+				},
 			]);
 			const result = await renderMap(makeJob(style));
 			expect(result).toContain('<image');
@@ -758,7 +758,7 @@ describe('renderMap', () => {
 					id: 'raster-layer',
 					type: 'raster',
 					source: 'satellite',
-				} as StyleSpecification['layers'][number],
+				},
 			]);
 			const result = await renderMap(makeJob(style));
 			expect(result).not.toContain('<image');
@@ -816,7 +816,7 @@ describe('renderMap', () => {
 						type,
 						source: 'src',
 						'source-layer': 'data',
-					} as StyleSpecification['layers'][number],
+					},
 				]);
 				const result = await renderMap(makeJob(style));
 				expect(result).toContain('<svg');

@@ -10,7 +10,10 @@ import type { Features, LayerFeatures } from '../geometry.js';
 function resolveTokens(text: string, properties: Record<string, unknown>): string {
 	return text.replace(/\{([^}]+)\}/g, (_, key: string) => {
 		const value = properties[key];
-		return value != null ? String(value as string | number) : '';
+		if (value == null) return '';
+		if (typeof value === 'string') return value;
+		if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+		return '';
 	});
 }
 
@@ -190,7 +193,7 @@ async function render(job: RenderJob): Promise<void> {
 								iconImage != null
 									? resolveTokens(
 											(iconImage as { toString(): string }).toString(),
-											feature.properties as Record<string, unknown>,
+											feature.properties,
 										)
 									: '';
 							if (!iconName || !spriteAtlas.has(iconName)) return [];
@@ -223,7 +226,7 @@ async function render(job: RenderJob): Promise<void> {
 							const textField = getLayout('text-field', feature);
 							const textRaw =
 								textField != null ? (textField as { toString(): string }).toString() : '';
-							const text = resolveTokens(textRaw, feature.properties as Record<string, unknown>);
+							const text = resolveTokens(textRaw, feature.properties);
 							if (!text) return [];
 							return [
 								[
