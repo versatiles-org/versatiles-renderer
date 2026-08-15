@@ -29,6 +29,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added a `typecheck` step to CI so type regressions fail the build (previously only lint/build/test ran). ([1ae2269](https://github.com/versatiles-org/versatiles-svg-renderer/commit/1ae2269b305bfa02f6899ae82f1bae9175179744))
 
+## [1.1.0] - 2026-08-15
+
+### Features
+
+- implement installMapLibrePage function for serving MapLibre assets ([753acec](https://github.com/versatiles-org/versatiles-svg-renderer/commit/753acec20b0d828af8994ec4a58667e07ce7e5d3))
+- add retry mechanism for rendering screenshots and log crashes ([0f308da](https://github.com/versatiles-org/versatiles-svg-renderer/commit/0f308dad9af7023a0d49c07b3087cab83a5d7794))
+- add dynamic Playwright image resolution in GitHub Actions workflow ([181ce82](https://github.com/versatiles-org/versatiles-svg-renderer/commit/181ce82bf3ae3ff105717206d6d322d888c16b1d))
+
+### Documentation
+
+- update README to format required style option as italic ([7eb96cf](https://github.com/versatiles-org/versatiles-svg-renderer/commit/7eb96cf4af13b024279de3985d5100591a8aee98))
+
+### Chores
+
+- **deps:** bump actions/setup-node from 6 to 7 in the action group ([40549e3](https://github.com/versatiles-org/versatiles-svg-renderer/commit/40549e319ed3d6f018620f4b89e16702b69342d6))
+- update dependencies in package.json ([e9d7a3b](https://github.com/versatiles-org/versatiles-svg-renderer/commit/e9d7a3be674b3f57fb1a77187059215532e70018))
+- add tslib as a dependency in package.json and package-lock.json ([128bf33](https://github.com/versatiles-org/versatiles-svg-renderer/commit/128bf339ae979f39ebaa8ff8353ae59ce75531f2))
+
 ## [1.0.0] - 2026-07-16
 
 ### Features
