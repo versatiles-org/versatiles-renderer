@@ -11,12 +11,39 @@ permissions:
   id-token: write
 
 jobs:
-  e2e:
-    name: Run E2E tests
+  # The Playwright container must match the installed Playwright exactly, or
+  # `browserType.launch` fails with "Executable doesn't exist". A job cannot read its
+  # own container tag from the repo (the container starts before any step runs), so
+  # resolve it here and hand it to the next job. The version comes from the lockfile
+  # rather than package.json because that is what `npm ci` actually installs —
+  # package.json only carries a `^` range.
+  container-image:
+    name: Resolve Playwright image
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.resolve.outputs.image }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Resolve Playwright image
+        id: resolve
+        run: |
+          version="$(node -p "require('./package-lock.json').packages['node_modules/playwright']?.version ?? ''")"
+          if [ -z "$version" ]; then
+            echo "::error::Could not read the playwright version from package-lock.json"
+            exit 1
+          fi
+          echo "image=mcr.microsoft.com/playwright:v${version}-noble" >> "$GITHUB_OUTPUT"
+          echo "Using mcr.microsoft.com/playwright:v${version}-noble"
+
+  e2e:
+    name: Run E2E tests
+    needs: container-image
+    runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.61.1-noble
+      image: ${{ needs.container-image.outputs.image }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
