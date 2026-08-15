@@ -98,6 +98,7 @@ async function renderSvgShot(
 		viewport: { width: WIDTH, height: HEIGHT },
 		deviceScaleFactor: SCALE,
 	});
+	page.on('crash', () => console.log(`  ${id}: SVG page crashed`));
 	try {
 		await page.setContent(`<!DOCTYPE html>
 <html><head><style>* { margin: 0; padding: 0; }</style></head>
@@ -116,6 +117,7 @@ async function renderMapLibreShot(region: Region, style: StyleSpecification): Pr
 		viewport: { width: WIDTH, height: HEIGHT },
 		deviceScaleFactor: SCALE,
 	});
+	page.on('crash', () => console.log(`  ${id}: MapLibre page crashed`));
 	try {
 		await installPageCache(page);
 		await installMapLibrePage(page, { width: WIDTH, height: HEIGHT });
@@ -185,6 +187,24 @@ const ABS_FLOOR = 0.01;
 // (stricter) degradation check.
 const ceilingFor = (base: number): number => Math.max(base * 1.5, base + 0.3);
 
+// Chromium occasionally refuses to capture a frame on a loaded CI runner
+// ("Page.captureScreenshot: Unable to capture screenshot"), which has nothing to do
+// with what is being rendered. Retry the region on fresh pages instead of failing the
+// whole run on a one-off, and log every retry so a real regression stays visible.
+async function withRetry<T>(id: string, render: () => Promise<T>, attempts = 3): Promise<T> {
+	for (let attempt = 1; ; attempt++) {
+		try {
+			return await render();
+		} catch (error) {
+			if (attempt >= attempts) throw error;
+			console.log(
+				dim(`  ${id}: attempt ${attempt}/${attempts} failed (${String(error)}) — retrying`),
+			);
+			await new Promise((r) => setTimeout(r, 1000));
+		}
+	}
+}
+
 interface Result {
 	region: Region;
 	id: string;
@@ -206,10 +226,9 @@ for (const region of regions) {
 	let maplibrePng: PNG;
 	let svgSizeKB: number;
 	try {
-		const [svgShot, maplibre] = await Promise.all([
-			renderSvgShot(region, style),
-			renderMapLibreShot(region, style),
-		]);
+		const [svgShot, maplibre] = await withRetry(id, () =>
+			Promise.all([renderSvgShot(region, style), renderMapLibreShot(region, style)]),
+		);
 		svgPng = svgShot.png;
 		svgSizeKB = svgShot.sizeKB;
 		maplibrePng = maplibre;
