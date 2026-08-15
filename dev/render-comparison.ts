@@ -5,6 +5,7 @@ import { chromium, firefox, webkit } from 'playwright';
 import { styles } from '@versatiles/style';
 import { renderToSVG } from '../src/index.js';
 import { ensureCacheDir, readCache, writeCache } from '../e2e/fetch-cache.js';
+import { installMapLibrePage } from '../e2e/maplibre-page.js';
 import type { BrowserType, Page } from 'playwright';
 
 const WIDTH = 1024;
@@ -122,17 +123,7 @@ const mlPage = await mlBrowser.newPage({
 	deviceScaleFactor: 1,
 });
 await installPageCache(mlPage);
-
-await mlPage.setContent(`<!DOCTYPE html>
-<html><head>
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css">
-<script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
-<style>* { margin: 0; padding: 0; } #map { width: ${WIDTH}px; height: ${HEIGHT}px; }</style>
-</head><body><div id="map"></div></body></html>`);
-
-await mlPage.waitForFunction(() => typeof (window as any).maplibregl !== 'undefined', {
-	timeout: 15000,
-});
+await installMapLibrePage(mlPage, { width: WIDTH, height: HEIGHT });
 
 // @ts-expect-error page.evaluate type instantiation too deep
 await mlPage.evaluate(

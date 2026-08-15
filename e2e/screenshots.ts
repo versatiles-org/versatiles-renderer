@@ -7,6 +7,7 @@ import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 import { renderToSVG } from '../src/index.js';
 import type { Page } from 'playwright';
 import { ensureCacheDir, installFetchCache, readCache, writeCache } from './fetch-cache.js';
+import { installMapLibrePage } from './maplibre-page.js';
 import { getStyle, regionId, regions, type Region } from './styles.js';
 
 installFetchCache();
@@ -117,16 +118,7 @@ async function renderMapLibreShot(region: Region, style: StyleSpecification): Pr
 	});
 	try {
 		await installPageCache(page);
-		await page.setContent(`<!DOCTYPE html>
-<html><head>
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css">
-<script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
-<style>* { margin: 0; padding: 0; } #map { width: ${WIDTH}px; height: ${HEIGHT}px; }</style>
-</head><body><div id="map"></div></body></html>`);
-
-		await page.waitForFunction(() => typeof (window as any).maplibregl !== 'undefined', {
-			timeout: 15000,
-		});
+		await installMapLibrePage(page, { width: WIDTH, height: HEIGHT });
 
 		// @ts-expect-error page.evaluate type instantiation too deep
 		await page.evaluate(
